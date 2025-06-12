@@ -1,9 +1,7 @@
 import 'package:flutter/material.dart';
 import 'dashboard_screen.dart';
-hi how are you doing today!
 
-void main() {
-}
+void main() {}
 
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
