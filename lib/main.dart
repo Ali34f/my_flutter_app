@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'register.dart'; // Import the register screen
+import 'login.dart'; // Import the login screen
 
 void main() {
   runApp(const TandooriNightsApp());
@@ -155,11 +156,11 @@ class WelcomeScreen extends StatelessWidget {
                   height: 56,
                   child: ElevatedButton(
                     onPressed: () {
-                      // Handle login navigation
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(
-                          content: Text('Login pressed'),
-                          backgroundColor: Color(0xFFDC143C),
+                      // Navigate to login screen
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => const LoginScreen(),
                         ),
                       );
                     },
