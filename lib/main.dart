@@ -1,183 +1,224 @@
 import 'package:flutter/material.dart';
-import 'dashboard_screen.dart';
+import 'register.dart'; // Import the register screen
 
-void main() {}
+void main() {
+  runApp(const TandooriNightsApp());
+}
 
-class MyApp extends StatelessWidget {
-  const MyApp({super.key});
+class TandooriNightsApp extends StatelessWidget {
+  const TandooriNightsApp({super.key});
 
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Login Demo',
-      debugShowCheckedModeBanner: false,
+      title: 'Tandoori Nights',
       theme: ThemeData(
-        brightness: Brightness.light,
-        colorScheme: ColorScheme.fromSeed(seedColor: Colors.blue),
-        useMaterial3: true,
+        primarySwatch: Colors.green,
+        fontFamily: null, // Use system default font
       ),
-      home: const LoginScreen(),
+      home: const WelcomeScreen(),
+      debugShowCheckedModeBanner: false,
     );
   }
 }
 
-class LoginScreen extends StatefulWidget {
-  const LoginScreen({super.key});
-
-  @override
-  State<LoginScreen> createState() => _LoginScreenState();
-}
-
-class _LoginScreenState extends State<LoginScreen> {
-  final _formKey = GlobalKey<FormState>();
-  final _emailController = TextEditingController();
-  final _passwordController = TextEditingController();
-  bool _obscurePassword = true;
-
-  void _login() {
-    if (_formKey.currentState!.validate()) {
-      String email = _emailController.text;
-      String password = _passwordController.text;
-
-      print('[DEBUG] Email: $email');
-      print('[DEBUG] Password: $password');
-      print('[DEBUG] Form validated, navigating to dashboard');
-
-      // Show loading or feedback
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(const SnackBar(content: Text('Logging in...')));
-
-      // Navigate to dashboard
-      Navigator.push(
-        context,
-        MaterialPageRoute(
-          builder: (context) => DashboardScreen(userEmail: email),
-        ),
-      );
-    } else {
-      print('[DEBUG] Form not validated, staying on login screen');
-    }
-  }
+class WelcomeScreen extends StatelessWidget {
+  const WelcomeScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       body: Container(
+        width: double.infinity,
+        height: double.infinity,
         decoration: const BoxDecoration(
           gradient: LinearGradient(
-            colors: [Color(0xFF4facfe), Color(0xFF00f2fe)],
-            begin: Alignment.topLeft,
-            end: Alignment.bottomRight,
+            begin: Alignment.topCenter,
+            end: Alignment.bottomCenter,
+            colors: [
+              Color(0xFF006A4E), // Bangladesh flag green
+              Color(0xFF004D3A), // Darker green
+            ],
           ),
         ),
-        padding: const EdgeInsets.symmetric(horizontal: 24),
-        child: Center(
-          child: SingleChildScrollView(
-            child: Card(
-              elevation: 12,
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(16),
-              ),
-              child: Padding(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 24,
-                  vertical: 32,
-                ),
-                child: Form(
-                  key: _formKey,
-                  child: Column(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      const Text(
-                        'Welcome Back',
-                        style: TextStyle(
-                          fontSize: 28,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                      const SizedBox(height: 8),
-                      Text(
-                        'Please login to continue',
-                        style: TextStyle(color: Colors.grey[600]),
-                      ),
-                      const SizedBox(height: 24),
+        child: SafeArea(
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 32.0),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                const Spacer(flex: 2),
 
-                      TextFormField(
-                        controller: _emailController,
-                        keyboardType: TextInputType.emailAddress,
-                        decoration: const InputDecoration(
-                          labelText: 'Email',
-                          prefixIcon: Icon(Icons.email_outlined),
-                          border: OutlineInputBorder(),
-                        ),
-                        validator: (value) {
-                          if (value == null || value.isEmpty) {
-                            return 'Enter your email';
-                          }
-                          if (!value.contains('@')) {
-                            return 'Enter a valid email';
-                          }
-                          return null;
-                        },
+                // Logo Circle with T
+                Container(
+                  width: 120,
+                  height: 120,
+                  decoration: const BoxDecoration(
+                    color: Color(0xFFF4F4F4), // Light background for logo
+                    shape: BoxShape.circle,
+                  ),
+                  child: const Center(
+                    child: Text(
+                      'T',
+                      style: TextStyle(
+                        fontSize: 48,
+                        fontWeight: FontWeight.w700,
+                        color: Color(0xFFDC143C), // Red color for logo
+                        letterSpacing: -1,
                       ),
-                      const SizedBox(height: 20),
-
-                      TextFormField(
-                        controller: _passwordController,
-                        obscureText: _obscurePassword,
-                        decoration: InputDecoration(
-                          labelText: 'Password',
-                          prefixIcon: const Icon(Icons.lock_outline),
-                          suffixIcon: IconButton(
-                            icon: Icon(
-                              _obscurePassword
-                                  ? Icons.visibility_off
-                                  : Icons.visibility,
-                            ),
-                            onPressed: () {
-                              setState(() {
-                                _obscurePassword = !_obscurePassword;
-                              });
-                            },
-                          ),
-                          border: const OutlineInputBorder(),
-                        ),
-                        validator: (value) {
-                          if (value == null || value.isEmpty) {
-                            return 'Enter your password';
-                          }
-                          if (value.length < 6) {
-                            return 'Password must be at least 6 characters';
-                          }
-                          return null;
-                        },
-                      ),
-                      const SizedBox(height: 30),
-
-                      SizedBox(
-                        width: double.infinity,
-                        child: ElevatedButton(
-                          onPressed: _login,
-                          style: ElevatedButton.styleFrom(
-                            padding: const EdgeInsets.symmetric(vertical: 16),
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(12),
-                            ),
-                          ),
-                          child: const Text(
-                            'Login',
-                            style: TextStyle(
-                              fontSize: 16,
-                              fontWeight: FontWeight.w600,
-                            ),
-                          ),
-                        ),
-                      ),
-                    ],
+                    ),
                   ),
                 ),
-              ),
+
+                const SizedBox(height: 40),
+
+                // Restaurant Name
+                const Text(
+                  'Tandoori\nNights',
+                  textAlign: TextAlign.center,
+                  style: TextStyle(
+                    fontSize: 48,
+                    fontWeight: FontWeight.w700,
+                    color: Colors.white,
+                    height: 1.1,
+                    letterSpacing: -0.5,
+                  ),
+                ),
+
+                const SizedBox(height: 16),
+
+                // Subtitle
+                const Text(
+                  'Authentic Indian Cuisine',
+                  style: TextStyle(
+                    fontSize: 18,
+                    color: Color(0xFFF4F4F4), // Light color for subtitle
+                    fontWeight: FontWeight.w300,
+                  ),
+                ),
+
+                const SizedBox(height: 40),
+
+                // Decorative lines (stacked vertically)
+                Column(
+                  children: [
+                    Container(
+                      width: 80,
+                      height: 3,
+                      color: const Color(
+                        0xFFDC143C,
+                      ), // Red decorative line (longer)
+                    ),
+                    const SizedBox(height: 8),
+                    Container(
+                      width: 50,
+                      height: 3,
+                      color: const Color(
+                        0xFFDC143C,
+                      ), // Red decorative line (shorter)
+                    ),
+                  ],
+                ),
+
+                const SizedBox(height: 60),
+
+                // Welcome Section
+                const Text(
+                  'Welcome',
+                  style: TextStyle(
+                    fontSize: 36,
+                    fontWeight: FontWeight.w700,
+                    color: Colors.white,
+                    letterSpacing: -0.5,
+                  ),
+                ),
+
+                const SizedBox(height: 24),
+
+                // Welcome Description
+                const Text(
+                  'Join our family to experience the rich\nflavors and aromatic spices of\ntraditional Indian cuisine.',
+                  textAlign: TextAlign.center,
+                  style: TextStyle(
+                    fontSize: 16,
+                    color: Color(0xFFF4F4F4), // Light color for description
+                    height: 1.5,
+                    fontWeight: FontWeight.w300,
+                  ),
+                ),
+
+                const Spacer(flex: 2),
+
+                // Login Button
+                SizedBox(
+                  width: double.infinity,
+                  height: 56,
+                  child: ElevatedButton(
+                    onPressed: () {
+                      // Handle login navigation
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(
+                          content: Text('Login pressed'),
+                          backgroundColor: Color(0xFFDC143C),
+                        ),
+                      );
+                    },
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: const Color(0xFFDC143C), // Red button
+                      foregroundColor: Colors.white,
+                      elevation: 2,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(28),
+                      ),
+                    ),
+                    child: const Text(
+                      'Login',
+                      style: TextStyle(
+                        fontSize: 18,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                  ),
+                ),
+
+                const SizedBox(height: 16),
+
+                // Create Account Button
+                SizedBox(
+                  width: double.infinity,
+                  height: 56,
+                  child: OutlinedButton(
+                    onPressed: () {
+                      // Navigate to register screen
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => const RegisterScreen(),
+                        ),
+                      );
+                    },
+                    style: OutlinedButton.styleFrom(
+                      foregroundColor: const Color(0xFFDC143C), // Red text
+                      side: const BorderSide(
+                        color: Color(0xFFDC143C), // Red border
+                        width: 2,
+                      ),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(28),
+                      ),
+                    ),
+                    child: const Text(
+                      'Create an Account',
+                      style: TextStyle(
+                        fontSize: 18,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                  ),
+                ),
+
+                const SizedBox(height: 40),
+              ],
             ),
           ),
         ),
