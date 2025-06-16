@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'register.dart'; // Import the register screen
-import 'login.dart'; // Import the login screen
+import 'register.dart';
+import 'login.dart';
 
 void main() {
   runApp(const TandooriNightsApp());

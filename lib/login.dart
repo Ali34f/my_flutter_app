@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
-import 'register.dart'; // Import register screen
+import 'register.dart';
+import 'reset.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -249,21 +250,18 @@ class _LoginScreenState extends State<LoginScreen> {
 
                   const SizedBox(height: 16),
 
-                  // Forgot Password Link
+                  // Forgot Password Link - UPDATED TO NAVIGATE TO RESET SCREEN
                   Align(
                     alignment: Alignment.centerRight,
                     child: GestureDetector(
                       onTap: () {
-                        // Navigate to reset.dart (will create later)
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          const SnackBar(
-                            content: Text(
-                              'Reset password feature coming soon!',
-                            ),
-                            backgroundColor: Color(0xFFDC143C),
+                        // Navigate to reset.dart
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => const ResetScreen(),
                           ),
                         );
-                        // TODO: Navigator.push(context, MaterialPageRoute(builder: (context) => const ResetScreen()));
                       },
                       child: const Text(
                         'Forgot Password?',
