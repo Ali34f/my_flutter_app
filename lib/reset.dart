@@ -83,6 +83,7 @@ class _ResetScreenState extends State<ResetScreen> {
                           fontWeight: FontWeight.w700,
                           color: Colors.white,
                           letterSpacing: -0.5,
+                          fontFamily: 'Georgia',
                         ),
                       ),
                     ],

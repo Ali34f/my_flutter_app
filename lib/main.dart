@@ -78,11 +78,12 @@ class WelcomeScreen extends StatelessWidget {
                   'Tandoori\nNights',
                   textAlign: TextAlign.center,
                   style: TextStyle(
-                    fontSize: 48,
+                    fontSize: 65,
                     fontWeight: FontWeight.w700,
-                    color: Colors.white,
+                    color: Color(0xFFDC143C),
                     height: 1.1,
                     letterSpacing: -0.5,
+                    fontFamily: 'Georgia',
                   ),
                 ),
 
@@ -131,6 +132,7 @@ class WelcomeScreen extends StatelessWidget {
                     fontWeight: FontWeight.w700,
                     color: Colors.white,
                     letterSpacing: -0.5,
+                    fontFamily: 'Georgia',
                   ),
                 ),
 

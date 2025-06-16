@@ -76,6 +76,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                           fontWeight: FontWeight.w700,
                           color: Colors.white,
                           letterSpacing: -0.5,
+                          fontFamily: 'Georgia',
                         ),
                       ),
                     ],
@@ -488,7 +489,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
 
                   const SizedBox(height: 24),
 
-                  // Sign In Link - FIXED TO NAVIGATE TO LOGIN SCREEN
+                  // Sign In Link
                   Center(
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.center,

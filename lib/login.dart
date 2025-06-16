@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'register.dart';
 import 'reset.dart';
+import 'welcome.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -70,6 +71,7 @@ class _LoginScreenState extends State<LoginScreen> {
                           fontWeight: FontWeight.w700,
                           color: Colors.white,
                           letterSpacing: -0.5,
+                          fontFamily: 'Georgia',
                         ),
                       ),
                     ],
@@ -285,13 +287,13 @@ class _LoginScreenState extends State<LoginScreen> {
                     child: ElevatedButton(
                       onPressed: () {
                         if (_formKey.currentState!.validate()) {
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            const SnackBar(
-                              content: Text('Login successful!'),
-                              backgroundColor: Color(0xFFDC143C),
+                          // Navigate to welcome screen after successful login
+                          Navigator.pushReplacement(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => const WelcomeScreen(),
                             ),
                           );
-                          // Handle login here - navigate to main app screens
                         }
                       },
                       style: ElevatedButton.styleFrom(
