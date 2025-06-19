@@ -66,7 +66,7 @@ class WelcomeScreen extends StatelessWidget {
 
                 const SizedBox(height: 30),
 
-                // Restaurant Name - Using Georgia font
+                // Restaurant Name
                 const Text(
                   'Tandoori\nNights',
                   textAlign: TextAlign.center,
@@ -120,7 +120,7 @@ class WelcomeScreen extends StatelessWidget {
 
                 const SizedBox(height: 40),
 
-                // Welcome Section - Using Georgia font
+                // Welcome Section
                 const Text(
                   'Welcome to Our\nKitchen',
                   textAlign: TextAlign.center,
