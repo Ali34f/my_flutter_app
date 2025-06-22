@@ -37,7 +37,7 @@ class CartManager extends ChangeNotifier {
 
   double get subtotal => _items.fold(0, (sum, item) => sum + item.totalPrice);
 
-  double get deliveryFee => _items.isEmpty ? 0 : 3.99;
+  double get deliveryFee => _items.isEmpty ? 0 : (subtotal >= 30 ? 0 : 3.99);
 
   double get tax => subtotal * 0.08; // 8% tax
 

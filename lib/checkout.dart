@@ -24,7 +24,9 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
   }
 
   void _updateUI() {
-    setState(() {});
+    if (mounted) {
+      setState(() {});
+    }
   }
 
   @override
@@ -37,7 +39,9 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
         centerTitle: true,
         leading: IconButton(
           icon: const Icon(Icons.arrow_back_ios, color: Color(0xFF2C3E50)),
-          onPressed: () => Navigator.pop(context),
+          onPressed: () {
+            Navigator.of(context).pop();
+          },
         ),
         title: const Text(
           'Your Order',
@@ -49,170 +53,200 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
           ),
         ),
       ),
-      body: _cartManager.items.isEmpty
-          ? _buildEmptyCart()
-          : Column(
+      body: SafeArea(
+        child: _cartManager.items.isEmpty
+            ? _buildEmptyCart()
+            : _buildCartContent(),
+      ),
+    );
+  }
+
+  Widget _buildCartContent() {
+    return Column(
+      children: [
+        // Cart Items List
+        Expanded(
+          child: SingleChildScrollView(
+            padding: const EdgeInsets.all(16),
+            child: Column(
               children: [
-                // Cart Items List
-                Expanded(
-                  child: ListView(
-                    padding: const EdgeInsets.all(16),
+                // Cart Items
+                ListView.builder(
+                  shrinkWrap: true,
+                  physics: const NeverScrollableScrollPhysics(),
+                  itemCount: _cartManager.items.length,
+                  itemBuilder: (context, index) {
+                    return _buildCartItem(_cartManager.items[index]);
+                  },
+                ),
+
+                const SizedBox(height: 24),
+
+                // Order Summary Section
+                Container(
+                  padding: const EdgeInsets.all(20),
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(20),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.black.withOpacity(0.05),
+                        blurRadius: 10,
+                        offset: const Offset(0, 4),
+                      ),
+                    ],
+                  ),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      // Cart Items
-                      ..._cartManager.items.map((item) => _buildCartItem(item)),
-
-                      const SizedBox(height: 24),
-
-                      // Order Summary Section
-                      Container(
-                        padding: const EdgeInsets.all(20),
-                        decoration: BoxDecoration(
-                          color: Colors.white,
-                          borderRadius: BorderRadius.circular(20),
-                          boxShadow: [
-                            BoxShadow(
-                              color: Colors.black.withOpacity(0.05),
-                              blurRadius: 10,
-                              offset: const Offset(0, 4),
-                            ),
-                          ],
-                        ),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            const Text(
-                              'Order Summary',
-                              style: TextStyle(
-                                fontSize: 20,
-                                fontWeight: FontWeight.w700,
-                                color: Color(0xFF2C3E50),
-                              ),
-                            ),
-                            const SizedBox(height: 20),
-
-                            // Subtotal
-                            _buildSummaryRow(
-                              'Subtotal',
-                              '\$${_cartManager.subtotal.toStringAsFixed(2)}',
-                            ),
-                            const SizedBox(height: 12),
-
-                            // Delivery Fee
-                            _buildSummaryRow(
-                              'Delivery Fee',
-                              '\$${_cartManager.deliveryFee.toStringAsFixed(2)}',
-                              isGreen: true,
-                            ),
-                            const SizedBox(height: 12),
-
-                            // Tax
-                            _buildSummaryRow(
-                              'Tax',
-                              '\$${_cartManager.tax.toStringAsFixed(2)}',
-                            ),
-
-                            const SizedBox(height: 16),
-                            const Divider(height: 1),
-                            const SizedBox(height: 16),
-
-                            // Total
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              children: [
-                                const Text(
-                                  'Total',
-                                  style: TextStyle(
-                                    fontSize: 20,
-                                    fontWeight: FontWeight.w800,
-                                    color: Color(0xFF2C3E50),
-                                  ),
-                                ),
-                                Text(
-                                  '\$${_cartManager.total.toStringAsFixed(2)}',
-                                  style: const TextStyle(
-                                    fontSize: 20,
-                                    fontWeight: FontWeight.w800,
-                                    color: Color(0xFF2C3E50),
-                                  ),
-                                ),
-                              ],
-                            ),
-
-                            const SizedBox(height: 16),
-
-                            // Free delivery info
-                            Container(
-                              padding: const EdgeInsets.all(12),
-                              decoration: BoxDecoration(
-                                color: const Color(0xFFE8F5E9),
-                                borderRadius: BorderRadius.circular(12),
-                                border: Border.all(
-                                  color: const Color(
-                                    0xFF4CAF50,
-                                  ).withOpacity(0.3),
-                                ),
-                              ),
-                              child: Row(
-                                children: [
-                                  Icon(
-                                    Icons.info_outline,
-                                    color: const Color(0xFF4CAF50),
-                                    size: 20,
-                                  ),
-                                  const SizedBox(width: 8),
-                                  Expanded(
-                                    child: Text(
-                                      'Add \$${(30 - _cartManager.subtotal).toStringAsFixed(2)} more for free delivery!',
-                                      style: const TextStyle(
-                                        color: Color(0xFF4CAF50),
-                                        fontSize: 14,
-                                        fontWeight: FontWeight.w500,
-                                      ),
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ),
-                          ],
+                      const Text(
+                        'Order Summary',
+                        style: TextStyle(
+                          fontSize: 20,
+                          fontWeight: FontWeight.w700,
+                          color: Color(0xFF2C3E50),
                         ),
                       ),
+                      const SizedBox(height: 20),
 
-                      const SizedBox(height: 100), // Space for floating button
+                      // Subtotal
+                      _buildSummaryRow(
+                        'Subtotal',
+                        '\$${_cartManager.subtotal.toStringAsFixed(2)}',
+                      ),
+                      const SizedBox(height: 12),
+
+                      // Delivery Fee
+                      _buildSummaryRow(
+                        'Delivery Fee',
+                        _cartManager.subtotal >= 30
+                            ? 'FREE'
+                            : '\$${_cartManager.deliveryFee.toStringAsFixed(2)}',
+                        isGreen: _cartManager.subtotal >= 30,
+                      ),
+                      const SizedBox(height: 12),
+
+                      // Tax
+                      _buildSummaryRow(
+                        'Tax',
+                        '\$${_cartManager.tax.toStringAsFixed(2)}',
+                      ),
+
+                      const SizedBox(height: 16),
+                      const Divider(height: 1),
+                      const SizedBox(height: 16),
+
+                      // Total
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          const Text(
+                            'Total',
+                            style: TextStyle(
+                              fontSize: 20,
+                              fontWeight: FontWeight.w800,
+                              color: Color(0xFF2C3E50),
+                            ),
+                          ),
+                          Text(
+                            '\$${_cartManager.total.toStringAsFixed(2)}',
+                            style: const TextStyle(
+                              fontSize: 20,
+                              fontWeight: FontWeight.w800,
+                              color: Color(0xFF2C3E50),
+                            ),
+                          ),
+                        ],
+                      ),
+
+                      const SizedBox(height: 16),
+
+                      // Free delivery info
+                      if (_cartManager.subtotal < 30)
+                        Container(
+                          padding: const EdgeInsets.all(12),
+                          decoration: BoxDecoration(
+                            color: const Color(0xFFE8F5E9),
+                            borderRadius: BorderRadius.circular(12),
+                            border: Border.all(
+                              color: const Color(0xFF4CAF50).withOpacity(0.3),
+                            ),
+                          ),
+                          child: Row(
+                            children: [
+                              const Icon(
+                                Icons.info_outline,
+                                color: Color(0xFF4CAF50),
+                                size: 20,
+                              ),
+                              const SizedBox(width: 8),
+                              Expanded(
+                                child: Text(
+                                  'Add \$${(30 - _cartManager.subtotal).toStringAsFixed(2)} more for free delivery!',
+                                  style: const TextStyle(
+                                    color: Color(0xFF4CAF50),
+                                    fontSize: 14,
+                                    fontWeight: FontWeight.w500,
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
                     ],
                   ),
                 ),
+
+                const SizedBox(height: 100), // Space for floating button
               ],
             ),
+          ),
+        ),
 
-      // Floating Checkout Button
-      floatingActionButton: _cartManager.items.isEmpty
-          ? null
-          : Container(
-              width: double.infinity,
-              padding: const EdgeInsets.symmetric(horizontal: 16),
-              child: FloatingActionButton.extended(
-                onPressed: _proceedToCheckout,
+        // Bottom Checkout Button - Fixed at bottom
+        Container(
+          padding: const EdgeInsets.all(16),
+          decoration: BoxDecoration(
+            color: Colors.white,
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withOpacity(0.1),
+                blurRadius: 8,
+                offset: const Offset(0, -2),
+              ),
+            ],
+          ),
+          child: SizedBox(
+            width: double.infinity,
+            height: 56,
+            child: ElevatedButton(
+              onPressed: _proceedToCheckout,
+              style: ElevatedButton.styleFrom(
                 backgroundColor: const Color(0xFFDC143C),
-                elevation: 8,
+                foregroundColor: Colors.white,
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(16),
                 ),
-                label: Container(
-                  width: double.infinity,
-                  padding: const EdgeInsets.symmetric(vertical: 8),
-                  child: Text(
+                elevation: 4,
+              ),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  const Icon(Icons.payment, size: 24),
+                  const SizedBox(width: 12),
+                  Text(
                     'Proceed to Checkout • \$${_cartManager.total.toStringAsFixed(2)}',
                     style: const TextStyle(
                       fontSize: 18,
                       fontWeight: FontWeight.w700,
-                      color: Colors.white,
                     ),
-                    textAlign: TextAlign.center,
                   ),
-                ),
+                ],
               ),
             ),
-      floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
+          ),
+        ),
+      ],
     );
   }
 
@@ -247,10 +281,11 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
           const Text(
             'Add some delicious items to get started!',
             style: TextStyle(fontSize: 16, color: Color(0xFF7F8C8D)),
+            textAlign: TextAlign.center,
           ),
           const SizedBox(height: 32),
           ElevatedButton(
-            onPressed: () => Navigator.pop(context),
+            onPressed: () => Navigator.of(context).pop(),
             style: ElevatedButton.styleFrom(
               backgroundColor: const Color(0xFF006A4E),
               foregroundColor: Colors.white,
@@ -285,6 +320,7 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
         ],
       ),
       child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           // Item Image
           Container(
@@ -317,116 +353,219 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
+                Row(
+                  children: [
+                    Expanded(
+                      child: Text(
+                        item.name,
+                        style: const TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.w700,
+                          color: Color(0xFF2C3E50),
+                        ),
+                        maxLines: 2,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                    ),
+                    // Delete Button
+                    IconButton(
+                      onPressed: () => _removeItem(item),
+                      icon: const Icon(
+                        Icons.delete_outline,
+                        color: Color(0xFFE74C3C),
+                        size: 20,
+                      ),
+                      constraints: const BoxConstraints(
+                        minWidth: 32,
+                        minHeight: 32,
+                      ),
+                      padding: EdgeInsets.zero,
+                    ),
+                  ],
+                ),
+
+                const SizedBox(height: 4),
+
+                Row(
+                  children: [
+                    Container(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 8,
+                        vertical: 4,
+                      ),
+                      decoration: BoxDecoration(
+                        color: const Color(0xFF006A4E).withOpacity(0.1),
+                        borderRadius: BorderRadius.circular(8),
+                        border: Border.all(
+                          color: const Color(0xFF006A4E),
+                          width: 1,
+                        ),
+                      ),
+                      child: Text(
+                        item.category,
+                        style: const TextStyle(
+                          color: Color(0xFF006A4E),
+                          fontSize: 12,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                    ),
+                    const SizedBox(width: 8),
+                    Container(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 8,
+                        vertical: 4,
+                      ),
+                      decoration: BoxDecoration(
+                        color: _getSpiceLevelColor(
+                          item.spiceLevel,
+                        ).withOpacity(0.1),
+                        borderRadius: BorderRadius.circular(8),
+                        border: Border.all(
+                          color: _getSpiceLevelColor(item.spiceLevel),
+                          width: 1,
+                        ),
+                      ),
+                      child: Text(
+                        item.spiceLevel,
+                        style: TextStyle(
+                          color: _getSpiceLevelColor(item.spiceLevel),
+                          fontSize: 12,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+
+                const SizedBox(height: 12),
+
+                Row(
+                  children: [
+                    Text(
+                      '\$${item.price.toStringAsFixed(2)}',
+                      style: const TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.w700,
+                        color: Color(0xFFDC143C),
+                      ),
+                    ),
+
+                    const Spacer(),
+
+                    // Quantity Controls
+                    Container(
+                      decoration: BoxDecoration(
+                        border: Border.all(color: Colors.grey[300]!),
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      child: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          IconButton(
+                            onPressed: () => _decreaseQuantity(item),
+                            icon: const Icon(Icons.remove, size: 18),
+                            color: const Color(0xFF7F8C8D),
+                            padding: const EdgeInsets.all(8),
+                            constraints: const BoxConstraints(
+                              minWidth: 36,
+                              minHeight: 36,
+                            ),
+                          ),
+                          Container(
+                            constraints: const BoxConstraints(minWidth: 40),
+                            child: Text(
+                              '${item.quantity}',
+                              style: const TextStyle(
+                                fontSize: 16,
+                                fontWeight: FontWeight.w600,
+                              ),
+                              textAlign: TextAlign.center,
+                            ),
+                          ),
+                          IconButton(
+                            onPressed: () => _increaseQuantity(item),
+                            icon: const Icon(Icons.add, size: 18),
+                            color: const Color(0xFFDC143C),
+                            padding: const EdgeInsets.all(8),
+                            constraints: const BoxConstraints(
+                              minWidth: 36,
+                              minHeight: 36,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+
+                const SizedBox(height: 8),
+
+                // Item total
                 Text(
-                  item.name,
+                  'Total: \$${item.totalPrice.toStringAsFixed(2)}',
                   style: const TextStyle(
-                    fontSize: 16,
-                    fontWeight: FontWeight.w700,
+                    fontSize: 14,
+                    fontWeight: FontWeight.w600,
                     color: Color(0xFF2C3E50),
                   ),
                 ),
-                const SizedBox(height: 4),
-                Text(
-                  item.category,
-                  style: TextStyle(fontSize: 14, color: Colors.grey[600]),
-                ),
-                const SizedBox(height: 8),
-                Text(
-                  '\$${item.price.toStringAsFixed(2)}',
-                  style: const TextStyle(
-                    fontSize: 16,
-                    fontWeight: FontWeight.w700,
-                    color: Color(0xFFDC143C),
-                  ),
-                ),
               ],
-            ),
-          ),
-
-          // Quantity Controls
-          Container(
-            decoration: BoxDecoration(
-              border: Border.all(color: Colors.grey[300]!),
-              borderRadius: BorderRadius.circular(12),
-            ),
-            child: Row(
-              children: [
-                IconButton(
-                  onPressed: () {
-                    _cartManager.updateQuantity(item.id, item.quantity - 1);
-                  },
-                  icon: const Icon(Icons.remove, size: 20),
-                  color: const Color(0xFF7F8C8D),
-                  padding: const EdgeInsets.all(8),
-                  constraints: const BoxConstraints(
-                    minWidth: 36,
-                    minHeight: 36,
-                  ),
-                ),
-                Container(
-                  constraints: const BoxConstraints(minWidth: 40),
-                  child: Text(
-                    '${item.quantity}',
-                    style: const TextStyle(
-                      fontSize: 16,
-                      fontWeight: FontWeight.w600,
-                    ),
-                    textAlign: TextAlign.center,
-                  ),
-                ),
-                IconButton(
-                  onPressed: () {
-                    _cartManager.updateQuantity(item.id, item.quantity + 1);
-                  },
-                  icon: const Icon(Icons.add, size: 20),
-                  color: const Color(0xFFDC143C),
-                  padding: const EdgeInsets.all(8),
-                  constraints: const BoxConstraints(
-                    minWidth: 36,
-                    minHeight: 36,
-                  ),
-                ),
-              ],
-            ),
-          ),
-
-          const SizedBox(width: 8),
-
-          // Delete Button
-          IconButton(
-            onPressed: () {
-              _cartManager.removeItem(item.id);
-              ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(
-                  content: Text('${item.name} removed from cart'),
-                  backgroundColor: const Color(0xFF006A4E),
-                  behavior: SnackBarBehavior.floating,
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                  action: SnackBarAction(
-                    label: 'UNDO',
-                    textColor: Colors.white,
-                    onPressed: () {
-                      _cartManager.addItem(
-                        id: item.id,
-                        name: item.name,
-                        category: item.category,
-                        price: item.price,
-                        spiceLevel: item.spiceLevel,
-                      );
-                    },
-                  ),
-                ),
-              );
-            },
-            icon: const Icon(
-              Icons.delete_outline,
-              color: Color(0xFFE74C3C),
-              size: 20,
             ),
           ),
         ],
+      ),
+    );
+  }
+
+  Color _getSpiceLevelColor(String spiceLevel) {
+    switch (spiceLevel.toLowerCase()) {
+      case 'mild':
+        return const Color(0xFF27AE60);
+      case 'medium':
+        return const Color(0xFFF39C12);
+      case 'hot':
+        return const Color(0xFFE74C3C);
+      default:
+        return const Color(0xFF7F8C8D);
+    }
+  }
+
+  void _increaseQuantity(CartItem item) {
+    _cartManager.updateQuantity(item.id, item.quantity + 1);
+  }
+
+  void _decreaseQuantity(CartItem item) {
+    if (item.quantity > 1) {
+      _cartManager.updateQuantity(item.id, item.quantity - 1);
+    } else {
+      _removeItem(item);
+    }
+  }
+
+  void _removeItem(CartItem item) {
+    _cartManager.removeItem(item.id);
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text('${item.name} removed from cart'),
+        backgroundColor: const Color(0xFF006A4E),
+        behavior: SnackBarBehavior.floating,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+        action: SnackBarAction(
+          label: 'UNDO',
+          textColor: Colors.white,
+          onPressed: () {
+            _cartManager.addItem(
+              id: item.id,
+              name: item.name,
+              category: item.category,
+              price: item.price,
+              spiceLevel: item.spiceLevel,
+            );
+            // Set the quantity back to what it was
+            _cartManager.updateQuantity(item.id, item.quantity);
+          },
+        ),
       ),
     );
   }
@@ -435,7 +574,14 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
-        Text(label, style: TextStyle(fontSize: 16, color: Colors.grey[700])),
+        Text(
+          label,
+          style: TextStyle(
+            fontSize: 16,
+            color: Colors.grey[700],
+            fontWeight: FontWeight.w500,
+          ),
+        ),
         Text(
           amount,
           style: TextStyle(
@@ -759,7 +905,7 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
               ),
               const SizedBox(height: 24),
               const Text(
-                'Order Placed!',
+                'Order Placed! 🇧🇩',
                 style: TextStyle(
                   fontSize: 24,
                   fontWeight: FontWeight.w800,

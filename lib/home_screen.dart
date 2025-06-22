@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'reservation.dart';
 import 'info.dart';
+import 'cart_manager.dart';
+import 'checkout.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -12,6 +14,7 @@ class HomeScreen extends StatefulWidget {
 class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
   late TabController _tabController;
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
+  final CartManager _cartManager = CartManager();
 
   // Bottom navigation state
   int _selectedBottomIndex = 0;
@@ -74,6 +77,9 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
     _tabController.addListener(() {
       setState(() {});
     });
+
+    // Add cart manager listener to update UI when cart changes
+    _cartManager.addListener(_updateCartUI);
   }
 
   @override
@@ -81,7 +87,72 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
     _tabController.dispose();
     _bottomNavController.dispose();
     _drawerController.dispose();
+    _cartManager.removeListener(_updateCartUI);
     super.dispose();
+  }
+
+  void _updateCartUI() {
+    setState(() {});
+  }
+
+  // Method to add item to cart
+  void _addToCart(
+    String name,
+    String category,
+    double price,
+    String spiceLevel,
+  ) {
+    // Generate a unique ID for the item
+    final String id =
+        '${category}_${name}_${DateTime.now().millisecondsSinceEpoch}';
+
+    _cartManager.addItem(
+      id: id,
+      name: name,
+      category: category,
+      price: price,
+      spiceLevel: spiceLevel,
+    );
+
+    // Show success message
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Row(
+          children: [
+            const Icon(Icons.check_circle, color: Colors.white, size: 20),
+            const SizedBox(width: 8),
+            Expanded(
+              child: Text(
+                '$name added to cart! 🛒',
+                style: const TextStyle(fontWeight: FontWeight.w600),
+              ),
+            ),
+            TextButton(
+              onPressed: () {
+                ScaffoldMessenger.of(context).hideCurrentSnackBar();
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => const CheckoutScreen(),
+                  ),
+                );
+              },
+              child: const Text(
+                'VIEW CART',
+                style: TextStyle(
+                  color: Colors.white,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+            ),
+          ],
+        ),
+        backgroundColor: const Color(0xFF006A4E),
+        duration: const Duration(seconds: 3),
+        behavior: SnackBarBehavior.floating,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+      ),
+    );
   }
 
   // Show detailed item information in a modal bottom sheet
@@ -93,6 +164,9 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
     String spiceLevel,
     String category,
   ) {
+    final double priceValue =
+        double.tryParse(price.replaceAll('\$', '')) ?? 0.0;
+
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
@@ -382,7 +456,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                                 ),
                               ),
 
-                              // Quantity selector
+                              // Quantity selector (placeholder for now)
                               Container(
                                 decoration: BoxDecoration(
                                   border: Border.all(
@@ -430,20 +504,11 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                             child: ElevatedButton(
                               onPressed: () {
                                 Navigator.pop(context);
-                                ScaffoldMessenger.of(context).showSnackBar(
-                                  SnackBar(
-                                    content: Text(
-                                      '$name added to cart! 🛒',
-                                      style: const TextStyle(
-                                        fontWeight: FontWeight.w600,
-                                      ),
-                                    ),
-                                    backgroundColor: const Color(0xFF006A4E),
-                                    behavior: SnackBarBehavior.floating,
-                                    shape: RoundedRectangleBorder(
-                                      borderRadius: BorderRadius.circular(12),
-                                    ),
-                                  ),
+                                _addToCart(
+                                  name,
+                                  category,
+                                  priceValue,
+                                  spiceLevel,
                                 );
                               },
                               style: ElevatedButton.styleFrom(
@@ -627,7 +692,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                 ),
               ),
 
-              // Enhanced Shopping Cart Button
+              // Enhanced Shopping Cart Button with Badge
               Container(
                 decoration: BoxDecoration(
                   color: Colors.white.withOpacity(0.15),
@@ -637,27 +702,50 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                     width: 1,
                   ),
                 ),
-                child: IconButton(
-                  onPressed: () {
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(
-                        content: const Text(
-                          'Shopping cart coming soon! 🛒',
-                          style: TextStyle(fontWeight: FontWeight.w600),
-                        ),
-                        backgroundColor: const Color(0xFFDC143C),
-                        behavior: SnackBarBehavior.floating,
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(12),
+                child: Stack(
+                  children: [
+                    IconButton(
+                      onPressed: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => const CheckoutScreen(),
+                          ),
+                        );
+                      },
+                      icon: const Icon(
+                        Icons.shopping_cart_outlined,
+                        color: Colors.white,
+                        size: 26,
+                      ),
+                    ),
+                    // Cart badge
+                    if (_cartManager.itemCount > 0)
+                      Positioned(
+                        right: 4,
+                        top: 4,
+                        child: Container(
+                          padding: const EdgeInsets.all(4),
+                          decoration: const BoxDecoration(
+                            color: Color(0xFFDC143C),
+                            shape: BoxShape.circle,
+                          ),
+                          constraints: const BoxConstraints(
+                            minWidth: 20,
+                            minHeight: 20,
+                          ),
+                          child: Text(
+                            '${_cartManager.itemCount}',
+                            style: const TextStyle(
+                              color: Colors.white,
+                              fontSize: 12,
+                              fontWeight: FontWeight.bold,
+                            ),
+                            textAlign: TextAlign.center,
+                          ),
                         ),
                       ),
-                    );
-                  },
-                  icon: const Icon(
-                    Icons.shopping_cart_outlined,
-                    color: Colors.white,
-                    size: 26,
-                  ),
+                  ],
                 ),
               ),
             ],
@@ -810,6 +898,9 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
     String spiceLevel,
     String category,
   ) {
+    final double priceValue =
+        double.tryParse(price.replaceAll('\$', '')) ?? 0.0;
+
     return GestureDetector(
       onTap: () {
         _showItemDetails(
@@ -1015,21 +1106,11 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                             // Fixed Add Button with proper child parameter
                             ElevatedButton(
                               onPressed: () {
-                                ScaffoldMessenger.of(context).showSnackBar(
-                                  SnackBar(
-                                    content: Text(
-                                      '$name added to cart! 🛒',
-                                      style: const TextStyle(
-                                        fontWeight: FontWeight.w600,
-                                      ),
-                                    ),
-                                    backgroundColor: const Color(0xFF006A4E),
-                                    duration: const Duration(seconds: 2),
-                                    behavior: SnackBarBehavior.floating,
-                                    shape: RoundedRectangleBorder(
-                                      borderRadius: BorderRadius.circular(12),
-                                    ),
-                                  ),
+                                _addToCart(
+                                  name,
+                                  category,
+                                  priceValue,
+                                  spiceLevel,
                                 );
                               },
                               style: ElevatedButton.styleFrom(
@@ -1302,6 +1383,19 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                   Icons.restaurant_menu,
                   'Full Menu',
                   () => Navigator.pop(context),
+                ),
+                _buildEnhancedDrawerItem(
+                  Icons.shopping_cart,
+                  'My Cart (${_cartManager.itemCount})',
+                  () {
+                    Navigator.pop(context);
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => const CheckoutScreen(),
+                      ),
+                    );
+                  },
                 ),
                 _buildEnhancedDrawerItem(
                   Icons.calendar_today,
