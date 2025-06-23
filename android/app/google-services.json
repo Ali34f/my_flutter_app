@@ -1,0 +1,48 @@
+{
+  "project_info": {
+    "project_number": "360822722810",
+    "project_id": "restaurantapp-cba15",
+    "storage_bucket": "restaurantapp-cba15.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:360822722810:android:2bdc583daa27cc7b7b7943",
+        "android_client_info": {
+          "package_name": "com.example.my_flutter_app"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBEcgVbcw99SyTzq4Kph-btWEd9Hq_iBBY"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:360822722810:android:0ac43a27e01d148b7b7943",
+        "android_client_info": {
+          "package_name": "com.jahin.restaurantapp"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBEcgVbcw99SyTzq4Kph-btWEd9Hq_iBBY"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

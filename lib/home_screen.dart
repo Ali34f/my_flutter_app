@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'reservation.dart';
 import 'info.dart';
 import 'cart_manager.dart';
@@ -93,6 +94,93 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
 
   void _updateCartUI() {
     setState(() {});
+  }
+
+  /// Gets the display name for the current user
+  String _getUserDisplayName() {
+    final User? currentUser = FirebaseAuth.instance.currentUser;
+
+    if (currentUser == null) {
+      return 'Guest';
+    }
+
+    // Check if user is anonymous (guest)
+    if (currentUser.isAnonymous) {
+      return 'Guest';
+    }
+
+    // Get display name or fall back to email username
+    String displayName = currentUser.displayName ?? '';
+
+    if (displayName.isNotEmpty) {
+      // Return first name only
+      return displayName.split(' ').first;
+    }
+
+    // Fall back to email username if no display name
+    String email = currentUser.email ?? '';
+    if (email.isNotEmpty) {
+      return email.split('@').first;
+    }
+
+    return 'User';
+  }
+
+  /// Gets the welcome message for the current user
+  String _getWelcomeMessage() {
+    final User? currentUser = FirebaseAuth.instance.currentUser;
+
+    if (currentUser == null) {
+      return 'Welcome! 🍽️';
+    }
+
+    if (currentUser.isAnonymous) {
+      return 'Welcome! Browse our menu 🍽️';
+    }
+
+    return 'Welcome back! 🇧🇩';
+  }
+
+  /// Handle user logout with proper Firebase sign out
+  Future<void> _handleLogout() async {
+    Navigator.pop(context);
+
+    // Show loading
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (context) => const Center(
+        child: CircularProgressIndicator(
+          valueColor: AlwaysStoppedAnimation<Color>(Color(0xFF006A4E)),
+        ),
+      ),
+    );
+
+    try {
+      // Sign out from Firebase
+      await FirebaseAuth.instance.signOut();
+
+      // Close loading dialog
+      if (mounted) {
+        Navigator.of(context).pop();
+
+        // Navigate to welcome screen
+        Navigator.pushNamedAndRemoveUntil(context, '/', (route) => false);
+      }
+    } catch (e) {
+      // Close loading dialog
+      if (mounted) {
+        Navigator.of(context).pop();
+
+        // Show error
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Error signing out: ${e.toString()}'),
+            backgroundColor: Colors.red,
+          ),
+        );
+      }
+    }
   }
 
   // Method to add item to cart
@@ -1272,7 +1360,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
       backgroundColor: const Color(0xFF8B1538), // Darker, more muted red
       child: Column(
         children: [
-          // User-friendly Profile Header
+          // User-friendly Profile Header - DYNAMIC VERSION
           Container(
             padding: const EdgeInsets.only(
               top: 60,
@@ -1325,24 +1413,24 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
 
                 const SizedBox(width: 18),
 
-                // User Info
-                const Expanded(
+                // User Info - DYNAMIC VERSION
+                Expanded(
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        'Jahinkhan923',
-                        style: TextStyle(
+                        _getUserDisplayName(),
+                        style: const TextStyle(
                           fontSize: 22,
                           fontWeight: FontWeight.w700,
                           color: Colors.white,
                           letterSpacing: 0.5,
                         ),
                       ),
-                      SizedBox(height: 4),
+                      const SizedBox(height: 4),
                       Text(
-                        'Welcome back! 🇧🇩',
-                        style: TextStyle(
+                        _getWelcomeMessage(),
+                        style: const TextStyle(
                           fontSize: 16,
                           color: Color(0xFFE8E8E8),
                           fontWeight: FontWeight.w400,
@@ -1455,18 +1543,11 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
             ),
           ),
 
-          // Softer Logout Button
+          // Enhanced Logout Button with Firebase Auth
           Container(
             margin: const EdgeInsets.all(24),
             child: OutlinedButton.icon(
-              onPressed: () {
-                Navigator.pop(context);
-                Navigator.pushNamedAndRemoveUntil(
-                  context,
-                  '/',
-                  (route) => false,
-                );
-              },
+              onPressed: _handleLogout,
               icon: const Icon(
                 Icons.logout,
                 color: Color(0xFFF4D03F),

@@ -1,9 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:firebase_core/firebase_core.dart';
 import 'register.dart';
 import 'login.dart';
 import 'home_screen.dart';
 
-void main() {
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await Firebase.initializeApp();
   runApp(const TandooriNightsApp());
 }
 
@@ -14,13 +17,30 @@ class TandooriNightsApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       title: 'Tandoori Nights',
-      theme: ThemeData(
-        primarySwatch: Colors.green,
-        fontFamily: null, // Use system default font
+      theme: ThemeData(primarySwatch: Colors.green, fontFamily: null),
+      home: FutureBuilder(
+        future: _initializeApp(),
+        builder: (context, snapshot) {
+          if (snapshot.connectionState == ConnectionState.done) {
+            if (snapshot.hasError) {
+              return Scaffold(
+                body: Center(child: Text('Error: ${snapshot.error}')),
+              );
+            }
+            return const WelcomeScreen();
+          }
+          return const Scaffold(
+            body: Center(child: CircularProgressIndicator()),
+          );
+        },
       ),
-      home: const WelcomeScreen(),
       debugShowCheckedModeBanner: false,
     );
+  }
+
+  Future<void> _initializeApp() async {
+    // Just a small delay to ensure everything is ready
+    await Future.delayed(const Duration(milliseconds: 100));
   }
 }
 
@@ -71,7 +91,6 @@ class _WelcomeScreenState extends State<WelcomeScreen>
           ),
         );
 
-    // Start animations - first show flag, then circle, then content
     _circleController.forward();
     Future.delayed(const Duration(milliseconds: 800), () {
       if (mounted) _contentController.forward();
@@ -91,18 +110,16 @@ class _WelcomeScreenState extends State<WelcomeScreen>
       body: Container(
         width: double.infinity,
         height: double.infinity,
-        // Bangladesh Flag Green Background
-        color: const Color(0xFF006A4E), // Official Bangladesh green
+        color: const Color(0xFF006A4E),
         child: SafeArea(
           child: Center(
             child: ScaleTransition(
               scale: _circleAnimation,
               child: Container(
-                // Red Circle - Bangladesh Flag Red
                 width: 340,
                 height: 340,
                 decoration: BoxDecoration(
-                  color: const Color(0xFFDC143C), // Official Bangladesh red
+                  color: const Color(0xFFDC143C),
                   shape: BoxShape.circle,
                   boxShadow: [
                     BoxShadow(
@@ -117,7 +134,6 @@ class _WelcomeScreenState extends State<WelcomeScreen>
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      // Restaurant Name at the top of the circle
                       SlideTransition(
                         position: _slideAnimation,
                         child: FadeTransition(
@@ -136,10 +152,7 @@ class _WelcomeScreenState extends State<WelcomeScreen>
                           ),
                         ),
                       ),
-
                       const SizedBox(height: 6),
-
-                      // Subtitle
                       SlideTransition(
                         position: _slideAnimation,
                         child: FadeTransition(
@@ -149,18 +162,13 @@ class _WelcomeScreenState extends State<WelcomeScreen>
                             textAlign: TextAlign.center,
                             style: TextStyle(
                               fontSize: 12,
-                              color: Color(
-                                0xFFF4F4F4,
-                              ), // Light color for subtitle
+                              color: Color(0xFFF4F4F4),
                               fontWeight: FontWeight.w300,
                             ),
                           ),
                         ),
                       ),
-
                       const SizedBox(height: 25),
-
-                      // Continue as Guest Button - NOW GOES TO HOME SCREEN
                       SlideTransition(
                         position: _slideAnimation,
                         child: FadeTransition(
@@ -171,18 +179,13 @@ class _WelcomeScreenState extends State<WelcomeScreen>
                             onPressed: () {
                               Navigator.push(
                                 context,
-                                _createRoute(
-                                  const HomeScreen(),
-                                ), // Changed to HomeScreen
+                                _createRoute(const HomeScreen()),
                               );
                             },
                           ),
                         ),
                       ),
-
                       const SizedBox(height: 12),
-
-                      // Login Button
                       SlideTransition(
                         position: _slideAnimation,
                         child: FadeTransition(
@@ -199,10 +202,7 @@ class _WelcomeScreenState extends State<WelcomeScreen>
                           ),
                         ),
                       ),
-
                       const SizedBox(height: 12),
-
-                      // Create Account Button
                       SlideTransition(
                         position: _slideAnimation,
                         child: FadeTransition(
@@ -249,7 +249,6 @@ class _WelcomeScreenState extends State<WelcomeScreen>
   }
 }
 
-// Custom Animated Button Widget with Hover Effects
 class _AnimatedButton extends StatefulWidget {
   final String text;
   final bool isPrimary;
@@ -324,7 +323,7 @@ class _AnimatedButtonState extends State<_AnimatedButton>
             return Transform.scale(
               scale: _scaleAnimation.value,
               child: SizedBox(
-                width: 200, // Narrower width to fit better in circle
+                width: 200,
                 height: 40,
                 child: widget.isPrimary
                     ? ElevatedButton(

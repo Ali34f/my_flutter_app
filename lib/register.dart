@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'login.dart';
+import 'home_screen.dart';
 
 class RegisterScreen extends StatefulWidget {
   const RegisterScreen({super.key});
@@ -16,8 +18,11 @@ class _RegisterScreenState extends State<RegisterScreen> {
   final _passwordController = TextEditingController();
   final _confirmPasswordController = TextEditingController();
 
+  final FirebaseAuth _auth = FirebaseAuth.instance;
+
   bool _isPasswordVisible = false;
   bool _isConfirmPasswordVisible = false;
+  bool _isLoading = false;
 
   @override
   void dispose() {
@@ -27,6 +32,154 @@ class _RegisterScreenState extends State<RegisterScreen> {
     _passwordController.dispose();
     _confirmPasswordController.dispose();
     super.dispose();
+  }
+
+  // Method to handle guest login
+  Future<void> _continueAsGuest() async {
+    setState(() {
+      _isLoading = true;
+    });
+
+    try {
+      // Sign in anonymously
+      await FirebaseAuth.instance.signInAnonymously();
+
+      if (mounted) {
+        // Show success message
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text(
+              'Welcome, Guest! You can browse our menu 🍽️',
+              style: TextStyle(fontWeight: FontWeight.w600),
+            ),
+            backgroundColor: Color(0xFF006A4E),
+            duration: Duration(seconds: 2),
+          ),
+        );
+
+        // Navigate to home screen
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(builder: (context) => const HomeScreen()),
+        );
+      }
+    } catch (e) {
+      setState(() {
+        _isLoading = false;
+      });
+
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Error: ${e.toString()}'),
+            backgroundColor: Colors.red,
+          ),
+        );
+      }
+    }
+  }
+
+  Future<void> _handleRegistration() async {
+    if (_formKey.currentState!.validate()) {
+      setState(() {
+        _isLoading = true;
+      });
+
+      try {
+        // Create user with Firebase Auth
+        UserCredential userCredential = await _auth
+            .createUserWithEmailAndPassword(
+              email: _emailController.text.trim(),
+              password: _passwordController.text.trim(),
+            );
+
+        // IMPORTANT: Update the user's display name AND reload user
+        await userCredential.user?.updateDisplayName(
+          _fullNameController.text.trim(),
+        );
+
+        // Reload the user to ensure the display name is saved
+        await userCredential.user?.reload();
+
+        // Get the updated user
+        User? updatedUser = FirebaseAuth.instance.currentUser;
+
+        print('Display name set to: ${updatedUser?.displayName}'); // Debug log
+
+        setState(() {
+          _isLoading = false;
+        });
+
+        if (mounted) {
+          // Extract first name for personalized message
+          String firstName = _fullNameController.text.trim().split(' ').first;
+
+          // Show success message with first name
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text(
+                'Welcome to Tandoori Nights, $firstName! 🎉',
+                style: const TextStyle(fontWeight: FontWeight.w600),
+              ),
+              backgroundColor: const Color(0xFF006A4E),
+              duration: const Duration(seconds: 3),
+            ),
+          );
+
+          // Navigate to home screen
+          Navigator.pushReplacement(
+            context,
+            MaterialPageRoute(builder: (context) => const HomeScreen()),
+          );
+        }
+      } on FirebaseAuthException catch (e) {
+        setState(() {
+          _isLoading = false;
+        });
+
+        String errorMessage;
+        switch (e.code) {
+          case 'weak-password':
+            errorMessage = 'The password provided is too weak.';
+            break;
+          case 'email-already-in-use':
+            errorMessage = 'An account already exists with this email address.';
+            break;
+          case 'invalid-email':
+            errorMessage = 'Please enter a valid email address.';
+            break;
+          case 'operation-not-allowed':
+            errorMessage = 'Email/password accounts are not enabled.';
+            break;
+          default:
+            errorMessage = 'Registration failed. Please try again.';
+        }
+
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text(errorMessage),
+              backgroundColor: Colors.red,
+              duration: const Duration(seconds: 3),
+            ),
+          );
+        }
+      } catch (e) {
+        setState(() {
+          _isLoading = false;
+        });
+
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text('An unexpected error occurred. Please try again.'),
+              backgroundColor: Colors.red,
+              duration: Duration(seconds: 3),
+            ),
+          );
+        }
+      }
+    }
   }
 
   @override
@@ -123,7 +276,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
 
                   const SizedBox(height: 40),
 
-                  // Full Name Field
+                  // Full Name Field - Enhanced validation
                   const Text(
                     'Full Name',
                     style: TextStyle(
@@ -137,8 +290,10 @@ class _RegisterScreenState extends State<RegisterScreen> {
                     controller: _fullNameController,
                     style: const TextStyle(color: Color(0xFFF4F4F4)),
                     textInputAction: TextInputAction.next,
+                    textCapitalization:
+                        TextCapitalization.words, // Auto capitalize
                     decoration: InputDecoration(
-                      hintText: 'Enter your full name',
+                      hintText: 'e.g. John Smith',
                       hintStyle: const TextStyle(
                         color: Color(0xFFB0B0B0),
                         fontSize: 16,
@@ -174,6 +329,14 @@ class _RegisterScreenState extends State<RegisterScreen> {
                     validator: (value) {
                       if (value == null || value.isEmpty) {
                         return 'Please enter your full name';
+                      }
+                      String trimmedValue = value.trim();
+                      if (trimmedValue.length < 2) {
+                        return 'Name must be at least 2 characters';
+                      }
+                      // Check if it contains at least first and last name
+                      if (!trimmedValue.contains(' ')) {
+                        return 'Please enter your first and last name';
                       }
                       return null;
                     },
@@ -234,7 +397,9 @@ class _RegisterScreenState extends State<RegisterScreen> {
                       if (value == null || value.isEmpty) {
                         return 'Please enter your email';
                       }
-                      if (!value.contains('@')) {
+                      if (!RegExp(
+                        r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$',
+                      ).hasMatch(value)) {
                         return 'Please enter a valid email';
                       }
                       return null;
@@ -295,6 +460,9 @@ class _RegisterScreenState extends State<RegisterScreen> {
                     validator: (value) {
                       if (value == null || value.isEmpty) {
                         return 'Please enter your phone number';
+                      }
+                      if (value.trim().length < 10) {
+                        return 'Please enter a valid phone number';
                       }
                       return null;
                     },
@@ -458,31 +626,73 @@ class _RegisterScreenState extends State<RegisterScreen> {
                     width: double.infinity,
                     height: 56,
                     child: ElevatedButton(
-                      onPressed: () {
-                        if (_formKey.currentState!.validate()) {
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            const SnackBar(
-                              content: Text('Account created successfully!'),
-                              backgroundColor: Color(0xFFDC143C),
-                            ),
-                          );
-                          // Handle account creation here
-                        }
-                      },
+                      onPressed: _isLoading ? null : _handleRegistration,
                       style: ElevatedButton.styleFrom(
-                        backgroundColor: const Color(0xFFDC143C), // Red button
+                        backgroundColor: _isLoading
+                            ? const Color(0xFFDC143C).withOpacity(0.7)
+                            : const Color(0xFFDC143C), // Red button
                         foregroundColor: Colors.white,
                         elevation: 2,
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(28),
                         ),
                       ),
-                      child: const Text(
-                        'Create Account',
-                        style: TextStyle(
-                          fontSize: 18,
-                          fontWeight: FontWeight.w600,
+                      child: _isLoading
+                          ? const SizedBox(
+                              width: 24,
+                              height: 24,
+                              child: CircularProgressIndicator(
+                                strokeWidth: 2.0,
+                                valueColor: AlwaysStoppedAnimation<Color>(
+                                  Colors.white,
+                                ),
+                              ),
+                            )
+                          : const Row(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                Icon(Icons.person_add, size: 20),
+                                SizedBox(width: 8),
+                                Text(
+                                  'Create Account',
+                                  style: TextStyle(
+                                    fontSize: 18,
+                                    fontWeight: FontWeight.w600,
+                                  ),
+                                ),
+                              ],
+                            ),
+                    ),
+                  ),
+
+                  const SizedBox(height: 16),
+
+                  // Continue as Guest Button
+                  SizedBox(
+                    width: double.infinity,
+                    height: 56,
+                    child: OutlinedButton(
+                      onPressed: _isLoading ? null : _continueAsGuest,
+                      style: OutlinedButton.styleFrom(
+                        foregroundColor: Colors.white,
+                        side: const BorderSide(color: Colors.white, width: 2),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(28),
                         ),
+                      ),
+                      child: const Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Icon(Icons.person_outline, size: 20),
+                          SizedBox(width: 8),
+                          Text(
+                            'Continue as Guest',
+                            style: TextStyle(
+                              fontSize: 18,
+                              fontWeight: FontWeight.w600,
+                            ),
+                          ),
+                        ],
                       ),
                     ),
                   ),
