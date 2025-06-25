@@ -23,3 +23,7 @@ dev_dependencies:
 
 flutter:
   uses-material-design: true
+  
+  # Add this assets section to load your menu data
+  assets:
+    - assets/data/
