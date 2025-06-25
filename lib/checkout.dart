@@ -112,24 +112,29 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
                       // Subtotal
                       _buildSummaryRow(
                         'Subtotal',
-                        '\$${_cartManager.subtotal.toStringAsFixed(2)}',
+                        _cartManager.formatCurrency(_cartManager.subtotal),
                       ),
                       const SizedBox(height: 12),
 
                       // Delivery Fee
                       _buildSummaryRow(
                         'Delivery Fee',
-                        _cartManager.subtotal >= 30
+                        _cartManager.subtotal >=
+                                _cartManager.freeDeliveryThreshold
                             ? 'FREE'
-                            : '\$${_cartManager.deliveryFee.toStringAsFixed(2)}',
-                        isGreen: _cartManager.subtotal >= 30,
+                            : _cartManager.formatCurrency(
+                                _cartManager.deliveryFee,
+                              ),
+                        isGreen:
+                            _cartManager.subtotal >=
+                            _cartManager.freeDeliveryThreshold,
                       ),
                       const SizedBox(height: 12),
 
-                      // Tax
+                      // VAT (20% for UK)
                       _buildSummaryRow(
-                        'Tax',
-                        '\$${_cartManager.tax.toStringAsFixed(2)}',
+                        'VAT (20%)',
+                        _cartManager.formatCurrency(_cartManager.tax),
                       ),
 
                       const SizedBox(height: 16),
@@ -149,7 +154,7 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
                             ),
                           ),
                           Text(
-                            '\$${_cartManager.total.toStringAsFixed(2)}',
+                            _cartManager.formatCurrency(_cartManager.total),
                             style: const TextStyle(
                               fontSize: 20,
                               fontWeight: FontWeight.w800,
@@ -162,7 +167,7 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
                       const SizedBox(height: 16),
 
                       // Free delivery info
-                      if (_cartManager.subtotal < 30)
+                      if (_cartManager.remainingForFreeDelivery > 0)
                         Container(
                           padding: const EdgeInsets.all(12),
                           decoration: BoxDecoration(
@@ -182,7 +187,7 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
                               const SizedBox(width: 8),
                               Expanded(
                                 child: Text(
-                                  'Add \$${(30 - _cartManager.subtotal).toStringAsFixed(2)} more for free delivery!',
+                                  'Add ${_cartManager.formatCurrency(_cartManager.remainingForFreeDelivery)} more for free delivery!',
                                   style: const TextStyle(
                                     color: Color(0xFF4CAF50),
                                     fontSize: 14,
@@ -235,7 +240,7 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
                   const Icon(Icons.payment, size: 24),
                   const SizedBox(width: 12),
                   Text(
-                    'Proceed to Checkout • \$${_cartManager.total.toStringAsFixed(2)}',
+                    'Proceed to Checkout • ${_cartManager.formatCurrency(_cartManager.total)}',
                     style: const TextStyle(
                       fontSize: 18,
                       fontWeight: FontWeight.w700,
@@ -443,7 +448,7 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
                 Row(
                   children: [
                     Text(
-                      '\$${item.price.toStringAsFixed(2)}',
+                      _cartManager.formatCurrency(item.price),
                       style: const TextStyle(
                         fontSize: 16,
                         fontWeight: FontWeight.w700,
@@ -503,7 +508,7 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
 
                 // Item total
                 Text(
-                  'Total: \$${item.totalPrice.toStringAsFixed(2)}',
+                  'Total: ${_cartManager.formatCurrency(item.totalPrice)}',
                   style: const TextStyle(
                     fontSize: 14,
                     fontWeight: FontWeight.w600,
@@ -704,7 +709,7 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
                             ),
                             SizedBox(height: 8),
                             Text(
-                              '123 Main Street, Dhaka 1212, Bangladesh',
+                              '123 High Street, Bristol BS1 2AA, United Kingdom',
                               style: TextStyle(
                                 color: Color(0xFF7F8C8D),
                                 fontSize: 14,
@@ -737,7 +742,7 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
                             const Icon(Icons.check_circle, size: 24),
                             const SizedBox(width: 12),
                             Text(
-                              'Place Order • \$${_cartManager.total.toStringAsFixed(2)}',
+                              'Place Order • ${_cartManager.formatCurrency(_cartManager.total)}',
                               style: const TextStyle(
                                 fontSize: 18,
                                 fontWeight: FontWeight.w700,

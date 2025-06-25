@@ -96,6 +96,12 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
     setState(() {});
   }
 
+  /// Check if current user is a guest (anonymous or not logged in)
+  bool _isGuestUser() {
+    final User? currentUser = FirebaseAuth.instance.currentUser;
+    return currentUser == null || currentUser.isAnonymous;
+  }
+
   /// Gets the display name for the current user
   String _getUserDisplayName() {
     final User? currentUser = FirebaseAuth.instance.currentUser;
@@ -252,8 +258,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
     String spiceLevel,
     String category,
   ) {
-    final double priceValue =
-        double.tryParse(price.replaceAll('\$', '')) ?? 0.0;
+    final double priceValue = double.tryParse(price.replaceAll('£', '')) ?? 0.0;
 
     showModalBottomSheet(
       context: context,
@@ -966,7 +971,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
           return _buildEnhancedMenuItem(
             'Sample ${category} Item ${index + 1}',
             'Delicious ${category.toLowerCase()} prepared with authentic spices and traditional cooking methods that bring the true taste of India.',
-            '\$${(12.99 + index * 2).toStringAsFixed(2)}',
+            '£${(12.99 + index * 2).toStringAsFixed(2)}',
             index % 3 == 0
                 ? 'mild'
                 : index % 3 == 1
@@ -986,8 +991,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
     String spiceLevel,
     String category,
   ) {
-    final double priceValue =
-        double.tryParse(price.replaceAll('\$', '')) ?? 0.0;
+    final double priceValue = double.tryParse(price.replaceAll('£', '')) ?? 0.0;
 
     return GestureDetector(
       onTap: () {
@@ -1356,6 +1360,8 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
   }
 
   Widget _buildEnhancedDrawer() {
+    final bool isGuest = _isGuestUser();
+
     return Drawer(
       backgroundColor: const Color(0xFF8B1538), // Darker, more muted red
       child: Column(
@@ -1404,9 +1410,9 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                       ),
                     ],
                   ),
-                  child: const Icon(
-                    Icons.person,
-                    color: Color(0xFF8B1538),
+                  child: Icon(
+                    isGuest ? Icons.person_outline : Icons.person,
+                    color: const Color(0xFF8B1538),
                     size: 36,
                   ),
                 ),
@@ -1436,6 +1442,31 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                           fontWeight: FontWeight.w400,
                         ),
                       ),
+                      if (isGuest) ...[
+                        const SizedBox(height: 8),
+                        Container(
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 8,
+                            vertical: 4,
+                          ),
+                          decoration: BoxDecoration(
+                            color: const Color(0xFFF4D03F).withOpacity(0.2),
+                            borderRadius: BorderRadius.circular(12),
+                            border: Border.all(
+                              color: const Color(0xFFF4D03F),
+                              width: 1,
+                            ),
+                          ),
+                          child: const Text(
+                            'Limited Access',
+                            style: TextStyle(
+                              color: Color(0xFFF4D03F),
+                              fontSize: 12,
+                              fontWeight: FontWeight.w600,
+                            ),
+                          ),
+                        ),
+                      ],
                     ],
                   ),
                 ),
@@ -1499,22 +1530,24 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                     );
                   },
                 ),
-                _buildEnhancedDrawerItem(Icons.history, 'Order History', () {
-                  Navigator.pop(context);
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(
-                      content: const Text(
-                        'Order history coming soon! 📋',
-                        style: TextStyle(fontWeight: FontWeight.w600),
+                // Only show Order History for logged-in users
+                if (!isGuest)
+                  _buildEnhancedDrawerItem(Icons.history, 'Order History', () {
+                    Navigator.pop(context);
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(
+                        content: const Text(
+                          'Order history coming soon! 📋',
+                          style: TextStyle(fontWeight: FontWeight.w600),
+                        ),
+                        backgroundColor: const Color(0xFF006A4E),
+                        behavior: SnackBarBehavior.floating,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12),
+                        ),
                       ),
-                      backgroundColor: const Color(0xFF006A4E),
-                      behavior: SnackBarBehavior.floating,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                    ),
-                  );
-                }),
+                    );
+                  }),
                 _buildEnhancedDrawerItem(Icons.phone, 'Contact Us', () {
                   Navigator.pop(context);
                   // Navigate to Contact Information Screen
@@ -1523,22 +1556,39 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                     MaterialPageRoute(builder: (context) => const InfoScreen()),
                   );
                 }),
-                _buildEnhancedDrawerItem(Icons.favorite, 'Favorites', () {
-                  Navigator.pop(context);
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(
-                      content: const Text(
-                        'Favorites feature coming soon! ❤️',
-                        style: TextStyle(fontWeight: FontWeight.w600),
-                      ),
-                      backgroundColor: const Color(0xFF006A4E),
-                      behavior: SnackBarBehavior.floating,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                    ),
-                  );
-                }),
+                // Guest users see a prompt to sign up instead of order history
+                if (isGuest)
+                  _buildEnhancedDrawerItem(
+                    Icons.person_add,
+                    'Sign Up for More Features',
+                    () {
+                      Navigator.pop(context);
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(
+                          content: const Text(
+                            'Sign up to access order history, favorites, and more! 🎉',
+                            style: TextStyle(fontWeight: FontWeight.w600),
+                          ),
+                          backgroundColor: const Color(0xFF006A4E),
+                          behavior: SnackBarBehavior.floating,
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                          action: SnackBarAction(
+                            label: 'SIGN UP',
+                            textColor: const Color(0xFFF4D03F),
+                            onPressed: () {
+                              Navigator.pushNamedAndRemoveUntil(
+                                context,
+                                '/',
+                                (route) => false,
+                              );
+                            },
+                          ),
+                        ),
+                      );
+                    },
+                  ),
               ],
             ),
           ),
@@ -1548,14 +1598,14 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
             margin: const EdgeInsets.all(24),
             child: OutlinedButton.icon(
               onPressed: _handleLogout,
-              icon: const Icon(
-                Icons.logout,
-                color: Color(0xFFF4D03F),
+              icon: Icon(
+                isGuest ? Icons.exit_to_app : Icons.logout,
+                color: const Color(0xFFF4D03F),
                 size: 22,
               ),
-              label: const Text(
-                'Logout',
-                style: TextStyle(
+              label: Text(
+                isGuest ? 'Exit' : 'Logout',
+                style: const TextStyle(
                   color: Color(0xFFF4D03F),
                   fontSize: 16,
                   fontWeight: FontWeight.w700,

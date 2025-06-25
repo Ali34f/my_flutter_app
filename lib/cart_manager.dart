@@ -37,11 +37,16 @@ class CartManager extends ChangeNotifier {
 
   double get subtotal => _items.fold(0, (sum, item) => sum + item.totalPrice);
 
-  double get deliveryFee => _items.isEmpty ? 0 : (subtotal >= 30 ? 0 : 3.99);
+  // Updated delivery fee threshold for UK market (£25 for free delivery)
+  double get deliveryFee => _items.isEmpty ? 0 : (subtotal >= 25 ? 0 : 2.99);
 
-  double get tax => subtotal * 0.08; // 8% tax
+  // UK VAT rate is 20%
+  double get tax => subtotal * 0.20;
 
   double get total => subtotal + deliveryFee + tax;
+
+  // Free delivery threshold for UK market
+  double get freeDeliveryThreshold => 25.0;
 
   void addItem({
     required String id,
@@ -90,5 +95,17 @@ class CartManager extends ChangeNotifier {
   void clearCart() {
     _items.clear();
     notifyListeners();
+  }
+
+  // Helper method to format currency consistently
+  String formatCurrency(double amount) {
+    return '£${amount.toStringAsFixed(2)}';
+  }
+
+  // Helper method to get remaining amount for free delivery
+  double get remainingForFreeDelivery {
+    return subtotal >= freeDeliveryThreshold
+        ? 0
+        : freeDeliveryThreshold - subtotal;
   }
 }
