@@ -13,7 +13,8 @@ class HomeScreen extends StatefulWidget {
   State<HomeScreen> createState() => _HomeScreenState();
 }
 
-class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
+class _HomeScreenState extends State<HomeScreen>
+    with TickerProviderStateMixin, RouteAware {
   late TabController _tabController;
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
   final CartManager _cartManager = CartManager();
@@ -240,6 +241,66 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
     );
   }
 
+  // Method to add setmeal to cart
+  void _addSetMealToCart(
+    String setmealName,
+    String curryName,
+    String sideName,
+    String drinkName,
+    double totalPrice,
+  ) {
+    final String id = 'setmeal_${DateTime.now().millisecondsSinceEpoch}';
+    final String combinedName =
+        '$setmealName (${curryName} + ${sideName} + ${drinkName})';
+
+    _cartManager.addItem(
+      id: id,
+      name: combinedName,
+      category: 'SetMeal',
+      price: totalPrice,
+      spiceLevel: '',
+    );
+
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Row(
+          children: [
+            const Icon(Icons.check_circle, color: Colors.white, size: 20),
+            const SizedBox(width: 8),
+            Expanded(
+              child: Text(
+                'SetMeal added to cart! 🛒',
+                style: const TextStyle(fontWeight: FontWeight.w600),
+              ),
+            ),
+            TextButton(
+              onPressed: () {
+                ScaffoldMessenger.of(context).hideCurrentSnackBar();
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => const CheckoutScreen(),
+                  ),
+                );
+              },
+              child: const Text(
+                'VIEW CART',
+                style: TextStyle(
+                  color: Colors.white,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+            ),
+          ],
+        ),
+        backgroundColor: const Color(0xFF006A4E),
+        duration: const Duration(seconds: 3),
+        behavior: SnackBarBehavior.floating,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+      ),
+    );
+  }
+
   // Get item variants and prices
   Map<String, double> _getItemVariants(String name, String category) {
     final items = MenuService.getItemsByCategory(category);
@@ -257,6 +318,498 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
     return variants.isNotEmpty ? variants : {'Regular': 0.0};
   }
 
+  // Check if this is a SetMeal item
+  bool _isSetMeal(String category, String name) {
+    return category.toLowerCase().contains('setmeal') ||
+        name.toLowerCase().contains('setmeal');
+  }
+
+  // Show SetMeal selection interface
+  void _showSetMealSelection(
+    BuildContext context,
+    String setmealName,
+    String description,
+    String category,
+    double basePrice,
+  ) {
+    // Get available options
+    final curries = MenuService.getItemsByCategory('Curries');
+    // Fixed options for sides - only Plain Naan and Pilau Rice
+    final sideOptions = [
+      {'name': 'Plain Naan', 'price': 0.0},
+      {'name': 'Pilau Rice', 'price': 0.0},
+    ];
+    final drinks = MenuService.getAllItems()
+        .where(
+          (item) =>
+              item.sizeOrType.contains('330ml') ||
+              item.name.toLowerCase().contains('330ml'),
+        )
+        .toList();
+
+    // Selection state
+    String? selectedCurry;
+    String? selectedSide;
+    String? selectedDrink;
+    final double fixedTotalPrice =
+        16.00; // Fixed price regardless of selections
+
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      builder: (BuildContext context) {
+        return StatefulBuilder(
+          builder: (context, setModalState) {
+            bool canAddToCart =
+                selectedCurry != null &&
+                selectedSide != null &&
+                selectedDrink != null;
+
+            return DraggableScrollableSheet(
+              initialChildSize: 0.85,
+              minChildSize: 0.5,
+              maxChildSize: 0.95,
+              builder: (_, controller) {
+                return Container(
+                  decoration: const BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.only(
+                      topLeft: Radius.circular(25),
+                      topRight: Radius.circular(25),
+                    ),
+                  ),
+                  child: Column(
+                    children: [
+                      // Handle bar
+                      Container(
+                        width: 50,
+                        height: 5,
+                        margin: const EdgeInsets.symmetric(vertical: 12),
+                        decoration: BoxDecoration(
+                          color: Colors.grey[300],
+                          borderRadius: BorderRadius.circular(10),
+                        ),
+                      ),
+
+                      Expanded(
+                        child: SingleChildScrollView(
+                          controller: controller,
+                          padding: const EdgeInsets.all(24),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              // SetMeal Header
+                              Row(
+                                children: [
+                                  Container(
+                                    width: 60,
+                                    height: 60,
+                                    decoration: BoxDecoration(
+                                      gradient: const LinearGradient(
+                                        colors: [
+                                          Color(0xFFDC143C),
+                                          Color(0xFFE74C3C),
+                                        ],
+                                      ),
+                                      borderRadius: BorderRadius.circular(15),
+                                    ),
+                                    child: const Icon(
+                                      Icons.set_meal,
+                                      color: Colors.white,
+                                      size: 30,
+                                    ),
+                                  ),
+                                  const SizedBox(width: 16),
+                                  Expanded(
+                                    child: Column(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                      children: [
+                                        Text(
+                                          setmealName,
+                                          style: const TextStyle(
+                                            fontSize: 24,
+                                            fontWeight: FontWeight.w800,
+                                            color: Color(0xFF2C3E50),
+                                          ),
+                                        ),
+                                        const SizedBox(height: 4),
+                                        const Text(
+                                          'Choose your perfect combination',
+                                          style: TextStyle(
+                                            fontSize: 14,
+                                            color: Color(0xFF7F8C8D),
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                ],
+                              ),
+
+                              const SizedBox(height: 24),
+
+                              if (description.isNotEmpty) ...[
+                                Text(
+                                  description,
+                                  style: const TextStyle(
+                                    fontSize: 14,
+                                    color: Color(0xFF7F8C8D),
+                                    height: 1.5,
+                                  ),
+                                ),
+                                const SizedBox(height: 24),
+                              ],
+
+                              // Step 1: Choose Curry
+                              _buildSetMealListSection(
+                                'Choose Your Curry',
+                                Icons.restaurant,
+                                curries
+                                    .map(
+                                      (item) => {
+                                        'name': item.name,
+                                        'price': 0.0,
+                                      },
+                                    )
+                                    .toList(),
+                                selectedCurry,
+                                (String name) {
+                                  setModalState(() {
+                                    selectedCurry = name;
+                                  });
+                                },
+                              ),
+
+                              const SizedBox(height: 20),
+
+                              // Step 2: Choose Side (Only Plain Naan or Pilau Rice)
+                              _buildSetMealListSection(
+                                'Choose Rice or Naan',
+                                Icons.rice_bowl,
+                                sideOptions,
+                                selectedSide,
+                                (String name) {
+                                  setModalState(() {
+                                    selectedSide = name;
+                                  });
+                                },
+                              ),
+
+                              const SizedBox(height: 20),
+
+                              // Step 3: Choose Drink
+                              _buildSetMealListSection(
+                                'Choose Your Drink',
+                                Icons.local_drink,
+                                drinks
+                                    .map(
+                                      (item) => {
+                                        'name': item.name,
+                                        'price': 0.0,
+                                      },
+                                    )
+                                    .toList(),
+                                selectedDrink,
+                                (String name) {
+                                  setModalState(() {
+                                    selectedDrink = name;
+                                  });
+                                },
+                              ),
+
+                              const SizedBox(height: 32),
+
+                              // Summary and Total
+                              Container(
+                                padding: const EdgeInsets.all(20),
+                                decoration: BoxDecoration(
+                                  color: const Color(0xFFF8F9FA),
+                                  borderRadius: BorderRadius.circular(15),
+                                  border: Border.all(
+                                    color: const Color(
+                                      0xFFDC143C,
+                                    ).withOpacity(0.2),
+                                  ),
+                                ),
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    const Text(
+                                      'Your SetMeal Summary',
+                                      style: TextStyle(
+                                        fontSize: 18,
+                                        fontWeight: FontWeight.w700,
+                                        color: Color(0xFF2C3E50),
+                                      ),
+                                    ),
+                                    const SizedBox(height: 12),
+                                    if (selectedCurry != null)
+                                      _buildSummaryItem(
+                                        'Curry:',
+                                        selectedCurry!,
+                                        0.0,
+                                      ),
+                                    if (selectedSide != null)
+                                      _buildSummaryItem(
+                                        'Side:',
+                                        selectedSide!,
+                                        0.0,
+                                      ),
+                                    if (selectedDrink != null)
+                                      _buildSummaryItem(
+                                        'Drink:',
+                                        selectedDrink!,
+                                        0.0,
+                                      ),
+                                    const Divider(height: 20),
+                                    Row(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.spaceBetween,
+                                      children: [
+                                        const Text(
+                                          'Total Price:',
+                                          style: TextStyle(
+                                            fontSize: 18,
+                                            fontWeight: FontWeight.w800,
+                                            color: Color(0xFF2C3E50),
+                                          ),
+                                        ),
+                                        Text(
+                                          '£${fixedTotalPrice.toStringAsFixed(2)}',
+                                          style: const TextStyle(
+                                            fontSize: 24,
+                                            fontWeight: FontWeight.w800,
+                                            color: Color(0xFFDC143C),
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  ],
+                                ),
+                              ),
+
+                              const SizedBox(height: 24),
+
+                              // Add to Cart button
+                              SizedBox(
+                                width: double.infinity,
+                                height: 52,
+                                child: ElevatedButton(
+                                  onPressed: canAddToCart
+                                      ? () {
+                                          Navigator.pop(context);
+                                          _addSetMealToCart(
+                                            setmealName,
+                                            selectedCurry!,
+                                            selectedSide!,
+                                            selectedDrink!,
+                                            fixedTotalPrice,
+                                          );
+                                        }
+                                      : null,
+                                  style: ElevatedButton.styleFrom(
+                                    backgroundColor: canAddToCart
+                                        ? const Color(0xFFDC143C)
+                                        : Colors.grey[400],
+                                    foregroundColor: Colors.white,
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(14),
+                                    ),
+                                    elevation: canAddToCart ? 3 : 0,
+                                  ),
+                                  child: Row(
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    children: [
+                                      const Icon(
+                                        Icons.shopping_cart_outlined,
+                                        size: 20,
+                                      ),
+                                      const SizedBox(width: 8),
+                                      Text(
+                                        canAddToCart
+                                            ? 'Add SetMeal to Cart - £${fixedTotalPrice.toStringAsFixed(2)}'
+                                            : 'Please make all selections',
+                                        style: const TextStyle(
+                                          fontSize: 16,
+                                          fontWeight: FontWeight.w700,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                );
+              },
+            );
+          },
+        );
+      },
+    );
+  }
+
+  Widget _buildSetMealListSection(
+    String title,
+    IconData icon,
+    List<Map<String, dynamic>> items,
+    String? selectedItem,
+    Function(String) onItemSelected,
+  ) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Row(
+          children: [
+            Icon(icon, color: const Color(0xFFDC143C), size: 20),
+            const SizedBox(width: 8),
+            Text(
+              title,
+              style: const TextStyle(
+                fontSize: 18,
+                fontWeight: FontWeight.w700,
+                color: Color(0xFF2C3E50),
+              ),
+            ),
+            if (selectedItem == null)
+              Container(
+                margin: const EdgeInsets.only(left: 8),
+                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                decoration: BoxDecoration(
+                  color: const Color(0xFFDC143C),
+                  borderRadius: BorderRadius.circular(10),
+                ),
+                child: const Text(
+                  '1 Required',
+                  style: TextStyle(
+                    color: Colors.white,
+                    fontSize: 10,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+              ),
+          ],
+        ),
+        const SizedBox(height: 12),
+        if (items.isEmpty)
+          Container(
+            padding: const EdgeInsets.all(16),
+            decoration: BoxDecoration(
+              color: Colors.grey[100],
+              borderRadius: BorderRadius.circular(10),
+            ),
+            child: const Text(
+              'No items available for this selection',
+              style: TextStyle(color: Color(0xFF7F8C8D)),
+            ),
+          )
+        else
+          Container(
+            decoration: BoxDecoration(
+              border: Border.all(color: Colors.grey[300]!),
+              borderRadius: BorderRadius.circular(10),
+            ),
+            child: Column(
+              children: items.asMap().entries.map((entry) {
+                final index = entry.key;
+                final item = entry.value;
+                final itemName = item['name'] as String;
+                final isSelected = selectedItem == itemName;
+                final isLastItem = index == items.length - 1;
+
+                return GestureDetector(
+                  onTap: () => onItemSelected(itemName),
+                  child: Container(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 16,
+                      vertical: 12,
+                    ),
+                    decoration: BoxDecoration(
+                      color: isSelected
+                          ? const Color(0xFFDC143C).withOpacity(0.05)
+                          : Colors.white,
+                      border: !isLastItem
+                          ? Border(
+                              bottom: BorderSide(
+                                color: Colors.grey[200]!,
+                                width: 1,
+                              ),
+                            )
+                          : null,
+                    ),
+                    child: Row(
+                      children: [
+                        Container(
+                          width: 20,
+                          height: 20,
+                          decoration: BoxDecoration(
+                            shape: BoxShape.circle,
+                            border: Border.all(
+                              color: isSelected
+                                  ? const Color(0xFFDC143C)
+                                  : Colors.grey[400]!,
+                              width: 2,
+                            ),
+                            color: isSelected
+                                ? const Color(0xFFDC143C)
+                                : Colors.transparent,
+                          ),
+                          child: isSelected
+                              ? const Icon(
+                                  Icons.check,
+                                  color: Colors.white,
+                                  size: 14,
+                                )
+                              : null,
+                        ),
+                        const SizedBox(width: 12),
+                        Expanded(
+                          child: Text(
+                            itemName,
+                            style: TextStyle(
+                              fontSize: 14,
+                              fontWeight: FontWeight.w500,
+                              color: isSelected
+                                  ? const Color(0xFFDC143C)
+                                  : const Color(0xFF2C3E50),
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                );
+              }).toList(),
+            ),
+          ),
+      ],
+    );
+  }
+
+  Widget _buildSummaryItem(String label, String item, double price) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 4),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          Expanded(
+            child: Text(
+              '$label $item',
+              style: const TextStyle(fontSize: 14, color: Color(0xFF2C3E50)),
+            ),
+          ),
+          const Icon(Icons.check_circle, color: Color(0xFF27AE60), size: 16),
+        ],
+      ),
+    );
+  }
+
   // Show detailed item information with variant selection
   void _showItemDetails(
     BuildContext context,
@@ -266,6 +819,15 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
     String category,
     bool isVeg,
   ) {
+    // Check if this is a SetMeal - if so, show special interface
+    if (_isSetMeal(category, name)) {
+      final variants = _getItemVariants(name, category);
+      final basePrice = variants.isNotEmpty ? variants.values.first : 0.0;
+      _showSetMealSelection(context, name, description, category, basePrice);
+      return;
+    }
+
+    // Original item details code continues here...
     final variants = _getItemVariants(name, category);
     String selectedVariant = variants.keys.first;
     double selectedPrice = variants.values.first;
@@ -929,13 +1491,6 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
   ) {
     final cleanedSpiceLevel = _cleanSpiceLevel(spiceLevel);
 
-    // Check if this is Side Dishes or Drinks category - use special layout
-    final bool isSpecialCategory =
-        category.toLowerCase().contains('side') ||
-        category.toLowerCase().contains('drink') ||
-        category.toLowerCase().contains('sundries') ||
-        category.toLowerCase().contains('setmeal');
-
     return GestureDetector(
       onTap: () {
         _showItemDetails(
@@ -979,127 +1534,57 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
               child: Row(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  // Conditional layout based on category
-                  if (isSpecialCategory)
-                    // Special layout for Side Dishes & Drinks - Price under image
-                    Column(
-                      children: [
-                        Stack(
-                          children: [
-                            Container(
-                              width: 80,
-                              height: 80,
-                              decoration: BoxDecoration(
-                                gradient: LinearGradient(
-                                  colors: [
-                                    const Color(0xFFDC143C).withOpacity(0.1),
-                                    const Color(0xFFDC143C).withOpacity(0.05),
-                                  ],
-                                ),
-                                borderRadius: BorderRadius.circular(15),
-                                border: Border.all(
-                                  color: const Color(
-                                    0xFFDC143C,
-                                  ).withOpacity(0.2),
-                                  width: 1,
-                                ),
-                              ),
-                              child: Icon(
-                                categoryIcons[categories.indexOf(category) %
-                                    categoryIcons.length],
-                                color: const Color(0xFFDC143C),
-                                size: 40,
-                              ),
-                            ),
-                            // Veg/Non-veg indicator
-                            Positioned(
-                              top: 4,
-                              right: 4,
-                              child: Container(
-                                width: 20,
-                                height: 20,
-                                decoration: BoxDecoration(
-                                  color: isVeg ? Colors.green : Colors.red,
-                                  shape: BoxShape.circle,
-                                  border: Border.all(
-                                    color: Colors.white,
-                                    width: 2,
-                                  ),
-                                ),
-                                child: Icon(
-                                  isVeg ? Icons.eco : Icons.restaurant,
-                                  color: Colors.white,
-                                  size: 10,
-                                ),
-                              ),
-                            ),
-                          ],
-                        ),
-                        const SizedBox(height: 8),
-                        // Price under the image for special categories
-                        Text(
-                          priceDisplay,
-                          style: const TextStyle(
-                            fontSize: 16,
-                            fontWeight: FontWeight.w800,
-                            color: Color(0xFFDC143C),
+                  // Consistent image layout for ALL categories
+                  Stack(
+                    children: [
+                      Container(
+                        width: 80,
+                        height: 80,
+                        decoration: BoxDecoration(
+                          gradient: LinearGradient(
+                            colors: [
+                              const Color(0xFFDC143C).withOpacity(0.1),
+                              const Color(0xFFDC143C).withOpacity(0.05),
+                            ],
                           ),
-                          textAlign: TextAlign.center,
+                          borderRadius: BorderRadius.circular(15),
+                          border: Border.all(
+                            color: const Color(0xFFDC143C).withOpacity(0.2),
+                            width: 1,
+                          ),
                         ),
-                      ],
-                    )
-                  else
-                    // Original layout for all other categories
-                    Stack(
-                      children: [
-                        Container(
-                          width: 80,
-                          height: 80,
+                        child: Icon(
+                          categoryIcons[categories.indexOf(category) %
+                              categoryIcons.length],
+                          color: const Color(0xFFDC143C),
+                          size: 40,
+                        ),
+                      ),
+                      // Veg/Non-veg indicator
+                      Positioned(
+                        top: 4,
+                        right: 4,
+                        child: Container(
+                          width: 20,
+                          height: 20,
                           decoration: BoxDecoration(
-                            gradient: LinearGradient(
-                              colors: [
-                                const Color(0xFFDC143C).withOpacity(0.1),
-                                const Color(0xFFDC143C).withOpacity(0.05),
-                              ],
-                            ),
-                            borderRadius: BorderRadius.circular(15),
-                            border: Border.all(
-                              color: const Color(0xFFDC143C).withOpacity(0.2),
-                              width: 1,
-                            ),
+                            color: isVeg ? Colors.green : Colors.red,
+                            shape: BoxShape.circle,
+                            border: Border.all(color: Colors.white, width: 2),
                           ),
                           child: Icon(
-                            categoryIcons[categories.indexOf(category) %
-                                categoryIcons.length],
-                            color: const Color(0xFFDC143C),
-                            size: 40,
+                            isVeg ? Icons.eco : Icons.restaurant,
+                            color: Colors.white,
+                            size: 10,
                           ),
                         ),
-                        // Veg/Non-veg indicator
-                        Positioned(
-                          top: 4,
-                          right: 4,
-                          child: Container(
-                            width: 20,
-                            height: 20,
-                            decoration: BoxDecoration(
-                              color: isVeg ? Colors.green : Colors.red,
-                              shape: BoxShape.circle,
-                              border: Border.all(color: Colors.white, width: 2),
-                            ),
-                            child: Icon(
-                              isVeg ? Icons.eco : Icons.restaurant,
-                              color: Colors.white,
-                              size: 10,
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
+                      ),
+                    ],
+                  ),
 
                   const SizedBox(width: 16),
 
-                  // Enhanced Food Info
+                  // Enhanced Food Info - CONSISTENT layout for ALL categories
                   Expanded(
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
@@ -1166,21 +1651,19 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
 
                         const SizedBox(height: 12),
 
-                        // Price and action row - Different for special categories
+                        // Price and action row - CONSISTENT FOR ALL CATEGORIES
                         Row(
                           children: [
-                            // Only show price here for non-special categories
-                            if (!isSpecialCategory) ...[
-                              Text(
-                                priceDisplay,
-                                style: const TextStyle(
-                                  fontSize: 18,
-                                  fontWeight: FontWeight.w800,
-                                  color: Color(0xFFDC143C),
-                                ),
+                            // Show price in the same position for ALL categories
+                            Text(
+                              priceDisplay,
+                              style: const TextStyle(
+                                fontSize: 16,
+                                fontWeight: FontWeight.w800,
+                                color: Color(0xFFDC143C),
                               ),
-                              const SizedBox(width: 8),
-                            ],
+                            ),
+                            const SizedBox(width: 4),
 
                             // Spice level badge
                             if (spiceLevel.isNotEmpty &&
@@ -1188,14 +1671,14 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                                 cleanedSpiceLevel != 'none')
                               Container(
                                 padding: const EdgeInsets.symmetric(
-                                  horizontal: 8,
-                                  vertical: 4,
+                                  horizontal: 6,
+                                  vertical: 2,
                                 ),
                                 decoration: BoxDecoration(
                                   color: _getSpiceLevelColors(
                                     spiceLevel,
                                   )[0].withOpacity(0.1),
-                                  borderRadius: BorderRadius.circular(12),
+                                  borderRadius: BorderRadius.circular(8),
                                   border: Border.all(
                                     color: _getSpiceLevelColors(spiceLevel)[0],
                                     width: 1,
@@ -1204,7 +1687,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                                 child: Text(
                                   cleanedSpiceLevel,
                                   style: TextStyle(
-                                    fontSize: 10,
+                                    fontSize: 8,
                                     fontWeight: FontWeight.w600,
                                     color: _getSpiceLevelColors(spiceLevel)[0],
                                   ),
@@ -1213,7 +1696,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
 
                             const Spacer(),
 
-                            // View Details Button
+                            // View Details Button - Special text for SetMeal
                             ElevatedButton(
                               onPressed: () {
                                 _showItemDetails(
@@ -1229,24 +1712,31 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                                 backgroundColor: const Color(0xFFDC143C),
                                 foregroundColor: Colors.white,
                                 shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(18),
+                                  borderRadius: BorderRadius.circular(12),
                                 ),
                                 padding: const EdgeInsets.symmetric(
-                                  horizontal: 16,
-                                  vertical: 8,
+                                  horizontal: 12,
+                                  vertical: 6,
                                 ),
                                 elevation: 4,
-                                minimumSize: const Size(60, 32),
+                                minimumSize: const Size(50, 28),
                               ),
-                              child: const Row(
+                              child: Row(
                                 mainAxisSize: MainAxisSize.min,
                                 children: [
-                                  Icon(Icons.info_outline, size: 16),
-                                  SizedBox(width: 4),
+                                  Icon(
+                                    _isSetMeal(category, name)
+                                        ? Icons.set_meal
+                                        : Icons.info_outline,
+                                    size: 16,
+                                  ),
+                                  const SizedBox(width: 3),
                                   Text(
-                                    'View',
-                                    style: TextStyle(
-                                      fontSize: 12,
+                                    _isSetMeal(category, name)
+                                        ? 'Build'
+                                        : 'View',
+                                    style: const TextStyle(
+                                      fontSize: 10,
                                       fontWeight: FontWeight.w700,
                                     ),
                                   ),
@@ -1586,22 +2076,36 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
     return Expanded(
       child: GestureDetector(
         onTap: () {
-          setState(() {
-            _selectedBottomIndex = index;
-          });
-
-          if (index == 1) {
-            Navigator.push(
-              context,
-              MaterialPageRoute(
-                builder: (context) => const ReservationScreen(),
-              ),
-            );
-          } else if (index == 2) {
-            Navigator.push(
-              context,
-              MaterialPageRoute(builder: (context) => const InfoScreen()),
-            );
+          if (index == 0) {
+            // Menu - just update state, don't navigate
+            setState(() {
+              _selectedBottomIndex = 0;
+            });
+          } else {
+            // For other tabs, navigate and reset to menu when returning
+            if (index == 1) {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => const ReservationScreen(),
+                ),
+              ).then((_) {
+                // Reset to menu when returning from reservation
+                setState(() {
+                  _selectedBottomIndex = 0;
+                });
+              });
+            } else if (index == 2) {
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => const InfoScreen()),
+              ).then((_) {
+                // Reset to menu when returning from contact
+                setState(() {
+                  _selectedBottomIndex = 0;
+                });
+              });
+            }
           }
         },
         child: Container(
