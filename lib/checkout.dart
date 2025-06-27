@@ -10,16 +10,23 @@ class CheckoutScreen extends StatefulWidget {
 
 class _CheckoutScreenState extends State<CheckoutScreen> {
   final CartManager _cartManager = CartManager();
+  final TextEditingController _addressController = TextEditingController();
+  final TextEditingController _instructionsController = TextEditingController();
 
   @override
   void initState() {
     super.initState();
     _cartManager.addListener(_updateUI);
+    // Set default address
+    _addressController.text =
+        '123 High Street, Bristol BS1 2AA, United Kingdom';
   }
 
   @override
   void dispose() {
     _cartManager.removeListener(_updateUI);
+    _addressController.dispose();
+    _instructionsController.dispose();
     super.dispose();
   }
 
@@ -116,26 +123,30 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
                       ),
                       const SizedBox(height: 12),
 
-                      // Delivery Fee
+                      // Service Charge
                       _buildSummaryRow(
-                        'Delivery Fee',
-                        _cartManager.subtotal >=
-                                _cartManager.freeDeliveryThreshold
-                            ? 'FREE'
-                            : _cartManager.formatCurrency(
-                                _cartManager.deliveryFee,
-                              ),
-                        isGreen:
-                            _cartManager.subtotal >=
-                            _cartManager.freeDeliveryThreshold,
+                        'Service Charge',
+                        _cartManager.formatCurrency(_cartManager.serviceCharge),
                       ),
                       const SizedBox(height: 12),
 
-                      // VAT (20% for UK)
-                      _buildSummaryRow(
-                        'VAT (20%)',
-                        _cartManager.formatCurrency(_cartManager.tax),
-                      ),
+                      // Delivery Fee (only show if delivery selected)
+                      if (_cartManager.orderType == 'delivery') ...[
+                        _buildSummaryRow(
+                          'Delivery Fee',
+                          _cartManager.formatCurrency(_cartManager.deliveryFee),
+                        ),
+                        const SizedBox(height: 12),
+                      ],
+
+                      // Card Charge (only show if card payment selected)
+                      if (_cartManager.paymentMethod == 'card') ...[
+                        _buildSummaryRow(
+                          'Card Processing Fee',
+                          _cartManager.formatCurrency(_cartManager.cardCharge),
+                        ),
+                        const SizedBox(height: 12),
+                      ],
 
                       const SizedBox(height: 16),
                       const Divider(height: 1),
@@ -163,41 +174,6 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
                           ),
                         ],
                       ),
-
-                      const SizedBox(height: 16),
-
-                      // Free delivery info
-                      if (_cartManager.remainingForFreeDelivery > 0)
-                        Container(
-                          padding: const EdgeInsets.all(12),
-                          decoration: BoxDecoration(
-                            color: const Color(0xFFE8F5E9),
-                            borderRadius: BorderRadius.circular(12),
-                            border: Border.all(
-                              color: const Color(0xFF4CAF50).withOpacity(0.3),
-                            ),
-                          ),
-                          child: Row(
-                            children: [
-                              const Icon(
-                                Icons.info_outline,
-                                color: Color(0xFF4CAF50),
-                                size: 20,
-                              ),
-                              const SizedBox(width: 8),
-                              Expanded(
-                                child: Text(
-                                  'Add ${_cartManager.formatCurrency(_cartManager.remainingForFreeDelivery)} more for free delivery!',
-                                  style: const TextStyle(
-                                    color: Color(0xFF4CAF50),
-                                    fontSize: 14,
-                                    fontWeight: FontWeight.w500,
-                                  ),
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
                     ],
                   ),
                 ),
@@ -416,30 +392,31 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
                       ),
                     ),
                     const SizedBox(width: 8),
-                    Container(
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 8,
-                        vertical: 4,
-                      ),
-                      decoration: BoxDecoration(
-                        color: _getSpiceLevelColor(
+                    if (item.spiceLevel.isNotEmpty)
+                      Container(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 8,
+                          vertical: 4,
+                        ),
+                        decoration: BoxDecoration(
+                          color: _getSpiceLevelColor(
+                            item.spiceLevel,
+                          ).withOpacity(0.1),
+                          borderRadius: BorderRadius.circular(8),
+                          border: Border.all(
+                            color: _getSpiceLevelColor(item.spiceLevel),
+                            width: 1,
+                          ),
+                        ),
+                        child: Text(
                           item.spiceLevel,
-                        ).withOpacity(0.1),
-                        borderRadius: BorderRadius.circular(8),
-                        border: Border.all(
-                          color: _getSpiceLevelColor(item.spiceLevel),
-                          width: 1,
+                          style: TextStyle(
+                            color: _getSpiceLevelColor(item.spiceLevel),
+                            fontSize: 12,
+                            fontWeight: FontWeight.w600,
+                          ),
                         ),
                       ),
-                      child: Text(
-                        item.spiceLevel,
-                        style: TextStyle(
-                          color: _getSpiceLevelColor(item.spiceLevel),
-                          fontSize: 12,
-                          fontWeight: FontWeight.w600,
-                        ),
-                      ),
-                    ),
                   ],
                 ),
 
@@ -604,159 +581,341 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
       context: context,
       isScrollControlled: true,
       backgroundColor: Colors.transparent,
-      builder: (context) => Container(
-        height: MediaQuery.of(context).size.height * 0.9,
-        decoration: const BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.only(
-            topLeft: Radius.circular(25),
-            topRight: Radius.circular(25),
-          ),
-        ),
-        child: Column(
-          children: [
-            Container(
-              width: 50,
-              height: 5,
-              margin: const EdgeInsets.symmetric(vertical: 12),
-              decoration: BoxDecoration(
-                color: Colors.grey[300],
-                borderRadius: BorderRadius.circular(10),
-              ),
+      builder: (context) => StatefulBuilder(
+        builder: (context, setModalState) => Container(
+          height: MediaQuery.of(context).size.height * 0.9,
+          decoration: const BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.only(
+              topLeft: Radius.circular(25),
+              topRight: Radius.circular(25),
             ),
-            Expanded(
-              child: SingleChildScrollView(
-                padding: const EdgeInsets.all(24),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    const Text(
-                      'Complete Your Order',
-                      style: TextStyle(
-                        fontSize: 24,
-                        fontWeight: FontWeight.w800,
-                        color: Color(0xFF2C3E50),
-                      ),
-                    ),
-                    const SizedBox(height: 24),
-
-                    // Delivery options
-                    _buildCheckoutSection(
-                      'Delivery Options',
-                      Icons.delivery_dining,
-                      Column(
-                        children: [
-                          _buildDeliveryOption(
-                            'Standard Delivery',
-                            '30-45 min',
-                            true,
-                          ),
-                          const SizedBox(height: 12),
-                          _buildDeliveryOption(
-                            'Express Delivery',
-                            '15-20 min',
-                            false,
-                          ),
-                        ],
-                      ),
-                    ),
-
-                    const SizedBox(height: 24),
-
-                    // Payment method
-                    _buildCheckoutSection(
-                      'Payment Method',
-                      Icons.payment,
-                      Column(
-                        children: [
-                          _buildPaymentOption(
-                            'Cash on Delivery',
-                            Icons.money,
-                            true,
-                          ),
-                          const SizedBox(height: 12),
-                          _buildPaymentOption(
-                            'Credit/Debit Card',
-                            Icons.credit_card,
-                            false,
-                          ),
-                        ],
-                      ),
-                    ),
-
-                    const SizedBox(height: 24),
-
-                    // Delivery address
-                    _buildCheckoutSection(
-                      'Delivery Address',
-                      Icons.location_on,
-                      Container(
-                        padding: const EdgeInsets.all(16),
-                        decoration: BoxDecoration(
-                          color: const Color(0xFFF8F9FA),
-                          borderRadius: BorderRadius.circular(12),
-                          border: Border.all(color: Colors.grey[300]!),
-                        ),
-                        child: const Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              'Home',
-                              style: TextStyle(
-                                fontWeight: FontWeight.w600,
-                                fontSize: 16,
-                              ),
-                            ),
-                            SizedBox(height: 8),
-                            Text(
-                              '123 High Street, Bristol BS1 2AA, United Kingdom',
-                              style: TextStyle(
-                                color: Color(0xFF7F8C8D),
-                                fontSize: 14,
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                    ),
-
-                    const SizedBox(height: 32),
-
-                    // Place order button
-                    SizedBox(
-                      width: double.infinity,
-                      height: 56,
-                      child: ElevatedButton(
-                        onPressed: _placeOrder,
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: const Color(0xFF006A4E),
-                          foregroundColor: Colors.white,
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(16),
-                          ),
-                          elevation: 4,
-                        ),
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            const Icon(Icons.check_circle, size: 24),
-                            const SizedBox(width: 12),
-                            Text(
-                              'Place Order • ${_cartManager.formatCurrency(_cartManager.total)}',
-                              style: const TextStyle(
-                                fontSize: 18,
-                                fontWeight: FontWeight.w700,
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                    ),
-                  ],
+          ),
+          child: Column(
+            children: [
+              // Handle bar with Bangladesh flag colors
+              Container(
+                width: 50,
+                height: 5,
+                margin: const EdgeInsets.symmetric(vertical: 12),
+                decoration: BoxDecoration(
+                  gradient: const LinearGradient(
+                    colors: [Color(0xFF006A4E), Color(0xFFDC143C)],
+                  ),
+                  borderRadius: BorderRadius.circular(10),
                 ),
               ),
-            ),
-          ],
+              Expanded(
+                child: SingleChildScrollView(
+                  padding: const EdgeInsets.all(24),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      // Header with Bangladesh flag inspired design
+                      Container(
+                        padding: const EdgeInsets.all(20),
+                        decoration: BoxDecoration(
+                          gradient: const LinearGradient(
+                            colors: [
+                              Color(0xFF006A4E),
+                              Color(0xFF008A5C),
+                              Color(0xFFDC143C),
+                            ],
+                            stops: [0.0, 0.6, 1.0],
+                          ),
+                          borderRadius: BorderRadius.circular(20),
+                          boxShadow: [
+                            BoxShadow(
+                              color: Colors.black.withOpacity(0.1),
+                              blurRadius: 8,
+                              offset: const Offset(0, 4),
+                            ),
+                          ],
+                        ),
+                        child: const Row(
+                          children: [
+                            Icon(
+                              Icons.restaurant,
+                              color: Colors.white,
+                              size: 30,
+                            ),
+                            SizedBox(width: 16),
+                            Expanded(
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    'Complete Your Order',
+                                    style: TextStyle(
+                                      fontSize: 24,
+                                      fontWeight: FontWeight.w800,
+                                      color: Colors.white,
+                                    ),
+                                  ),
+                                  SizedBox(height: 4),
+                                  Text(
+                                    'Authentic Bangladeshi Cuisine 🇧🇩',
+                                    style: TextStyle(
+                                      fontSize: 14,
+                                      color: Colors.white,
+                                      fontWeight: FontWeight.w400,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+
+                      const SizedBox(height: 24),
+
+                      // Order Type Selection
+                      _buildCheckoutSection(
+                        'Order Type',
+                        Icons.delivery_dining,
+                        Column(
+                          children: [
+                            _buildOrderTypeOption(
+                              'Collection',
+                              'Pick up from restaurant',
+                              Icons.store,
+                              'collection',
+                              setModalState,
+                            ),
+                            const SizedBox(height: 12),
+                            _buildOrderTypeOption(
+                              'Delivery',
+                              'Delivered to your door (+£2.99)',
+                              Icons.delivery_dining,
+                              'delivery',
+                              setModalState,
+                            ),
+                          ],
+                        ),
+                      ),
+
+                      const SizedBox(height: 24),
+
+                      // Payment Method Selection
+                      _buildCheckoutSection(
+                        'Payment Method',
+                        Icons.payment,
+                        Column(
+                          children: [
+                            _buildPaymentOption(
+                              'Cash',
+                              'Pay with cash',
+                              Icons.money,
+                              'cash',
+                              setModalState,
+                            ),
+                            const SizedBox(height: 12),
+                            _buildPaymentOption(
+                              'Card Payment',
+                              'Pay by card (+50p processing fee)',
+                              Icons.credit_card,
+                              'card',
+                              setModalState,
+                            ),
+                          ],
+                        ),
+                      ),
+
+                      const SizedBox(height: 24),
+
+                      // Address Section (only show if delivery)
+                      if (_cartManager.orderType == 'delivery') ...[
+                        _buildCheckoutSection(
+                          'Delivery Address',
+                          Icons.location_on,
+                          Column(
+                            children: [
+                              TextFormField(
+                                controller: _addressController,
+                                maxLines: 3,
+                                decoration: InputDecoration(
+                                  hintText: 'Enter your full address...',
+                                  border: OutlineInputBorder(
+                                    borderRadius: BorderRadius.circular(12),
+                                    borderSide: BorderSide(
+                                      color: Colors.grey[300]!,
+                                    ),
+                                  ),
+                                  focusedBorder: OutlineInputBorder(
+                                    borderRadius: BorderRadius.circular(12),
+                                    borderSide: const BorderSide(
+                                      color: Color(0xFF006A4E),
+                                      width: 2,
+                                    ),
+                                  ),
+                                  contentPadding: const EdgeInsets.all(16),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                        const SizedBox(height: 24),
+                      ],
+
+                      // Special Instructions
+                      _buildCheckoutSection(
+                        'Special Instructions',
+                        Icons.note_add,
+                        Column(
+                          children: [
+                            TextFormField(
+                              controller: _instructionsController,
+                              maxLines: 3,
+                              decoration: InputDecoration(
+                                hintText:
+                                    'Any special requests? (e.g., extra spicy, no onions...)',
+                                border: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(12),
+                                  borderSide: BorderSide(
+                                    color: Colors.grey[300]!,
+                                  ),
+                                ),
+                                focusedBorder: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(12),
+                                  borderSide: const BorderSide(
+                                    color: Color(0xFF006A4E),
+                                    width: 2,
+                                  ),
+                                ),
+                                contentPadding: const EdgeInsets.all(16),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+
+                      const SizedBox(height: 24),
+
+                      // Updated Order Summary
+                      Container(
+                        padding: const EdgeInsets.all(20),
+                        decoration: BoxDecoration(
+                          gradient: LinearGradient(
+                            colors: [
+                              const Color(0xFF006A4E).withOpacity(0.05),
+                              const Color(0xFFDC143C).withOpacity(0.05),
+                            ],
+                          ),
+                          borderRadius: BorderRadius.circular(16),
+                          border: Border.all(
+                            color: const Color(0xFF006A4E).withOpacity(0.3),
+                          ),
+                        ),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            const Text(
+                              'Order Summary',
+                              style: TextStyle(
+                                fontSize: 18,
+                                fontWeight: FontWeight.w700,
+                                color: Color(0xFF2C3E50),
+                              ),
+                            ),
+                            const SizedBox(height: 16),
+                            _buildSummaryRow(
+                              'Subtotal',
+                              _cartManager.formatCurrency(
+                                _cartManager.subtotal,
+                              ),
+                            ),
+                            const SizedBox(height: 8),
+                            _buildSummaryRow(
+                              'Service Charge',
+                              _cartManager.formatCurrency(
+                                _cartManager.serviceCharge,
+                              ),
+                            ),
+                            if (_cartManager.orderType == 'delivery') ...[
+                              const SizedBox(height: 8),
+                              _buildSummaryRow(
+                                'Delivery Fee',
+                                _cartManager.formatCurrency(
+                                  _cartManager.deliveryFee,
+                                ),
+                              ),
+                            ],
+                            if (_cartManager.paymentMethod == 'card') ...[
+                              const SizedBox(height: 8),
+                              _buildSummaryRow(
+                                'Card Processing Fee',
+                                _cartManager.formatCurrency(
+                                  _cartManager.cardCharge,
+                                ),
+                              ),
+                            ],
+                            const Divider(height: 20),
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                const Text(
+                                  'Total:',
+                                  style: TextStyle(
+                                    fontSize: 20,
+                                    fontWeight: FontWeight.w800,
+                                    color: Color(0xFF2C3E50),
+                                  ),
+                                ),
+                                Text(
+                                  _cartManager.formatCurrency(
+                                    _cartManager.total,
+                                  ),
+                                  style: const TextStyle(
+                                    fontSize: 20,
+                                    fontWeight: FontWeight.w800,
+                                    color: Color(0xFFDC143C),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ],
+                        ),
+                      ),
+
+                      const SizedBox(height: 32),
+
+                      // Place Order Button
+                      SizedBox(
+                        width: double.infinity,
+                        height: 56,
+                        child: ElevatedButton(
+                          onPressed: _placeOrder,
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: const Color(0xFF006A4E),
+                            foregroundColor: Colors.white,
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(16),
+                            ),
+                            elevation: 4,
+                          ),
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              const Icon(Icons.check_circle, size: 24),
+                              const SizedBox(width: 12),
+                              Text(
+                                'Place Order • ${_cartManager.formatCurrency(_cartManager.total)}',
+                                style: const TextStyle(
+                                  fontSize: 18,
+                                  fontWeight: FontWeight.w700,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ],
+          ),
         ),
       ),
     );
@@ -772,10 +931,12 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
               width: 40,
               height: 40,
               decoration: BoxDecoration(
-                color: const Color(0xFF006A4E).withOpacity(0.1),
+                gradient: const LinearGradient(
+                  colors: [Color(0xFF006A4E), Color(0xFFDC143C)],
+                ),
                 borderRadius: BorderRadius.circular(10),
               ),
-              child: Icon(icon, color: const Color(0xFF006A4E), size: 24),
+              child: Icon(icon, color: Colors.white, size: 24),
             ),
             const SizedBox(width: 12),
             Text(
@@ -794,97 +955,154 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
     );
   }
 
-  Widget _buildDeliveryOption(String title, String time, bool isSelected) {
-    return Container(
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: isSelected
-            ? const Color(0xFF006A4E).withOpacity(0.05)
-            : Colors.white,
-        borderRadius: BorderRadius.circular(12),
-        border: Border.all(
-          color: isSelected ? const Color(0xFF006A4E) : Colors.grey[300]!,
-          width: isSelected ? 2 : 1,
+  Widget _buildOrderTypeOption(
+    String title,
+    String subtitle,
+    IconData icon,
+    String orderType,
+    StateSetter setModalState,
+  ) {
+    final bool isSelected = _cartManager.orderType == orderType;
+
+    return GestureDetector(
+      onTap: () {
+        _cartManager.setOrderType(orderType);
+        setModalState(() {});
+      },
+      child: Container(
+        padding: const EdgeInsets.all(16),
+        decoration: BoxDecoration(
+          color: isSelected
+              ? const Color(0xFF006A4E).withOpacity(0.05)
+              : Colors.white,
+          borderRadius: BorderRadius.circular(12),
+          border: Border.all(
+            color: isSelected ? const Color(0xFF006A4E) : Colors.grey[300]!,
+            width: isSelected ? 2 : 1,
+          ),
         ),
-      ),
-      child: Row(
-        children: [
-          Icon(
-            isSelected
-                ? Icons.radio_button_checked
-                : Icons.radio_button_unchecked,
-            color: isSelected ? const Color(0xFF006A4E) : Colors.grey,
-          ),
-          const SizedBox(width: 12),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  title,
-                  style: TextStyle(
-                    fontSize: 16,
-                    fontWeight: FontWeight.w600,
-                    color: isSelected
-                        ? const Color(0xFF006A4E)
-                        : const Color(0xFF2C3E50),
-                  ),
-                ),
-                Text(
-                  time,
-                  style: TextStyle(fontSize: 14, color: Colors.grey[600]),
-                ),
-              ],
+        child: Row(
+          children: [
+            Icon(
+              isSelected
+                  ? Icons.radio_button_checked
+                  : Icons.radio_button_unchecked,
+              color: isSelected ? const Color(0xFF006A4E) : Colors.grey,
             ),
-          ),
-        ],
+            const SizedBox(width: 12),
+            Icon(icon, color: const Color(0xFFDC143C), size: 24),
+            const SizedBox(width: 12),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    title,
+                    style: TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.w600,
+                      color: isSelected
+                          ? const Color(0xFF006A4E)
+                          : const Color(0xFF2C3E50),
+                    ),
+                  ),
+                  Text(
+                    subtitle,
+                    style: TextStyle(fontSize: 14, color: Colors.grey[600]),
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }
 
-  Widget _buildPaymentOption(String title, IconData icon, bool isSelected) {
-    return Container(
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: isSelected
-            ? const Color(0xFF006A4E).withOpacity(0.05)
-            : Colors.white,
-        borderRadius: BorderRadius.circular(12),
-        border: Border.all(
-          color: isSelected ? const Color(0xFF006A4E) : Colors.grey[300]!,
-          width: isSelected ? 2 : 1,
+  Widget _buildPaymentOption(
+    String title,
+    String subtitle,
+    IconData icon,
+    String paymentMethod,
+    StateSetter setModalState,
+  ) {
+    final bool isSelected = _cartManager.paymentMethod == paymentMethod;
+
+    return GestureDetector(
+      onTap: () {
+        _cartManager.setPaymentMethod(paymentMethod);
+        setModalState(() {});
+      },
+      child: Container(
+        padding: const EdgeInsets.all(16),
+        decoration: BoxDecoration(
+          color: isSelected
+              ? const Color(0xFF006A4E).withOpacity(0.05)
+              : Colors.white,
+          borderRadius: BorderRadius.circular(12),
+          border: Border.all(
+            color: isSelected ? const Color(0xFF006A4E) : Colors.grey[300]!,
+            width: isSelected ? 2 : 1,
+          ),
         ),
-      ),
-      child: Row(
-        children: [
-          Icon(
-            isSelected
-                ? Icons.radio_button_checked
-                : Icons.radio_button_unchecked,
-            color: isSelected ? const Color(0xFF006A4E) : Colors.grey,
-          ),
-          const SizedBox(width: 12),
-          Icon(icon, color: const Color(0xFF7F8C8D)),
-          const SizedBox(width: 12),
-          Text(
-            title,
-            style: TextStyle(
-              fontSize: 16,
-              fontWeight: FontWeight.w600,
-              color: isSelected
-                  ? const Color(0xFF006A4E)
-                  : const Color(0xFF2C3E50),
+        child: Row(
+          children: [
+            Icon(
+              isSelected
+                  ? Icons.radio_button_checked
+                  : Icons.radio_button_unchecked,
+              color: isSelected ? const Color(0xFF006A4E) : Colors.grey,
             ),
-          ),
-        ],
+            const SizedBox(width: 12),
+            Icon(icon, color: const Color(0xFFDC143C), size: 24),
+            const SizedBox(width: 12),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    title,
+                    style: TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.w600,
+                      color: isSelected
+                          ? const Color(0xFF006A4E)
+                          : const Color(0xFF2C3E50),
+                    ),
+                  ),
+                  Text(
+                    subtitle,
+                    style: TextStyle(fontSize: 14, color: Colors.grey[600]),
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }
 
   void _placeOrder() {
+    // Validate delivery address if delivery is selected
+    if (_cartManager.orderType == 'delivery' &&
+        _addressController.text.trim().isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: const Text('Please enter a delivery address'),
+          backgroundColor: const Color(0xFFE74C3C),
+          behavior: SnackBarBehavior.floating,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(12),
+          ),
+        ),
+      );
+      return;
+    }
+
     Navigator.pop(context); // Close bottom sheet
 
-    // Show success dialog
+    // Show success dialog with Bangladesh theme
     showDialog(
       context: context,
       barrierDismissible: false,
@@ -895,16 +1113,26 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
+              // Success icon with Bangladesh colors
               Container(
                 width: 80,
                 height: 80,
                 decoration: BoxDecoration(
-                  color: const Color(0xFF4CAF50).withOpacity(0.1),
+                  gradient: const LinearGradient(
+                    colors: [Color(0xFF006A4E), Color(0xFF008A5C)],
+                  ),
                   shape: BoxShape.circle,
+                  boxShadow: [
+                    BoxShadow(
+                      color: const Color(0xFF006A4E).withOpacity(0.3),
+                      blurRadius: 8,
+                      offset: const Offset(0, 4),
+                    ),
+                  ],
                 ),
                 child: const Icon(
                   Icons.check_circle,
-                  color: Color(0xFF4CAF50),
+                  color: Colors.white,
                   size: 50,
                 ),
               ),
@@ -918,10 +1146,85 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
                 ),
               ),
               const SizedBox(height: 12),
-              const Text(
-                'Your order has been successfully placed.\nYou will receive a confirmation shortly.',
-                style: TextStyle(fontSize: 16, color: Color(0xFF7F8C8D)),
+              Text(
+                _cartManager.orderType == 'delivery'
+                    ? 'Your order will be delivered to:\n${_addressController.text}'
+                    : 'Your order is ready for collection',
+                style: const TextStyle(fontSize: 16, color: Color(0xFF7F8C8D)),
                 textAlign: TextAlign.center,
+              ),
+              const SizedBox(height: 16),
+              Container(
+                padding: const EdgeInsets.all(16),
+                decoration: BoxDecoration(
+                  color: const Color(0xFFF8F9FA),
+                  borderRadius: BorderRadius.circular(12),
+                  border: Border.all(
+                    color: const Color(0xFF006A4E).withOpacity(0.2),
+                  ),
+                ),
+                child: Column(
+                  children: [
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        const Text(
+                          'Order Type:',
+                          style: TextStyle(fontWeight: FontWeight.w600),
+                        ),
+                        Text(
+                          _cartManager.orderType == 'delivery'
+                              ? 'Delivery'
+                              : 'Collection',
+                          style: const TextStyle(
+                            color: Color(0xFF006A4E),
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 8),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        const Text(
+                          'Payment:',
+                          style: TextStyle(fontWeight: FontWeight.w600),
+                        ),
+                        Text(
+                          _cartManager.paymentMethod == 'cash'
+                              ? 'Cash'
+                              : 'Card',
+                          style: const TextStyle(
+                            color: Color(0xFF006A4E),
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 8),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        const Text(
+                          'Total:',
+                          style: TextStyle(
+                            fontWeight: FontWeight.w800,
+                            fontSize: 16,
+                          ),
+                        ),
+                        Text(
+                          _cartManager.formatCurrency(_cartManager.total),
+                          style: const TextStyle(
+                            color: Color(0xFFDC143C),
+                            fontWeight: FontWeight.w800,
+                            fontSize: 16,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
               ),
               const SizedBox(height: 24),
               SizedBox(

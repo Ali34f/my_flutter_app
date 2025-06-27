@@ -3,6 +3,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'reservation.dart';
 import 'info.dart';
 import 'cart_manager.dart';
+import 'order_history.dart';
 import 'checkout.dart';
 import 'menu_service.dart';
 
@@ -13,8 +14,7 @@ class HomeScreen extends StatefulWidget {
   State<HomeScreen> createState() => _HomeScreenState();
 }
 
-class _HomeScreenState extends State<HomeScreen>
-    with TickerProviderStateMixin, RouteAware {
+class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
   late TabController _tabController;
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
   final CartManager _cartManager = CartManager();
@@ -2076,36 +2076,22 @@ class _HomeScreenState extends State<HomeScreen>
     return Expanded(
       child: GestureDetector(
         onTap: () {
-          if (index == 0) {
-            // Menu - just update state, don't navigate
-            setState(() {
-              _selectedBottomIndex = 0;
-            });
-          } else {
-            // For other tabs, navigate and reset to menu when returning
-            if (index == 1) {
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (context) => const ReservationScreen(),
-                ),
-              ).then((_) {
-                // Reset to menu when returning from reservation
-                setState(() {
-                  _selectedBottomIndex = 0;
-                });
-              });
-            } else if (index == 2) {
-              Navigator.push(
-                context,
-                MaterialPageRoute(builder: (context) => const InfoScreen()),
-              ).then((_) {
-                // Reset to menu when returning from contact
-                setState(() {
-                  _selectedBottomIndex = 0;
-                });
-              });
-            }
+          setState(() {
+            _selectedBottomIndex = index;
+          });
+
+          if (index == 1) {
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => const ReservationScreen(),
+              ),
+            );
+          } else if (index == 2) {
+            Navigator.push(
+              context,
+              MaterialPageRoute(builder: (context) => const InfoScreen()),
+            );
           }
         },
         child: Container(
@@ -2281,7 +2267,7 @@ class _HomeScreenState extends State<HomeScreen>
 
           Expanded(
             child: ListView(
-              padding: const EdgeInsets.symmetric(vertical: 12),
+              padding: const EdgeInsets.symmetric(vertical: 16),
               children: [
                 _buildEnhancedDrawerItem(
                   Icons.home,
@@ -2322,20 +2308,14 @@ class _HomeScreenState extends State<HomeScreen>
                 if (!isGuest)
                   _buildEnhancedDrawerItem(Icons.history, 'Order History', () {
                     Navigator.pop(context);
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(
-                        content: const Text(
-                          'Order history coming soon! 📋',
-                          style: TextStyle(fontWeight: FontWeight.w600),
-                        ),
-                        backgroundColor: const Color(0xFF006A4E),
-                        behavior: SnackBarBehavior.floating,
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(12),
-                        ),
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => const OrderHistoryScreen(),
                       ),
                     );
                   }),
+
                 _buildEnhancedDrawerItem(Icons.phone, 'Contact Us', () {
                   Navigator.pop(context);
                   Navigator.push(
@@ -2386,13 +2366,13 @@ class _HomeScreenState extends State<HomeScreen>
               icon: Icon(
                 isGuest ? Icons.exit_to_app : Icons.logout,
                 color: const Color(0xFFF4D03F),
-                size: 20,
+                size: 22,
               ),
               label: Text(
                 isGuest ? 'Exit' : 'Logout',
                 style: const TextStyle(
                   color: Color(0xFFF4D03F),
-                  fontSize: 15,
+                  fontSize: 16,
                   fontWeight: FontWeight.w700,
                   letterSpacing: 0.5,
                 ),
@@ -2403,8 +2383,8 @@ class _HomeScreenState extends State<HomeScreen>
                   borderRadius: BorderRadius.circular(25),
                 ),
                 padding: const EdgeInsets.symmetric(
-                  vertical: 12,
-                  horizontal: 20,
+                  vertical: 16,
+                  horizontal: 24,
                 ),
                 backgroundColor: Colors.transparent,
               ),
@@ -2423,7 +2403,7 @@ class _HomeScreenState extends State<HomeScreen>
     VoidCallback onTap,
   ) {
     return Container(
-      margin: const EdgeInsets.symmetric(horizontal: 12, vertical: 3),
+      margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
       decoration: BoxDecoration(borderRadius: BorderRadius.circular(10)),
       child: ListTile(
         leading: Container(
@@ -2432,19 +2412,19 @@ class _HomeScreenState extends State<HomeScreen>
             color: Colors.white.withOpacity(0.08),
             borderRadius: BorderRadius.circular(8),
           ),
-          child: Icon(icon, color: Colors.white, size: 20),
+          child: Icon(icon, color: Colors.white, size: 24),
         ),
         title: Text(
           title,
           style: const TextStyle(
             color: Colors.white,
-            fontSize: 14,
+            fontSize: 16,
             fontWeight: FontWeight.w600,
             letterSpacing: 0.3,
           ),
         ),
         onTap: onTap,
-        contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+        contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
         hoverColor: Colors.white.withOpacity(0.05),
         splashColor: Colors.white.withOpacity(0.1),

@@ -31,21 +31,35 @@ class CartManager extends ChangeNotifier {
 
   final List<CartItem> _items = [];
 
+  // Order type: 'delivery' or 'collection'
+  String _orderType =
+      'collection'; // Default to collection (no delivery charge)
+
+  // Payment method: 'cash' or 'card'
+  String _paymentMethod = 'cash'; // Default to cash (no card charge)
+
   List<CartItem> get items => List.unmodifiable(_items);
+  String get orderType => _orderType;
+  String get paymentMethod => _paymentMethod;
 
   int get itemCount => _items.fold(0, (sum, item) => sum + item.quantity);
-
   double get subtotal => _items.fold(0, (sum, item) => sum + item.totalPrice);
 
-  // Updated delivery fee threshold for UK market (£25 for free delivery)
-  double get deliveryFee => _items.isEmpty ? 0 : (subtotal >= 25 ? 0 : 2.99);
+  // Service charge: 75p for all orders
+  double get serviceCharge => _items.isEmpty ? 0 : 0.75;
 
-  // UK VAT rate is 20%
-  double get tax => subtotal * 0.20;
+  // Delivery fee: £2.99 only if delivery is selected
+  double get deliveryFee =>
+      (_items.isEmpty || _orderType == 'collection') ? 0 : 2.99;
 
-  double get total => subtotal + deliveryFee + tax;
+  // Card processing fee: 50p only if card payment is selected
+  double get cardCharge =>
+      (_items.isEmpty || _paymentMethod == 'cash') ? 0 : 0.50;
 
-  // Free delivery threshold for UK market
+  // Total calculation
+  double get total => subtotal + serviceCharge + deliveryFee + cardCharge;
+
+  // Free delivery threshold (for future use)
   double get freeDeliveryThreshold => 25.0;
 
   void addItem({
@@ -92,8 +106,20 @@ class CartManager extends ChangeNotifier {
     }
   }
 
+  void setOrderType(String type) {
+    _orderType = type;
+    notifyListeners();
+  }
+
+  void setPaymentMethod(String method) {
+    _paymentMethod = method;
+    notifyListeners();
+  }
+
   void clearCart() {
     _items.clear();
+    _orderType = 'collection';
+    _paymentMethod = 'cash';
     notifyListeners();
   }
 
