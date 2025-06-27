@@ -1419,6 +1419,212 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
     );
   }
 
+  Widget _buildEnhancedCategoryTabs() {
+    return Container(
+      decoration: BoxDecoration(
+        color: const Color(0xFFF8F9FA),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.05),
+            blurRadius: 8,
+            offset: const Offset(0, 2),
+          ),
+        ],
+      ),
+      child: Column(
+        children: [
+          const SizedBox(height: 16),
+          SizedBox(
+            height: 50,
+            child: TabBar(
+              controller: _tabController,
+              isScrollable: true,
+              indicatorColor: Colors.transparent,
+              dividerColor: Colors.transparent,
+              labelColor: Colors.white,
+              unselectedLabelColor: const Color(0xFFDC143C),
+              labelStyle: const TextStyle(
+                fontSize: 11,
+                fontWeight: FontWeight.w600,
+              ),
+              unselectedLabelStyle: const TextStyle(
+                fontSize: 11,
+                fontWeight: FontWeight.w500,
+              ),
+              padding: const EdgeInsets.symmetric(horizontal: 8),
+              tabAlignment: TabAlignment.start,
+              labelPadding: const EdgeInsets.symmetric(horizontal: 3),
+              tabs: List.generate(categories.length, (index) {
+                final isSelected = _tabController.index == index;
+                return Tab(
+                  child: Container(
+                    constraints: const BoxConstraints(
+                      minWidth: 65,
+                      maxWidth: 120,
+                      minHeight: 32,
+                    ),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 8,
+                      vertical: 4,
+                    ),
+                    decoration: BoxDecoration(
+                      gradient: isSelected
+                          ? const LinearGradient(
+                              colors: [Color(0xFFDC143C), Color(0xFFE74C3C)],
+                            )
+                          : null,
+                      color: isSelected ? null : Colors.white,
+                      borderRadius: BorderRadius.circular(16),
+                      border: Border.all(
+                        color: const Color(0xFFDC143C),
+                        width: 1.2,
+                      ),
+                      boxShadow: isSelected
+                          ? [
+                              BoxShadow(
+                                color: const Color(0xFFDC143C).withOpacity(0.3),
+                                blurRadius: 4,
+                                offset: const Offset(0, 2),
+                              ),
+                            ]
+                          : null,
+                    ),
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Icon(
+                          categoryIcons[index % categoryIcons.length],
+                          size: 12,
+                        ),
+                        const SizedBox(width: 3),
+                        Flexible(
+                          child: Text(
+                            categories[index].trim(),
+                            overflow: TextOverflow.ellipsis,
+                            maxLines: 1,
+                            textAlign: TextAlign.center,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                );
+              }),
+            ),
+          ),
+          const SizedBox(height: 10),
+          Container(
+            height: 2,
+            margin: const EdgeInsets.symmetric(horizontal: 20),
+            child: LinearProgressIndicator(
+              value: (_tabController.index + 1) / categories.length,
+              backgroundColor: Colors.grey.withOpacity(0.2),
+              valueColor: const AlwaysStoppedAnimation<Color>(
+                Color(0xFFDC143C),
+              ),
+            ),
+          ),
+          const SizedBox(height: 8),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildCategoryNotice(String category) {
+    String? notice;
+    Color backgroundColor;
+    Color textColor;
+    Color borderColor;
+    IconData icon;
+
+    switch (category.toLowerCase()) {
+      case 'curries':
+      case 'house specials':
+      case 'seafood':
+      case 'vegetarian':
+      case 'balti dishes':
+        notice =
+            'Served with free plain rice, pilau rice, naan or chips.\nAny other rice or naan £2.10 extra';
+        backgroundColor = const Color(0xFFE8F5E8); // Light green background
+        textColor = const Color(0xFF2E7D32); // Dark green text
+        borderColor = const Color(0xFF4CAF50); // Medium green border
+        icon = Icons.rice_bowl;
+        break;
+
+      case 'starters':
+        notice = 'All starters served with mint sauce and salad';
+        backgroundColor = const Color(0xFFFEEBEE); // Light red background
+        textColor = const Color(0xFFC62828); // Dark red text
+        borderColor = const Color(0xFFE57373); // Medium red border
+        icon = Icons.restaurant;
+        break;
+
+      case 'side dishes':
+        notice =
+            'All vegetable dishes available as main course extra £3.50.\nAlso served with free plain rice, pilau rice, naan or chips.\nAny changes £2.10 extra';
+        backgroundColor = const Color(0xFFFFF8E1); // Light orange background
+        textColor = const Color(0xFFE65100); // Dark orange text
+        borderColor = const Color(0xFFFFB74D); // Medium orange border
+        icon = Icons.eco;
+        break;
+
+      case 'tandoori':
+        notice =
+            'All tandoori dishes served with plain naan, mint sauce and salad.\nAny changes of naan £2.10';
+        backgroundColor = const Color(0xFFF3E5F5); // Light purple background
+        textColor = const Color(0xFF6A1B9A); // Dark purple text
+        borderColor = const Color(0xFF9C27B0); // Medium purple border
+        icon = Icons.local_fire_department;
+        break;
+
+      default:
+        return const SizedBox.shrink();
+    }
+
+    return Container(
+      margin: const EdgeInsets.fromLTRB(16, 8, 16, 0),
+      padding: const EdgeInsets.all(14),
+      decoration: BoxDecoration(
+        color: backgroundColor,
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: borderColor.withOpacity(0.3), width: 1),
+        boxShadow: [
+          BoxShadow(
+            color: borderColor.withOpacity(0.1),
+            blurRadius: 6,
+            offset: const Offset(0, 2),
+          ),
+        ],
+      ),
+      child: Row(
+        children: [
+          Container(
+            padding: const EdgeInsets.all(8),
+            decoration: BoxDecoration(
+              color: borderColor.withOpacity(0.1),
+              borderRadius: BorderRadius.circular(8),
+            ),
+            child: Icon(icon, color: textColor, size: 18),
+          ),
+          const SizedBox(width: 12),
+          Expanded(
+            child: Text(
+              notice,
+              style: TextStyle(
+                color: textColor,
+                fontSize: 12,
+                fontWeight: FontWeight.w600,
+                height: 1.3,
+              ),
+            ),
+          ),
+          Icon(Icons.info_outline, color: textColor.withOpacity(0.6), size: 16),
+        ],
+      ),
+    );
+  }
+
   Widget _buildMenuItems(String category) {
     final allItems = MenuService.getItemsByCategory(category);
 
@@ -1456,9 +1662,19 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
       color: const Color(0xFFF8F9FA),
       child: ListView.builder(
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-        itemCount: groupedItems.length,
+        itemCount: groupedItems.length + 1, // +1 for the notice
         itemBuilder: (context, index) {
-          final itemGroup = groupedItems.values.elementAt(index);
+          // First item is the category notice
+          if (index == 0) {
+            return Padding(
+              padding: const EdgeInsets.only(bottom: 8),
+              child: _buildCategoryNotice(category),
+            );
+          }
+
+          // Adjust index for actual menu items
+          final actualIndex = index - 1;
+          final itemGroup = groupedItems.values.elementAt(actualIndex);
           final firstItem = itemGroup.first;
 
           // Get the price range for display
@@ -1925,118 +2141,6 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
             ],
           ),
         ),
-      ),
-    );
-  }
-
-  Widget _buildEnhancedCategoryTabs() {
-    return Container(
-      decoration: BoxDecoration(
-        color: const Color(0xFFF8F9FA),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.05),
-            blurRadius: 8,
-            offset: const Offset(0, 2),
-          ),
-        ],
-      ),
-      child: Column(
-        children: [
-          const SizedBox(height: 16),
-          SizedBox(
-            height: 50,
-            child: TabBar(
-              controller: _tabController,
-              isScrollable: true,
-              indicatorColor: Colors.transparent,
-              dividerColor: Colors.transparent,
-              labelColor: Colors.white,
-              unselectedLabelColor: const Color(0xFFDC143C),
-              labelStyle: const TextStyle(
-                fontSize: 11,
-                fontWeight: FontWeight.w600,
-              ),
-              unselectedLabelStyle: const TextStyle(
-                fontSize: 11,
-                fontWeight: FontWeight.w500,
-              ),
-              padding: const EdgeInsets.symmetric(horizontal: 8),
-              tabAlignment: TabAlignment.start,
-              labelPadding: const EdgeInsets.symmetric(horizontal: 3),
-              tabs: List.generate(categories.length, (index) {
-                final isSelected = _tabController.index == index;
-                return Tab(
-                  child: Container(
-                    constraints: const BoxConstraints(
-                      minWidth: 65,
-                      maxWidth: 120,
-                      minHeight: 32,
-                    ),
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 8,
-                      vertical: 4,
-                    ),
-                    decoration: BoxDecoration(
-                      gradient: isSelected
-                          ? const LinearGradient(
-                              colors: [Color(0xFFDC143C), Color(0xFFE74C3C)],
-                            )
-                          : null,
-                      color: isSelected ? null : Colors.white,
-                      borderRadius: BorderRadius.circular(16),
-                      border: Border.all(
-                        color: const Color(0xFFDC143C),
-                        width: 1.2,
-                      ),
-                      boxShadow: isSelected
-                          ? [
-                              BoxShadow(
-                                color: const Color(0xFFDC143C).withOpacity(0.3),
-                                blurRadius: 4,
-                                offset: const Offset(0, 2),
-                              ),
-                            ]
-                          : null,
-                    ),
-                    child: Row(
-                      mainAxisSize: MainAxisSize.min,
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Icon(
-                          categoryIcons[index % categoryIcons.length],
-                          size: 12,
-                        ),
-                        const SizedBox(width: 3),
-                        Flexible(
-                          child: Text(
-                            categories[index].trim(),
-                            overflow: TextOverflow.ellipsis,
-                            maxLines: 1,
-                            textAlign: TextAlign.center,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                );
-              }),
-            ),
-          ),
-          const SizedBox(height: 10),
-          Container(
-            height: 2,
-            margin: const EdgeInsets.symmetric(horizontal: 20),
-            child: LinearProgressIndicator(
-              value: (_tabController.index + 1) / categories.length,
-              backgroundColor: Colors.grey.withOpacity(0.2),
-              valueColor: const AlwaysStoppedAnimation<Color>(
-                Color(0xFFDC143C),
-              ),
-            ),
-          ),
-          const SizedBox(height: 8),
-        ],
       ),
     );
   }
