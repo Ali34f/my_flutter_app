@@ -301,6 +301,65 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
     );
   }
 
+  // Method to add complete curry dish to cart
+  void _addCurryDishToCart(
+    String curryType,
+    String protein,
+    String side,
+    double totalPrice,
+    String spiceLevel,
+  ) {
+    final String id = 'curry_${DateTime.now().millisecondsSinceEpoch}';
+    final String combinedName = '$protein $curryType with $side';
+
+    _cartManager.addItem(
+      id: id,
+      name: combinedName,
+      category: 'Curries',
+      price: totalPrice,
+      spiceLevel: spiceLevel,
+    );
+
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Row(
+          children: [
+            const Icon(Icons.check_circle, color: Colors.white, size: 20),
+            const SizedBox(width: 8),
+            Expanded(
+              child: Text(
+                '$combinedName added to cart! 🛒',
+                style: const TextStyle(fontWeight: FontWeight.w600),
+              ),
+            ),
+            TextButton(
+              onPressed: () {
+                ScaffoldMessenger.of(context).hideCurrentSnackBar();
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => const CheckoutScreen(),
+                  ),
+                );
+              },
+              child: const Text(
+                'VIEW CART',
+                style: TextStyle(
+                  color: Colors.white,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+            ),
+          ],
+        ),
+        backgroundColor: const Color(0xFF006A4E),
+        duration: const Duration(seconds: 3),
+        behavior: SnackBarBehavior.floating,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+      ),
+    );
+  }
+
   // Get item variants and prices
   Map<String, double> _getItemVariants(String name, String category) {
     final items = MenuService.getItemsByCategory(category);
@@ -322,6 +381,153 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
   bool _isSetMeal(String category, String name) {
     return category.toLowerCase().contains('setmeal') ||
         name.toLowerCase().contains('setmeal');
+  }
+
+  // Check if this is a curry item that needs protein and side selection
+  bool _isCurryItem(String category, String name) {
+    // If it's not a curry-related category, return false
+    if (!category.toLowerCase().contains('curries') &&
+        !category.toLowerCase().contains('curry') &&
+        !category.toLowerCase().contains('house specials') &&
+        !category.toLowerCase().contains('vegetarian') &&
+        !category.toLowerCase().contains('balti')) {
+      return false;
+    }
+
+    // Smart detection: if an item doesn't have variants with different proteins,
+    // it's probably a standalone dish that shouldn't use curry interface
+    if (category.toLowerCase().contains('house specials')) {
+      final categoryItems = MenuService.getItemsByCategory(category);
+      final curryType = _extractCurryType(name);
+
+      // Count how many different proteins exist for this curry type
+      final proteinCount = categoryItems.where((item) {
+        final itemCurryType = _extractCurryType(item.name);
+        return itemCurryType.toLowerCase() == curryType.toLowerCase();
+      }).length;
+
+      // If only 1 variant exists, it's probably a standalone dish
+      if (proteinCount <= 1) {
+        return false;
+      }
+    }
+
+    return true;
+  }
+
+  // Extract curry type from item name (e.g., "Chicken Korma" -> "Korma")
+  String _extractCurryType(String itemName) {
+    final commonProteins = [
+      'chicken',
+      'lamb',
+      'beef',
+      'prawn',
+      'king prawn',
+      'fish',
+      'vegetable',
+      'paneer',
+    ];
+    String curryType = itemName.toLowerCase();
+
+    for (final protein in commonProteins) {
+      if (curryType.startsWith(protein)) {
+        curryType = curryType.replaceFirst(protein, '').trim();
+        break;
+      }
+    }
+
+    return curryType.isNotEmpty ? curryType : itemName;
+  }
+
+  // Get available proteins for a curry type
+  List<Map<String, dynamic>> _getAvailableProteins(
+    String curryType,
+    String category,
+  ) {
+    final items = MenuService.getItemsByCategory(category);
+    final proteins = <Map<String, dynamic>>[];
+
+    // Special handling for seafood - show all seafood options for any seafood curry
+    if (category.toLowerCase().contains('seafood')) {
+      final Set<String> addedProteins = {}; // Prevent duplicates
+
+      for (final item in items) {
+        if (item.name.toLowerCase().contains('curry') ||
+            item.name.toLowerCase().contains('masala') ||
+            item.name.toLowerCase().contains('korma') ||
+            item.name.toLowerCase().contains('madras')) {
+          final extractedType = _extractCurryType(item.name);
+          final protein = item.name
+              .toLowerCase()
+              .replaceAll(extractedType.toLowerCase(), '')
+              .trim();
+
+          if (protein.isNotEmpty && !addedProteins.contains(protein)) {
+            addedProteins.add(protein);
+            proteins.add({
+              'name': _capitalizeFirst(protein),
+              'price': item.price,
+              'spiceLevel': item.spiceLevel,
+            });
+          }
+        }
+      }
+
+      // If no curry-like items found, create a default protein from the clicked item
+      if (proteins.isEmpty) {
+        final extractedType = _extractCurryType(curryType);
+        final protein = curryType
+            .toLowerCase()
+            .replaceAll(extractedType.toLowerCase(), '')
+            .trim();
+        if (protein.isNotEmpty) {
+          // Find the price from the original item
+          final originalItem = items.firstWhere(
+            (item) => item.name.toLowerCase().contains(curryType.toLowerCase()),
+            orElse: () => items.first,
+          );
+          proteins.add({
+            'name': _capitalizeFirst(protein),
+            'price': originalItem.price,
+            'spiceLevel': originalItem.spiceLevel,
+          });
+        }
+      }
+    } else {
+      // Original logic for other categories
+      for (final item in items) {
+        final extractedType = _extractCurryType(item.name);
+        if (extractedType.toLowerCase().contains(curryType.toLowerCase())) {
+          final protein = item.name
+              .toLowerCase()
+              .replaceAll(extractedType.toLowerCase(), '')
+              .trim();
+          if (protein.isNotEmpty) {
+            proteins.add({
+              'name': _capitalizeFirst(protein),
+              'price': item.price,
+              'spiceLevel': item.spiceLevel,
+            });
+          }
+        }
+      }
+    }
+
+    return proteins;
+  }
+
+  String _capitalizeFirst(String text) {
+    if (text.isEmpty) return text;
+    return text[0].toUpperCase() + text.substring(1);
+  }
+
+  // Check if this is a seafood curry that needs curry selection interface
+  bool _isSeafoodCurry(String category, String name) {
+    return category.toLowerCase().contains('seafood') &&
+        (name.toLowerCase().contains('curry') ||
+            name.toLowerCase().contains('masala') ||
+            name.toLowerCase().contains('korma') ||
+            name.toLowerCase().contains('madras'));
   }
 
   // Show SetMeal selection interface
@@ -655,6 +861,465 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
     );
   }
 
+  // Show curry selection interface (protein + side)
+  void _showCurrySelection(
+    BuildContext context,
+    String curryType,
+    String description,
+    String category,
+  ) {
+    final availableProteins = _getAvailableProteins(curryType, category);
+
+    // Fixed side options
+    final sideOptions = [
+      {'name': 'Plain Rice', 'price': 0.0},
+      {'name': 'Pilau Rice', 'price': 0.0},
+      {'name': 'Plain Naan', 'price': 0.0},
+      {'name': 'Chips', 'price': 0.0},
+      {'name': 'Cheese Naan', 'price': 2.10},
+      {'name': 'Chilli Naan', 'price': 2.10},
+      {'name': 'Coconut Rice', 'price': 2.10},
+      {'name': 'Keema Naan', 'price': 2.10},
+      {'name': 'Keema Rice', 'price': 2.10},
+      {'name': 'Peshwari Naan', 'price': 2.10},
+      {'name': 'Vegetable Naan', 'price': 2.10},
+      {'name': 'Vegetable Rice', 'price': 2.10},
+    ];
+
+    // Selection state
+    String? selectedProtein;
+    String? selectedSide;
+    double selectedProteinPrice = 0.0;
+    String selectedSpiceLevel = '';
+
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      builder: (BuildContext context) {
+        return StatefulBuilder(
+          builder: (context, setModalState) {
+            bool canAddToCart = selectedProtein != null && selectedSide != null;
+            double sidePrice = selectedSide != null
+                ? sideOptions.firstWhere(
+                        (s) => s['name'] == selectedSide,
+                      )['price']
+                      as double
+                : 0.0;
+            double totalPrice = selectedProteinPrice + sidePrice;
+
+            return DraggableScrollableSheet(
+              initialChildSize: 0.85,
+              minChildSize: 0.5,
+              maxChildSize: 0.95,
+              builder: (_, controller) {
+                return Container(
+                  decoration: const BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.only(
+                      topLeft: Radius.circular(25),
+                      topRight: Radius.circular(25),
+                    ),
+                  ),
+                  child: Column(
+                    children: [
+                      // Handle bar
+                      Container(
+                        width: 50,
+                        height: 5,
+                        margin: const EdgeInsets.symmetric(vertical: 12),
+                        decoration: BoxDecoration(
+                          color: Colors.grey[300],
+                          borderRadius: BorderRadius.circular(10),
+                        ),
+                      ),
+
+                      Expanded(
+                        child: SingleChildScrollView(
+                          controller: controller,
+                          padding: const EdgeInsets.all(24),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              // Curry Header
+                              Row(
+                                children: [
+                                  Container(
+                                    width: 60,
+                                    height: 60,
+                                    decoration: BoxDecoration(
+                                      gradient: const LinearGradient(
+                                        colors: [
+                                          Color(0xFFDC143C),
+                                          Color(0xFFE74C3C),
+                                        ],
+                                      ),
+                                      borderRadius: BorderRadius.circular(15),
+                                    ),
+                                    child: const Icon(
+                                      Icons.restaurant,
+                                      color: Colors.white,
+                                      size: 30,
+                                    ),
+                                  ),
+                                  const SizedBox(width: 16),
+                                  Expanded(
+                                    child: Column(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                      children: [
+                                        Text(
+                                          _capitalizeFirst(curryType),
+                                          style: const TextStyle(
+                                            fontSize: 24,
+                                            fontWeight: FontWeight.w800,
+                                            color: Color(0xFF2C3E50),
+                                          ),
+                                        ),
+                                        const SizedBox(height: 4),
+                                        const Text(
+                                          'Choose your curry and side',
+                                          style: TextStyle(
+                                            fontSize: 14,
+                                            color: Color(0xFF7F8C8D),
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                ],
+                              ),
+
+                              const SizedBox(height: 24),
+
+                              if (description.isNotEmpty) ...[
+                                Text(
+                                  description,
+                                  style: const TextStyle(
+                                    fontSize: 14,
+                                    color: Color(0xFF7F8C8D),
+                                    height: 1.5,
+                                  ),
+                                ),
+                                const SizedBox(height: 24),
+                              ],
+
+                              // Choose Curry
+                              _buildCurrySelectionSection(
+                                'Choose Your Curry',
+                                Icons.restaurant,
+                                availableProteins,
+                                selectedProtein,
+                                (String name) {
+                                  setModalState(() {
+                                    selectedProtein = name;
+                                    final protein = availableProteins
+                                        .firstWhere((p) => p['name'] == name);
+                                    selectedProteinPrice =
+                                        protein['price'] as double;
+                                    selectedSpiceLevel =
+                                        protein['spiceLevel'] as String;
+                                  });
+                                },
+                                showPrice: true,
+                              ),
+
+                              const SizedBox(height: 20),
+
+                              // Step 2: Choose Side
+                              _buildCurrySelectionSection(
+                                'Choose Side',
+                                Icons.rice_bowl,
+                                sideOptions,
+                                selectedSide,
+                                (String name) {
+                                  setModalState(() {
+                                    selectedSide = name;
+                                  });
+                                },
+                                showPrice: true,
+                              ),
+
+                              const SizedBox(height: 32),
+
+                              // Summary and Total
+                              Container(
+                                padding: const EdgeInsets.all(20),
+                                decoration: BoxDecoration(
+                                  color: const Color(0xFFF8F9FA),
+                                  borderRadius: BorderRadius.circular(15),
+                                  border: Border.all(
+                                    color: const Color(
+                                      0xFFDC143C,
+                                    ).withOpacity(0.2),
+                                  ),
+                                ),
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    const Text(
+                                      'Your Order Summary',
+                                      style: TextStyle(
+                                        fontSize: 18,
+                                        fontWeight: FontWeight.w700,
+                                        color: Color(0xFF2C3E50),
+                                      ),
+                                    ),
+                                    const SizedBox(height: 12),
+                                    if (selectedProtein != null)
+                                      _buildSummaryItem(
+                                        'Protein:',
+                                        '$selectedProtein $curryType',
+                                        selectedProteinPrice,
+                                      ),
+                                    if (selectedSide != null)
+                                      _buildSummaryItem(
+                                        'Side:',
+                                        selectedSide!,
+                                        sidePrice,
+                                      ),
+                                    const Divider(height: 20),
+                                    Row(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.spaceBetween,
+                                      children: [
+                                        const Text(
+                                          'Total Price:',
+                                          style: TextStyle(
+                                            fontSize: 18,
+                                            fontWeight: FontWeight.w800,
+                                            color: Color(0xFF2C3E50),
+                                          ),
+                                        ),
+                                        Text(
+                                          '£${totalPrice.toStringAsFixed(2)}',
+                                          style: const TextStyle(
+                                            fontSize: 24,
+                                            fontWeight: FontWeight.w800,
+                                            color: Color(0xFFDC143C),
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  ],
+                                ),
+                              ),
+
+                              const SizedBox(height: 24),
+
+                              // Add to Cart button
+                              SizedBox(
+                                width: double.infinity,
+                                height: 52,
+                                child: ElevatedButton(
+                                  onPressed: canAddToCart
+                                      ? () {
+                                          Navigator.pop(context);
+                                          _addCurryDishToCart(
+                                            curryType,
+                                            selectedProtein!,
+                                            selectedSide!,
+                                            totalPrice,
+                                            selectedSpiceLevel,
+                                          );
+                                        }
+                                      : null,
+                                  style: ElevatedButton.styleFrom(
+                                    backgroundColor: canAddToCart
+                                        ? const Color(0xFFDC143C)
+                                        : Colors.grey[400],
+                                    foregroundColor: Colors.white,
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(14),
+                                    ),
+                                    elevation: canAddToCart ? 3 : 0,
+                                  ),
+                                  child: Row(
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    children: [
+                                      const Icon(
+                                        Icons.shopping_cart_outlined,
+                                        size: 20,
+                                      ),
+                                      const SizedBox(width: 8),
+                                      Text(
+                                        canAddToCart
+                                            ? 'Add to Cart - £${totalPrice.toStringAsFixed(2)}'
+                                            : 'Please make all selections',
+                                        style: const TextStyle(
+                                          fontSize: 16,
+                                          fontWeight: FontWeight.w700,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                );
+              },
+            );
+          },
+        );
+      },
+    );
+  }
+
+  Widget _buildCurrySelectionSection(
+    String title,
+    IconData icon,
+    List<Map<String, dynamic>> items,
+    String? selectedItem,
+    Function(String) onItemSelected, {
+    bool showPrice = false,
+  }) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Row(
+          children: [
+            Icon(icon, color: const Color(0xFFDC143C), size: 20),
+            const SizedBox(width: 8),
+            Text(
+              title,
+              style: const TextStyle(
+                fontSize: 18,
+                fontWeight: FontWeight.w700,
+                color: Color(0xFF2C3E50),
+              ),
+            ),
+            if (selectedItem == null)
+              Container(
+                margin: const EdgeInsets.only(left: 8),
+                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                decoration: BoxDecoration(
+                  color: const Color(0xFFDC143C),
+                  borderRadius: BorderRadius.circular(10),
+                ),
+                child: const Text(
+                  '1 Required',
+                  style: TextStyle(
+                    color: Colors.white,
+                    fontSize: 10,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+              ),
+          ],
+        ),
+        const SizedBox(height: 12),
+        if (items.isEmpty)
+          Container(
+            padding: const EdgeInsets.all(16),
+            decoration: BoxDecoration(
+              color: Colors.grey[100],
+              borderRadius: BorderRadius.circular(10),
+            ),
+            child: const Text(
+              'No items available for this selection',
+              style: TextStyle(color: Color(0xFF7F8C8D)),
+            ),
+          )
+        else
+          Container(
+            decoration: BoxDecoration(
+              border: Border.all(color: Colors.grey[300]!),
+              borderRadius: BorderRadius.circular(10),
+            ),
+            child: Column(
+              children: items.asMap().entries.map((entry) {
+                final index = entry.key;
+                final item = entry.value;
+                final itemName = item['name'] as String;
+                final itemPrice = item['price'] as double;
+                final isSelected = selectedItem == itemName;
+                final isLastItem = index == items.length - 1;
+
+                return GestureDetector(
+                  onTap: () => onItemSelected(itemName),
+                  child: Container(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 16,
+                      vertical: 12,
+                    ),
+                    decoration: BoxDecoration(
+                      color: isSelected
+                          ? const Color(0xFFDC143C).withOpacity(0.05)
+                          : Colors.white,
+                      border: !isLastItem
+                          ? Border(
+                              bottom: BorderSide(
+                                color: Colors.grey[200]!,
+                                width: 1,
+                              ),
+                            )
+                          : null,
+                    ),
+                    child: Row(
+                      children: [
+                        Container(
+                          width: 20,
+                          height: 20,
+                          decoration: BoxDecoration(
+                            shape: BoxShape.circle,
+                            border: Border.all(
+                              color: isSelected
+                                  ? const Color(0xFFDC143C)
+                                  : Colors.grey[400]!,
+                              width: 2,
+                            ),
+                            color: isSelected
+                                ? const Color(0xFFDC143C)
+                                : Colors.transparent,
+                          ),
+                          child: isSelected
+                              ? const Icon(
+                                  Icons.check,
+                                  color: Colors.white,
+                                  size: 14,
+                                )
+                              : null,
+                        ),
+                        const SizedBox(width: 12),
+                        Expanded(
+                          child: Text(
+                            itemName,
+                            style: TextStyle(
+                              fontSize: 14,
+                              fontWeight: FontWeight.w500,
+                              color: isSelected
+                                  ? const Color(0xFFDC143C)
+                                  : const Color(0xFF2C3E50),
+                            ),
+                          ),
+                        ),
+                        if (showPrice && itemPrice > 0)
+                          Text(
+                            '+£${itemPrice.toStringAsFixed(2)}',
+                            style: TextStyle(
+                              fontSize: 12,
+                              fontWeight: FontWeight.w600,
+                              color: isSelected
+                                  ? const Color(0xFFDC143C)
+                                  : const Color(0xFF7F8C8D),
+                            ),
+                          ),
+                      ],
+                    ),
+                  ),
+                );
+              }).toList(),
+            ),
+          ),
+      ],
+    );
+  }
+
   Widget _buildSetMealListSection(
     String title,
     IconData icon,
@@ -804,7 +1469,17 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
               style: const TextStyle(fontSize: 14, color: Color(0xFF2C3E50)),
             ),
           ),
-          const Icon(Icons.check_circle, color: Color(0xFF27AE60), size: 16),
+          if (price > 0)
+            Text(
+              '+£${price.toStringAsFixed(2)}',
+              style: const TextStyle(
+                fontSize: 12,
+                fontWeight: FontWeight.w600,
+                color: Color(0xFF7F8C8D),
+              ),
+            )
+          else
+            const Icon(Icons.check_circle, color: Color(0xFF27AE60), size: 16),
         ],
       ),
     );
@@ -824,6 +1499,13 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
       final variants = _getItemVariants(name, category);
       final basePrice = variants.isNotEmpty ? variants.values.first : 0.0;
       _showSetMealSelection(context, name, description, category, basePrice);
+      return;
+    }
+
+    // Check if this is a curry item - if so, show curry selection interface
+    if (_isCurryItem(category, name) || _isSeafoodCurry(category, name)) {
+      final curryType = _extractCurryType(name);
+      _showCurrySelection(context, curryType, description, category);
       return;
     }
 
@@ -1631,7 +2313,35 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
     // Group items by name to combine variants
     final Map<String, List<dynamic>> groupedItems = {};
     for (final item in allItems) {
-      final key = item.name.toLowerCase().trim();
+      String key;
+
+      // For curry categories, group by curry type instead of full name
+      // Exception: Seafood shows individual items but still has curry selection
+      if (_isCurryItem(category, item.name) &&
+          !category.toLowerCase().contains('seafood')) {
+        key = _extractCurryType(item.name).toLowerCase().trim();
+      } else if (category.toLowerCase().contains('house specials')) {
+        // Smart grouping: group items that have the same curry base
+        final curryType = _extractCurryType(item.name);
+        final baseName = curryType.toLowerCase().trim();
+
+        // Check if multiple items share the same curry base
+        final categoryItems = MenuService.getItemsByCategory(category);
+        final similarItems = categoryItems.where((otherItem) {
+          final otherCurryType = _extractCurryType(otherItem.name);
+          return otherCurryType.toLowerCase().trim() == baseName;
+        }).length;
+
+        // If multiple items share the same base, group them
+        if (similarItems > 1) {
+          key = baseName;
+        } else {
+          key = item.name.toLowerCase().trim();
+        }
+      } else {
+        key = item.name.toLowerCase().trim();
+      }
+
       if (!groupedItems.containsKey(key)) {
         groupedItems[key] = [];
       }
@@ -1684,8 +2394,35 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
               ? 'From £${prices.first.toStringAsFixed(2)}'
               : '£${prices.first.toStringAsFixed(2)}';
 
+          // For curry items, use the curry type as the display name
+          // For curry items, use the curry type as the display name
+          // Exception: Seafood shows full item names
+          String displayName;
+          if (_isCurryItem(category, firstItem.name) &&
+              !category.toLowerCase().contains('seafood')) {
+            displayName = _capitalizeFirst(_extractCurryType(firstItem.name));
+          } else if (category.toLowerCase().contains('house specials')) {
+            // Check if this is a grouped item
+            final curryType = _extractCurryType(firstItem.name);
+            final baseName = curryType.toLowerCase().trim();
+
+            final categoryItems = MenuService.getItemsByCategory(category);
+            final similarItems = categoryItems.where((otherItem) {
+              final otherCurryType = _extractCurryType(otherItem.name);
+              return otherCurryType.toLowerCase().trim() == baseName;
+            }).length;
+
+            if (similarItems > 1) {
+              displayName = _capitalizeFirst(curryType);
+            } else {
+              displayName = firstItem.name;
+            }
+          } else {
+            displayName = firstItem.name;
+          }
+
           return _buildEnhancedMenuItem(
-            firstItem.name,
+            displayName,
             firstItem.description ?? '',
             priceDisplay,
             firstItem.spiceLevel ?? '',
@@ -1695,6 +2432,9 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
         },
       ),
     );
+    // Defensive: in case something goes wrong, always return a widget
+    // (This line should never be reached, but is required for non-nullable return)
+    // return const SizedBox.shrink();
   }
 
   Widget _buildEnhancedMenuItem(
@@ -1867,7 +2607,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
 
                         const SizedBox(height: 12),
 
-                        // Price and action row - CONSISTENT FOR ALL CATEGORIES
+                        // Price and action row
                         Row(
                           children: [
                             // Show price in the same position for ALL categories
@@ -1943,6 +2683,9 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                                   Icon(
                                     _isSetMeal(category, name)
                                         ? Icons.set_meal
+                                        : (_isCurryItem(category, name) ||
+                                              _isSeafoodCurry(category, name))
+                                        ? Icons.restaurant
                                         : Icons.info_outline,
                                     size: 16,
                                   ),
@@ -1950,6 +2693,9 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                                   Text(
                                     _isSetMeal(category, name)
                                         ? 'Build'
+                                        : (_isCurryItem(category, name) ||
+                                              _isSeafoodCurry(category, name))
+                                        ? 'Choose'
                                         : 'View',
                                     style: const TextStyle(
                                       fontSize: 10,
