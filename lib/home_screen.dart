@@ -2008,6 +2008,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
         .trim()
         .toLowerCase()
         .replaceAll('medum', 'medium')
+        .replaceAll('medium', 'mid')
         .replaceAll('hoy', 'hot');
   }
 
@@ -2017,7 +2018,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
     switch (cleaned) {
       case 'mild':
         return [const Color(0xFF27AE60), const Color(0xFF2ECC71)];
-      case 'medium':
+      case 'mid':
         return [const Color(0xFFF39C12), const Color(0xFFE67E22)];
       case 'hot':
         return [const Color(0xFFE74C3C), const Color(0xFFC0392B)];
@@ -2609,6 +2610,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
 
                         // Price and action row
                         Row(
+                          crossAxisAlignment: CrossAxisAlignment.center,
                           children: [
                             // Show price in the same position for ALL categories
                             Text(

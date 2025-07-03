@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'cart_manager.dart';
+import 'order_service.dart';
 
 class CheckoutScreen extends StatefulWidget {
   const CheckoutScreen({super.key});
@@ -12,6 +14,9 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
   final CartManager _cartManager = CartManager();
   final TextEditingController _addressController = TextEditingController();
   final TextEditingController _instructionsController = TextEditingController();
+
+  // Loading state for order placement
+  bool _isPlacingOrder = false;
 
   @override
   void initState() {
@@ -880,12 +885,12 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
 
                       const SizedBox(height: 32),
 
-                      // Place Order Button
+                      // Place Order Button with loading state
                       SizedBox(
                         width: double.infinity,
                         height: 56,
                         child: ElevatedButton(
-                          onPressed: _placeOrder,
+                          onPressed: _isPlacingOrder ? null : _placeOrder,
                           style: ElevatedButton.styleFrom(
                             backgroundColor: const Color(0xFF006A4E),
                             foregroundColor: Colors.white,
@@ -894,20 +899,29 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
                             ),
                             elevation: 4,
                           ),
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              const Icon(Icons.check_circle, size: 24),
-                              const SizedBox(width: 12),
-                              Text(
-                                'Place Order • ${_cartManager.formatCurrency(_cartManager.total)}',
-                                style: const TextStyle(
-                                  fontSize: 18,
-                                  fontWeight: FontWeight.w700,
+                          child: _isPlacingOrder
+                              ? const SizedBox(
+                                  width: 24,
+                                  height: 24,
+                                  child: CircularProgressIndicator(
+                                    color: Colors.white,
+                                    strokeWidth: 2,
+                                  ),
+                                )
+                              : Row(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: [
+                                    const Icon(Icons.check_circle, size: 24),
+                                    const SizedBox(width: 12),
+                                    Text(
+                                      'Place Order • ${_cartManager.formatCurrency(_cartManager.total)}',
+                                      style: const TextStyle(
+                                        fontSize: 18,
+                                        fontWeight: FontWeight.w700,
+                                      ),
+                                    ),
+                                  ],
                                 ),
-                              ),
-                            ],
-                          ),
                         ),
                       ),
                     ],
@@ -1083,7 +1097,8 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
     );
   }
 
-  void _placeOrder() {
+  // 🔥 MAIN FIREBASE INTEGRATION - This is where the magic happens!
+  void _placeOrder() async {
     // Validate delivery address if delivery is selected
     if (_cartManager.orderType == 'delivery' &&
         _addressController.text.trim().isEmpty) {
@@ -1100,9 +1115,111 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
       return;
     }
 
+    // Check if user is authenticated
+    final user = FirebaseAuth.instance.currentUser;
+    if (user == null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: const Text('Please log in to place an order'),
+          backgroundColor: const Color(0xFFE74C3C),
+          behavior: SnackBarBehavior.floating,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(12),
+          ),
+          action: SnackBarAction(
+            label: 'LOGIN',
+            textColor: Colors.white,
+            onPressed: () {
+              // Navigate to login screen
+              // Navigator.push(context, MaterialPageRoute(builder: (context) => LoginScreen()));
+            },
+          ),
+        ),
+      );
+      return;
+    }
+
+    setState(() {
+      _isPlacingOrder = true;
+    });
+
     Navigator.pop(context); // Close bottom sheet
 
-    // Show success dialog with Bangladesh theme
+    try {
+      print('🛒 Starting order placement process...');
+
+      // Convert cart items to OrderItem format
+      final List<OrderItem> orderItems = _cartManager.items.map((cartItem) {
+        return OrderItem(
+          id: cartItem.id,
+          name: cartItem.name,
+          quantity: cartItem.quantity,
+          price: cartItem.price,
+          category: cartItem.category,
+          spiceLevel: cartItem.spiceLevel,
+        );
+      }).toList();
+
+      // Prepare delivery address
+      String deliveryAddress;
+      if (_cartManager.orderType == 'delivery') {
+        deliveryAddress = _addressController.text.trim();
+      } else if (_cartManager.orderType == 'collection') {
+        deliveryAddress = 'Pickup - Tandoori Nights Restaurant';
+      } else {
+        deliveryAddress = 'Dine In - Tandoori Nights Restaurant';
+      }
+
+      print('📦 Creating order with ${orderItems.length} items');
+      print('💰 Total: £${_cartManager.total}');
+      print('🚚 Order type: ${_cartManager.orderType}');
+      print('💳 Payment: ${_cartManager.paymentMethod}');
+
+      // 🔥 CREATE THE ORDER IN FIREBASE
+      final orderId = await OrderService.createOrder(
+        items: orderItems,
+        total: _cartManager.total,
+        paymentMethod: _cartManager.paymentMethod == 'cash'
+            ? 'Cash'
+            : 'Credit Card',
+        deliveryAddress: deliveryAddress,
+        orderType: _cartManager.orderType,
+        specialInstructions: _instructionsController.text.trim().isEmpty
+            ? null
+            : _instructionsController.text.trim(),
+      );
+
+      print('✅ Order created successfully with ID: $orderId');
+
+      setState(() {
+        _isPlacingOrder = false;
+      });
+
+      // Show success dialog with real order ID
+      _showSuccessDialog(orderId);
+    } catch (e) {
+      setState(() {
+        _isPlacingOrder = false;
+      });
+
+      print('❌ Error placing order: $e');
+
+      // Show error dialog
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Failed to place order: $e'),
+          backgroundColor: const Color(0xFFE74C3C),
+          behavior: SnackBarBehavior.floating,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(12),
+          ),
+          duration: const Duration(seconds: 5),
+        ),
+      );
+    }
+  }
+
+  void _showSuccessDialog(String orderId) {
     showDialog(
       context: context,
       barrierDismissible: false,
@@ -1143,6 +1260,15 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
                   fontSize: 24,
                   fontWeight: FontWeight.w800,
                   color: Color(0xFF2C3E50),
+                ),
+              ),
+              const SizedBox(height: 12),
+              Text(
+                'Order ID: $orderId',
+                style: const TextStyle(
+                  fontSize: 14,
+                  fontWeight: FontWeight.w600,
+                  color: Color(0xFF006A4E),
                 ),
               ),
               const SizedBox(height: 12),
@@ -1227,26 +1353,61 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
                 ),
               ),
               const SizedBox(height: 24),
-              SizedBox(
-                width: double.infinity,
-                child: ElevatedButton(
-                  onPressed: () {
-                    _cartManager.clearCart();
-                    Navigator.of(context).popUntil((route) => route.isFirst);
-                  },
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: const Color(0xFF006A4E),
-                    foregroundColor: Colors.white,
-                    padding: const EdgeInsets.symmetric(vertical: 16),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(12),
+
+              // Action buttons
+              Row(
+                children: [
+                  Expanded(
+                    child: OutlinedButton.icon(
+                      onPressed: () {
+                        Navigator.of(context).pop(); // Close dialog
+                        Navigator.pushNamed(
+                          context,
+                          '/order-history',
+                        ); // Navigate to order history
+                      },
+                      icon: const Icon(Icons.history, size: 20),
+                      label: const Text('View Orders'),
+                      style: OutlinedButton.styleFrom(
+                        foregroundColor: const Color(0xFF006A4E),
+                        side: const BorderSide(
+                          color: Color(0xFF006A4E),
+                          width: 2,
+                        ),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                        padding: const EdgeInsets.symmetric(vertical: 12),
+                      ),
                     ),
                   ),
-                  child: const Text(
-                    'Back to Menu',
-                    style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: ElevatedButton(
+                      onPressed: () {
+                        _cartManager.clearCart();
+                        Navigator.of(
+                          context,
+                        ).popUntil((route) => route.isFirst);
+                      },
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: const Color(0xFF006A4E),
+                        foregroundColor: Colors.white,
+                        padding: const EdgeInsets.symmetric(vertical: 12),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                      ),
+                      child: const Text(
+                        'Back to Menu',
+                        style: TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                    ),
                   ),
-                ),
+                ],
               ),
             ],
           ),

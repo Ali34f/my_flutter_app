@@ -1,50 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-
-// Order Model
-class OrderItem {
-  final String id;
-  final String name;
-  final int quantity;
-  final double price;
-  final String category;
-  final String spiceLevel;
-
-  OrderItem({
-    required this.id,
-    required this.name,
-    required this.quantity,
-    required this.price,
-    required this.category,
-    required this.spiceLevel,
-  });
-}
-
-class Order {
-  final String id;
-  final DateTime date;
-  final List<OrderItem> items;
-  final double total;
-  final String status;
-  final String paymentMethod;
-  final String? specialInstructions;
-  final String deliveryAddress;
-  final String orderType; // 'delivery', 'pickup', 'dine-in'
-
-  Order({
-    required this.id,
-    required this.date,
-    required this.items,
-    required this.total,
-    required this.status,
-    required this.paymentMethod,
-    this.specialInstructions,
-    required this.deliveryAddress,
-    required this.orderType,
-  });
-
-  double get totalItems => items.fold(0, (sum, item) => sum + item.quantity);
-}
+import 'order_service.dart';
 
 class OrderHistoryScreen extends StatefulWidget {
   const OrderHistoryScreen({super.key});
@@ -78,6 +34,7 @@ class _OrderHistoryScreenState extends State<OrderHistoryScreen>
     _fadeAnimation = Tween<double>(begin: 0.0, end: 1.0).animate(
       CurvedAnimation(parent: _fadeController, curve: Curves.easeInOut),
     );
+
     _fadeController.forward();
   }
 
@@ -88,125 +45,94 @@ class _OrderHistoryScreenState extends State<OrderHistoryScreen>
     super.dispose();
   }
 
-  // Sample order data - replace with actual data from your backend
-  List<Order> get _sampleOrders => [
-    Order(
-      id: 'ORD-2024-001',
-      date: DateTime.now().subtract(const Duration(days: 1)),
-      items: [
-        OrderItem(
-          id: '1',
-          name: 'Chicken Tikka Masala',
-          quantity: 2,
-          price: 16.99,
-          category: 'Curries',
-          spiceLevel: 'medium',
-        ),
-        OrderItem(
-          id: '2',
-          name: 'Garlic Naan',
-          quantity: 3,
-          price: 4.99,
-          category: 'Side Dishes',
-          spiceLevel: 'mild',
-        ),
-        OrderItem(
-          id: '3',
-          name: 'Mango Lassi',
-          quantity: 2,
-          price: 5.99,
-          category: 'Drinks',
-          spiceLevel: 'mild',
-        ),
-      ],
-      total: 45.95,
-      status: 'Completed',
-      paymentMethod: 'Credit Card',
-      specialInstructions: 'Extra spicy, please!',
-      deliveryAddress: '123 Bristol Street, Bristol BS1 2AB',
-      orderType: 'delivery',
-    ),
-    Order(
-      id: 'ORD-2024-002',
-      date: DateTime.now().subtract(const Duration(days: 3)),
-      items: [
-        OrderItem(
-          id: '4',
-          name: 'Lamb Biryani',
-          quantity: 1,
-          price: 18.99,
-          category: 'Biryani',
-          spiceLevel: 'hot',
-        ),
-        OrderItem(
-          id: '5',
-          name: 'Samosas (4 pieces)',
-          quantity: 1,
-          price: 6.99,
-          category: 'Starters',
-          spiceLevel: 'medium',
-        ),
-      ],
-      total: 28.98,
-      status: 'Completed',
-      paymentMethod: 'PayPal',
-      deliveryAddress: 'Pickup - Tandoori Nights Restaurant',
-      orderType: 'pickup',
-    ),
-    Order(
-      id: 'ORD-2024-003',
-      date: DateTime.now().subtract(const Duration(hours: 2)),
-      items: [
-        OrderItem(
-          id: '6',
-          name: 'Paneer Makhani',
-          quantity: 1,
-          price: 14.99,
-          category: 'Vegetarian',
-          spiceLevel: 'mild',
-        ),
-        OrderItem(
-          id: '7',
-          name: 'Basmati Rice',
-          quantity: 2,
-          price: 3.99,
-          category: 'Side Dishes',
-          spiceLevel: 'mild',
-        ),
-      ],
-      total: 22.97,
-      status: 'In Progress',
-      paymentMethod: 'Cash',
-      deliveryAddress: 'Table 5 - Dine In',
-      orderType: 'dine-in',
-    ),
-    Order(
-      id: 'ORD-2024-004',
-      date: DateTime.now().subtract(const Duration(days: 7)),
-      items: [
-        OrderItem(
-          id: '8',
-          name: 'Tandoori Mixed Grill',
-          quantity: 1,
-          price: 22.99,
-          category: 'Tandoori',
-          spiceLevel: 'hot',
-        ),
-      ],
-      total: 25.99,
-      status: 'Cancelled',
-      paymentMethod: 'Credit Card',
-      specialInstructions: 'Customer cancelled due to delay',
-      deliveryAddress: '456 Park Road, Bristol BS2 3CD',
-      orderType: 'delivery',
-    ),
-  ];
+  // Build orders with real-time stream
+  Widget _buildOrdersWithStream() {
+    return StreamBuilder<List<Order>>(
+      stream: OrderService.getUserOrdersStream(),
+      builder: (context, snapshot) {
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          return _buildLoadingState();
+        }
 
-  List<Order> get _filteredOrders {
-    if (_selectedFilter == 'All') return _sampleOrders;
-    return _sampleOrders
-        .where((order) => order.status == _selectedFilter)
-        .toList();
+        if (snapshot.hasError) {
+          return _buildErrorState(snapshot.error.toString());
+        }
+
+        final orders = snapshot.data ?? [];
+        final filteredOrders = _getFilteredOrders(orders);
+
+        if (filteredOrders.isEmpty) {
+          return _buildEmptyState();
+        }
+
+        return ListView.builder(
+          padding: const EdgeInsets.all(16),
+          itemCount: filteredOrders.length,
+          itemBuilder: (context, index) {
+            final order = filteredOrders[index];
+            return _buildOrderCard(order);
+          },
+        );
+      },
+    );
+  }
+
+  List<Order> _getFilteredOrders(List<Order> orders) {
+    if (_selectedFilter == 'All') return orders;
+    return orders.where((order) => order.status == _selectedFilter).toList();
+  }
+
+  Widget _buildLoadingState() {
+    return const Center(
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          CircularProgressIndicator(color: Color(0xFF006A4E)),
+          SizedBox(height: 16),
+          Text(
+            'Loading your orders...',
+            style: TextStyle(fontSize: 16, color: Color(0xFF7F8C8D)),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildErrorState(String error) {
+    return Center(
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          const Icon(Icons.error_outline, size: 60, color: Color(0xFFDC143C)),
+          const SizedBox(height: 16),
+          const Text(
+            'Failed to load orders',
+            style: TextStyle(
+              fontSize: 20,
+              fontWeight: FontWeight.w600,
+              color: Color(0xFF2C3E50),
+            ),
+          ),
+          const SizedBox(height: 8),
+          Text(
+            error,
+            textAlign: TextAlign.center,
+            style: const TextStyle(fontSize: 14, color: Color(0xFF7F8C8D)),
+          ),
+          const SizedBox(height: 24),
+          ElevatedButton(
+            onPressed: () {
+              setState(() {}); // Trigger rebuild to retry
+            },
+            style: ElevatedButton.styleFrom(
+              backgroundColor: const Color(0xFF006A4E),
+              foregroundColor: Colors.white,
+            ),
+            child: const Text('Retry'),
+          ),
+        ],
+      ),
+    );
   }
 
   Color _getStatusColor(String status) {
@@ -240,6 +166,8 @@ class _OrderHistoryScreenState extends State<OrderHistoryScreen>
       case 'delivery':
         return Icons.delivery_dining;
       case 'pickup':
+        return Icons.store;
+      case 'collection':
         return Icons.store;
       case 'dine-in':
         return Icons.restaurant;
@@ -410,7 +338,7 @@ class _OrderHistoryScreenState extends State<OrderHistoryScreen>
                           const SizedBox(height: 24),
 
                           // Enhanced Delivery/Pickup information
-                          _buildInfoSection('Delivery Information', [
+                          _buildInfoSection('Order Information', [
                             _buildInfoRow('Address', order.deliveryAddress),
                             _buildInfoRow(
                               'Order Type',
@@ -515,7 +443,7 @@ class _OrderHistoryScreenState extends State<OrderHistoryScreen>
 
                           const SizedBox(height: 24),
 
-                          // Enhanced Action buttons
+                          // Enhanced Action buttons for completed orders
                           if (order.status == 'Completed') ...[
                             Row(
                               children: [
@@ -926,10 +854,11 @@ class _OrderHistoryScreenState extends State<OrderHistoryScreen>
           ),
         ),
         actions: [
+          // Refresh button
           IconButton(
             onPressed: () {
               HapticFeedback.lightImpact();
-              // Filter functionality
+              setState(() {}); // Trigger rebuild to refresh stream
             },
             icon: Container(
               padding: const EdgeInsets.all(8),
@@ -937,11 +866,7 @@ class _OrderHistoryScreenState extends State<OrderHistoryScreen>
                 color: Colors.white.withOpacity(0.2),
                 borderRadius: BorderRadius.circular(12),
               ),
-              child: const Icon(
-                Icons.filter_list,
-                color: Colors.white,
-                size: 20,
-              ),
+              child: const Icon(Icons.refresh, color: Colors.white, size: 20),
             ),
           ),
           const SizedBox(width: 8),
@@ -1017,19 +942,8 @@ class _OrderHistoryScreenState extends State<OrderHistoryScreen>
               ),
             ),
 
-            // Orders list
-            Expanded(
-              child: _filteredOrders.isEmpty
-                  ? _buildEmptyState()
-                  : ListView.builder(
-                      padding: const EdgeInsets.all(16),
-                      itemCount: _filteredOrders.length,
-                      itemBuilder: (context, index) {
-                        final order = _filteredOrders[index];
-                        return _buildOrderCard(order);
-                      },
-                    ),
-            ),
+            // Orders list - Using StreamBuilder for real-time updates
+            Expanded(child: _buildOrdersWithStream()),
           ],
         ),
       ),
