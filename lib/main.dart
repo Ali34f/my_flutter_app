@@ -3,6 +3,8 @@ import 'package:firebase_core/firebase_core.dart';
 import 'register.dart';
 import 'login.dart';
 import 'home_screen.dart';
+import 'checkout.dart';
+import 'order_history.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -34,6 +36,15 @@ class TandooriNightsApp extends StatelessWidget {
           );
         },
       ),
+      // 🔥 CRITICAL: Add named routes for proper navigation
+      routes: {
+        '/welcome': (context) => const WelcomeScreen(),
+        '/login': (context) => const LoginScreen(),
+        '/register': (context) => const RegisterScreen(),
+        '/home': (context) => const HomeScreen(),
+        '/checkout': (context) => const CheckoutScreen(),
+        '/order-history': (context) => const OrderHistoryScreen(),
+      },
       debugShowCheckedModeBanner: false,
     );
   }
@@ -158,7 +169,7 @@ class _WelcomeScreenState extends State<WelcomeScreen>
                         child: FadeTransition(
                           opacity: _contentAnimation,
                           child: const Text(
-                            'Authentic Indian Cuisine',
+                            'Authentic Bangladeshi Cuisine',
                             textAlign: TextAlign.center,
                             style: TextStyle(
                               fontSize: 12,
@@ -177,9 +188,11 @@ class _WelcomeScreenState extends State<WelcomeScreen>
                             text: 'Continue as Guest',
                             isPrimary: true,
                             onPressed: () {
-                              Navigator.push(
+                              // 🔥 FIXED: Use named route instead of direct navigation
+                              Navigator.pushNamedAndRemoveUntil(
                                 context,
-                                _createRoute(const HomeScreen()),
+                                '/home',
+                                (route) => false,
                               );
                             },
                           ),
@@ -194,10 +207,8 @@ class _WelcomeScreenState extends State<WelcomeScreen>
                             text: 'Login',
                             isPrimary: false,
                             onPressed: () {
-                              Navigator.push(
-                                context,
-                                _createRoute(const LoginScreen()),
-                              );
+                              // 🔥 FIXED: Use named route instead of direct navigation
+                              Navigator.pushNamed(context, '/login');
                             },
                           ),
                         ),
@@ -211,10 +222,8 @@ class _WelcomeScreenState extends State<WelcomeScreen>
                             text: 'Create Account',
                             isPrimary: false,
                             onPressed: () {
-                              Navigator.push(
-                                context,
-                                _createRoute(const RegisterScreen()),
-                              );
+                              // 🔥 FIXED: Use named route instead of direct navigation
+                              Navigator.pushNamed(context, '/register');
                             },
                           ),
                         ),
@@ -230,23 +239,8 @@ class _WelcomeScreenState extends State<WelcomeScreen>
     );
   }
 
-  Route _createRoute(Widget destination) {
-    return PageRouteBuilder(
-      pageBuilder: (context, animation, secondaryAnimation) => destination,
-      transitionsBuilder: (context, animation, secondaryAnimation, child) {
-        const begin = Offset(1.0, 0.0);
-        const end = Offset.zero;
-        const curve = Curves.ease;
-
-        var tween = Tween(
-          begin: begin,
-          end: end,
-        ).chain(CurveTween(curve: curve));
-
-        return SlideTransition(position: animation.drive(tween), child: child);
-      },
-    );
-  }
+  // 🗑️ REMOVED: Custom route builder - using named routes instead
+  // Route _createRoute(Widget destination) { ... }
 }
 
 class _AnimatedButton extends StatefulWidget {

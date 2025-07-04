@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'cart_manager.dart';
 import 'order_service.dart';
+import 'postcode_service.dart';
 
 class CheckoutScreen extends StatefulWidget {
   const CheckoutScreen({super.key});
@@ -15,16 +16,21 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
   final TextEditingController _addressController = TextEditingController();
   final TextEditingController _instructionsController = TextEditingController();
 
-  // Loading state for order placement
+  // NEW: Additional controllers for structured address input
+  final TextEditingController _phoneController = TextEditingController();
+  final TextEditingController _postcodeController = TextEditingController();
+  final TextEditingController _streetController = TextEditingController();
+  final TextEditingController _cityController = TextEditingController();
+
+  // Loading states
   bool _isPlacingOrder = false;
+  bool _isLoadingAddress = false; // NEW: For postcode lookup
 
   @override
   void initState() {
     super.initState();
     _cartManager.addListener(_updateUI);
-    // Set default address
-    _addressController.text =
-        '123 High Street, Bristol BS1 2AA, United Kingdom';
+    // REMOVED: Default address setup
   }
 
   @override
@@ -32,6 +38,11 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
     _cartManager.removeListener(_updateUI);
     _addressController.dispose();
     _instructionsController.dispose();
+    // NEW: Dispose new controllers
+    _phoneController.dispose();
+    _postcodeController.dispose();
+    _streetController.dispose();
+    _cityController.dispose();
     super.dispose();
   }
 
@@ -39,6 +50,97 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
     if (mounted) {
       setState(() {});
     }
+  }
+
+  // NEW: Postcode lookup method using real API
+  Future<void> _lookupPostcode() async {
+    final postcode = _postcodeController.text.trim();
+    if (postcode.isEmpty) {
+      _showErrorSnackBar('Please enter a postcode');
+      return;
+    }
+
+    // Validate postcode format
+    if (!PostcodeService.isValidUKPostcode(postcode)) {
+      _showErrorSnackBar('Please enter a valid UK postcode (e.g., BS1 2AA)');
+      return;
+    }
+
+    setState(() {
+      _isLoadingAddress = true;
+    });
+
+    try {
+      final addressData = await PostcodeService.lookupPostcode(postcode);
+
+      // Update city field with API data
+      _cityController.text = addressData['city'] ?? '';
+
+      // Format postcode properly
+      _postcodeController.text = PostcodeService.formatPostcode(postcode);
+
+      // Update full address if street is filled
+      _updateFullAddress();
+
+      _showSuccessSnackBar('Postcode verified successfully!');
+    } catch (e) {
+      _showErrorSnackBar(e.toString());
+    } finally {
+      setState(() {
+        _isLoadingAddress = false;
+      });
+    }
+  }
+
+  // NEW: Update full address when any field changes
+  void _updateFullAddress() {
+    if (_streetController.text.isNotEmpty &&
+        _cityController.text.isNotEmpty &&
+        _postcodeController.text.isNotEmpty) {
+      _addressController.text =
+          '${_streetController.text.trim()}, ${_cityController.text.trim()}, ${_postcodeController.text.trim()}, United Kingdom';
+    }
+  }
+
+  // NEW: Helper methods for snackbars
+  void _showErrorSnackBar(String message) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Row(
+          children: [
+            const Icon(Icons.error_outline, color: Colors.white, size: 20),
+            const SizedBox(width: 8),
+            Expanded(child: Text(message)),
+          ],
+        ),
+        backgroundColor: const Color(0xFFE74C3C),
+        behavior: SnackBarBehavior.floating,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+      ),
+    );
+  }
+
+  void _showSuccessSnackBar(String message) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Row(
+          children: [
+            const Icon(Icons.check_circle, color: Colors.white, size: 20),
+            const SizedBox(width: 8),
+            Expanded(child: Text(message)),
+          ],
+        ),
+        backgroundColor: const Color(0xFF006A4E),
+        behavior: SnackBarBehavior.floating,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+      ),
+    );
+  }
+
+  // NEW: Phone number validation
+  bool _isValidUKPhoneNumber(String phone) {
+    String cleanPhone = phone.replaceAll(RegExp(r'[^\d+]'), '');
+    return RegExp(r'^(\+44|0)[1-9]\d{8,9}$').hasMatch(cleanPhone);
   }
 
   @override
@@ -729,18 +831,141 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
 
                       const SizedBox(height: 24),
 
-                      // Address Section (only show if delivery)
+                      // NEW: Contact Information and Address Section (only show if delivery)
                       if (_cartManager.orderType == 'delivery') ...[
+                        _buildCheckoutSection(
+                          'Contact Information',
+                          Icons.person,
+                          Column(
+                            children: [
+                              // Phone Number Field
+                              TextFormField(
+                                controller: _phoneController,
+                                keyboardType: TextInputType.phone,
+                                decoration: InputDecoration(
+                                  labelText: 'Phone Number *',
+                                  hintText: 'e.g., +44 7123 456789',
+                                  border: OutlineInputBorder(
+                                    borderRadius: BorderRadius.circular(12),
+                                    borderSide: BorderSide(
+                                      color: Colors.grey[300]!,
+                                    ),
+                                  ),
+                                  focusedBorder: OutlineInputBorder(
+                                    borderRadius: BorderRadius.circular(12),
+                                    borderSide: const BorderSide(
+                                      color: Color(0xFF006A4E),
+                                      width: 2,
+                                    ),
+                                  ),
+                                  prefixIcon: const Icon(
+                                    Icons.phone,
+                                    color: Color(0xFF006A4E),
+                                  ),
+                                  contentPadding: const EdgeInsets.all(16),
+                                ),
+                                onChanged: (value) {
+                                  // Optional: Real-time validation
+                                },
+                              ),
+                            ],
+                          ),
+                        ),
+                        const SizedBox(height: 24),
+
                         _buildCheckoutSection(
                           'Delivery Address',
                           Icons.location_on,
                           Column(
                             children: [
+                              // Postcode Lookup
+                              Row(
+                                children: [
+                                  Expanded(
+                                    flex: 2,
+                                    child: TextFormField(
+                                      controller: _postcodeController,
+                                      textCapitalization:
+                                          TextCapitalization.characters,
+                                      decoration: InputDecoration(
+                                        labelText: 'Postcode *',
+                                        hintText: 'e.g., BS1 2AA',
+                                        border: OutlineInputBorder(
+                                          borderRadius: BorderRadius.circular(
+                                            12,
+                                          ),
+                                          borderSide: BorderSide(
+                                            color: Colors.grey[300]!,
+                                          ),
+                                        ),
+                                        focusedBorder: OutlineInputBorder(
+                                          borderRadius: BorderRadius.circular(
+                                            12,
+                                          ),
+                                          borderSide: const BorderSide(
+                                            color: Color(0xFF006A4E),
+                                            width: 2,
+                                          ),
+                                        ),
+                                        contentPadding: const EdgeInsets.all(
+                                          16,
+                                        ),
+                                      ),
+                                      onChanged: (value) {
+                                        // Auto-update full address when postcode changes
+                                        if (value.isNotEmpty) {
+                                          _updateFullAddress();
+                                        }
+                                      },
+                                    ),
+                                  ),
+                                  const SizedBox(width: 12),
+                                  Expanded(
+                                    child: ElevatedButton.icon(
+                                      onPressed: _isLoadingAddress
+                                          ? null
+                                          : _lookupPostcode,
+                                      icon: _isLoadingAddress
+                                          ? const SizedBox(
+                                              width: 16,
+                                              height: 16,
+                                              child: CircularProgressIndicator(
+                                                strokeWidth: 2,
+                                                color: Colors.white,
+                                              ),
+                                            )
+                                          : const Icon(Icons.search, size: 20),
+                                      label: Text(
+                                        _isLoadingAddress
+                                            ? 'Finding...'
+                                            : 'Find',
+                                      ),
+                                      style: ElevatedButton.styleFrom(
+                                        backgroundColor: const Color(
+                                          0xFF006A4E,
+                                        ),
+                                        foregroundColor: Colors.white,
+                                        shape: RoundedRectangleBorder(
+                                          borderRadius: BorderRadius.circular(
+                                            12,
+                                          ),
+                                        ),
+                                        padding: const EdgeInsets.symmetric(
+                                          vertical: 16,
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                              const SizedBox(height: 16),
+
+                              // Street Address
                               TextFormField(
-                                controller: _addressController,
-                                maxLines: 3,
+                                controller: _streetController,
                                 decoration: InputDecoration(
-                                  hintText: 'Enter your full address...',
+                                  labelText: 'Street Address *',
+                                  hintText: 'e.g., 123 High Street',
                                   border: OutlineInputBorder(
                                     borderRadius: BorderRadius.circular(12),
                                     borderSide: BorderSide(
@@ -756,7 +981,78 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
                                   ),
                                   contentPadding: const EdgeInsets.all(16),
                                 ),
+                                onChanged: (value) {
+                                  _updateFullAddress();
+                                },
                               ),
+                              const SizedBox(height: 16),
+
+                              // City
+                              TextFormField(
+                                controller: _cityController,
+                                decoration: InputDecoration(
+                                  labelText: 'City *',
+                                  hintText: 'e.g., Bristol',
+                                  border: OutlineInputBorder(
+                                    borderRadius: BorderRadius.circular(12),
+                                    borderSide: BorderSide(
+                                      color: Colors.grey[300]!,
+                                    ),
+                                  ),
+                                  focusedBorder: OutlineInputBorder(
+                                    borderRadius: BorderRadius.circular(12),
+                                    borderSide: const BorderSide(
+                                      color: Color(0xFF006A4E),
+                                      width: 2,
+                                    ),
+                                  ),
+                                  contentPadding: const EdgeInsets.all(16),
+                                ),
+                                onChanged: (value) {
+                                  _updateFullAddress();
+                                },
+                              ),
+                              const SizedBox(height: 12),
+
+                              // Address Preview
+                              if (_addressController.text.isNotEmpty)
+                                Container(
+                                  width: double.infinity,
+                                  padding: const EdgeInsets.all(12),
+                                  decoration: BoxDecoration(
+                                    color: const Color(
+                                      0xFF006A4E,
+                                    ).withOpacity(0.05),
+                                    borderRadius: BorderRadius.circular(8),
+                                    border: Border.all(
+                                      color: const Color(
+                                        0xFF006A4E,
+                                      ).withOpacity(0.3),
+                                    ),
+                                  ),
+                                  child: Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: [
+                                      const Text(
+                                        'Delivery to:',
+                                        style: TextStyle(
+                                          fontSize: 12,
+                                          fontWeight: FontWeight.w600,
+                                          color: Color(0xFF006A4E),
+                                        ),
+                                      ),
+                                      const SizedBox(height: 4),
+                                      Text(
+                                        _addressController.text,
+                                        style: const TextStyle(
+                                          fontSize: 14,
+                                          color: Color(0xFF2C3E50),
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
                             ],
                           ),
                         ),
@@ -1097,22 +1393,47 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
     );
   }
 
-  // 🔥 MAIN FIREBASE INTEGRATION - This is where the magic happens!
+  // UPDATED: Enhanced order placement method with validation
   void _placeOrder() async {
-    // Validate delivery address if delivery is selected
-    if (_cartManager.orderType == 'delivery' &&
-        _addressController.text.trim().isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: const Text('Please enter a delivery address'),
-          backgroundColor: const Color(0xFFE74C3C),
-          behavior: SnackBarBehavior.floating,
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(12),
-          ),
-        ),
-      );
-      return;
+    // Enhanced validation for delivery orders
+    if (_cartManager.orderType == 'delivery') {
+      // Validate phone number
+      if (_phoneController.text.trim().isEmpty) {
+        _showErrorSnackBar('Please enter your phone number');
+        return;
+      }
+
+      if (!_isValidUKPhoneNumber(_phoneController.text.trim())) {
+        _showErrorSnackBar('Please enter a valid UK phone number');
+        return;
+      }
+
+      // Validate postcode
+      if (_postcodeController.text.trim().isEmpty) {
+        _showErrorSnackBar('Please enter your postcode');
+        return;
+      }
+
+      if (!PostcodeService.isValidUKPostcode(_postcodeController.text.trim())) {
+        _showErrorSnackBar('Please enter a valid UK postcode');
+        return;
+      }
+
+      // Validate street address
+      if (_streetController.text.trim().isEmpty) {
+        _showErrorSnackBar('Please enter your street address');
+        return;
+      }
+
+      // Validate city
+      if (_cityController.text.trim().isEmpty) {
+        _showErrorSnackBar('Please enter your city');
+        return;
+      }
+
+      // Update full address
+      _addressController.text =
+          '${_streetController.text.trim()}, ${_cityController.text.trim()}, ${PostcodeService.formatPostcode(_postcodeController.text.trim())}, United Kingdom';
     }
 
     // Check if user is authenticated
@@ -1130,8 +1451,7 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
             label: 'LOGIN',
             textColor: Colors.white,
             onPressed: () {
-              // Navigate to login screen
-              // Navigator.push(context, MaterialPageRoute(builder: (context) => LoginScreen()));
+              Navigator.pushNamed(context, '/login');
             },
           ),
         ),
@@ -1146,8 +1466,6 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
     Navigator.pop(context); // Close bottom sheet
 
     try {
-      print('🛒 Starting order placement process...');
-
       // Convert cart items to OrderItem format
       final List<OrderItem> orderItems = _cartManager.items.map((cartItem) {
         return OrderItem(
@@ -1170,12 +1488,7 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
         deliveryAddress = 'Dine In - Tandoori Nights Restaurant';
       }
 
-      print('📦 Creating order with ${orderItems.length} items');
-      print('💰 Total: £${_cartManager.total}');
-      print('🚚 Order type: ${_cartManager.orderType}');
-      print('💳 Payment: ${_cartManager.paymentMethod}');
-
-      // 🔥 CREATE THE ORDER IN FIREBASE
+      // NEW: Create the order with phone number
       final orderId = await OrderService.createOrder(
         items: orderItems,
         total: _cartManager.total,
@@ -1187,9 +1500,10 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
         specialInstructions: _instructionsController.text.trim().isEmpty
             ? null
             : _instructionsController.text.trim(),
+        phoneNumber: _cartManager.orderType == 'delivery'
+            ? _phoneController.text.trim()
+            : null, // Include phone number for delivery orders
       );
-
-      print('✅ Order created successfully with ID: $orderId');
 
       setState(() {
         _isPlacingOrder = false;
@@ -1202,12 +1516,10 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
         _isPlacingOrder = false;
       });
 
-      print('❌ Error placing order: $e');
-
       // Show error dialog
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text('Failed to place order: $e'),
+          content: Text('Failed to place order: ${e.toString()}'),
           backgroundColor: const Color(0xFFE74C3C),
           behavior: SnackBarBehavior.floating,
           shape: RoundedRectangleBorder(
@@ -1354,7 +1666,7 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
               ),
               const SizedBox(height: 24),
 
-              // Action buttons
+              // Action buttons with proper navigation
               Row(
                 children: [
                   Expanded(
@@ -1384,11 +1696,19 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
                   const SizedBox(width: 12),
                   Expanded(
                     child: ElevatedButton(
-                      onPressed: () {
+                      onPressed: () async {
+                        // Clear the cart
                         _cartManager.clearCart();
-                        Navigator.of(
+
+                        // Close the dialog first
+                        Navigator.of(context).pop();
+
+                        // Navigate back to home screen (remove all previous routes)
+                        Navigator.pushNamedAndRemoveUntil(
                           context,
-                        ).popUntil((route) => route.isFirst);
+                          '/home', // Make sure this route name matches your home_screen.dart route
+                          (route) => false, // This removes all previous routes
+                        );
                       },
                       style: ElevatedButton.styleFrom(
                         backgroundColor: const Color(0xFF006A4E),
