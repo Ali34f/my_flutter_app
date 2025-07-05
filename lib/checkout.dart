@@ -16,7 +16,7 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
   final TextEditingController _addressController = TextEditingController();
   final TextEditingController _instructionsController = TextEditingController();
 
-  // NEW: Additional controllers for structured address input
+  // Controllers
   final TextEditingController _phoneController = TextEditingController();
   final TextEditingController _postcodeController = TextEditingController();
   final TextEditingController _streetController = TextEditingController();
@@ -24,13 +24,15 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
 
   // Loading states
   bool _isPlacingOrder = false;
-  bool _isLoadingAddress = false; // NEW: For postcode lookup
+  bool _isLoadingAddress = false;
+
+  // Minimum order amount
+  static const double minimumOrderAmount = 15.0;
 
   @override
   void initState() {
     super.initState();
     _cartManager.addListener(_updateUI);
-    // REMOVED: Default address setup
   }
 
   @override
@@ -38,7 +40,6 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
     _cartManager.removeListener(_updateUI);
     _addressController.dispose();
     _instructionsController.dispose();
-    // NEW: Dispose new controllers
     _phoneController.dispose();
     _postcodeController.dispose();
     _streetController.dispose();
@@ -52,7 +53,11 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
     }
   }
 
-  // NEW: Postcode lookup method using real API
+  // Check if minimum order requirement is met
+  bool get _isMinimumOrderMet => _cartManager.subtotal >= minimumOrderAmount;
+  double get _amountNeeded => minimumOrderAmount - _cartManager.subtotal;
+
+  // Postcode lookup method using real API
   Future<void> _lookupPostcode() async {
     final postcode = _postcodeController.text.trim();
     if (postcode.isEmpty) {
@@ -92,7 +97,7 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
     }
   }
 
-  // NEW: Update full address when any field changes
+  // Update full address when any field changes
   void _updateFullAddress() {
     if (_streetController.text.isNotEmpty &&
         _cityController.text.isNotEmpty &&
@@ -102,7 +107,7 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
     }
   }
 
-  // NEW: Helper methods for snackbars
+  // Helper methods for snackbars
   void _showErrorSnackBar(String message) {
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
@@ -137,7 +142,7 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
     );
   }
 
-  // NEW: Phone number validation
+  // Phone number validation
   bool _isValidUKPhoneNumber(String phone) {
     String cleanPhone = phone.replaceAll(RegExp(r'[^\d+]'), '');
     return RegExp(r'^(\+44|0)[1-9]\d{8,9}$').hasMatch(cleanPhone);
@@ -184,6 +189,55 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
             padding: const EdgeInsets.all(16),
             child: Column(
               children: [
+                // Minimum Order Notice (if not met)
+                if (!_isMinimumOrderMet)
+                  Container(
+                    width: double.infinity,
+                    padding: const EdgeInsets.all(16),
+                    margin: const EdgeInsets.only(bottom: 16),
+                    decoration: BoxDecoration(
+                      color: const Color(0xFFFFF3CD),
+                      borderRadius: BorderRadius.circular(12),
+                      border: Border.all(
+                        color: const Color(0xFFFFD60A),
+                        width: 1,
+                      ),
+                    ),
+                    child: Row(
+                      children: [
+                        const Icon(
+                          Icons.info_outline,
+                          color: Color(0xFF856404),
+                          size: 24,
+                        ),
+                        const SizedBox(width: 12),
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              const Text(
+                                'Minimum Order Required',
+                                style: TextStyle(
+                                  fontWeight: FontWeight.w700,
+                                  color: Color(0xFF856404),
+                                  fontSize: 16,
+                                ),
+                              ),
+                              const SizedBox(height: 4),
+                              Text(
+                                'Add ${_cartManager.formatCurrency(_amountNeeded)} more to reach the £15 minimum order',
+                                style: const TextStyle(
+                                  color: Color(0xFF856404),
+                                  fontSize: 14,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+
                 // Cart Items
                 ListView.builder(
                   shrinkWrap: true,
@@ -223,10 +277,53 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
                       ),
                       const SizedBox(height: 20),
 
-                      // Subtotal
-                      _buildSummaryRow(
-                        'Subtotal',
-                        _cartManager.formatCurrency(_cartManager.subtotal),
+                      // Subtotal with minimum order indicator
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Row(
+                            children: [
+                              Text(
+                                'Subtotal',
+                                style: TextStyle(
+                                  fontSize: 16,
+                                  color: Colors.grey[700],
+                                  fontWeight: FontWeight.w500,
+                                ),
+                              ),
+                              const SizedBox(width: 8),
+                              if (!_isMinimumOrderMet)
+                                Container(
+                                  padding: const EdgeInsets.symmetric(
+                                    horizontal: 6,
+                                    vertical: 2,
+                                  ),
+                                  decoration: BoxDecoration(
+                                    color: const Color(0xFFFFD60A),
+                                    borderRadius: BorderRadius.circular(4),
+                                  ),
+                                  child: const Text(
+                                    'Min £15',
+                                    style: TextStyle(
+                                      fontSize: 10,
+                                      fontWeight: FontWeight.w600,
+                                      color: Color(0xFF856404),
+                                    ),
+                                  ),
+                                ),
+                            ],
+                          ),
+                          Text(
+                            _cartManager.formatCurrency(_cartManager.subtotal),
+                            style: TextStyle(
+                              fontSize: 16,
+                              fontWeight: FontWeight.w600,
+                              color: _isMinimumOrderMet
+                                  ? const Color(0xFF2C3E50)
+                                  : const Color(0xFFE74C3C),
+                            ),
+                          ),
+                        ],
                       ),
                       const SizedBox(height: 12),
 
@@ -308,22 +405,29 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
             width: double.infinity,
             height: 56,
             child: ElevatedButton(
-              onPressed: _proceedToCheckout,
+              onPressed: _isMinimumOrderMet ? _proceedToCheckout : null,
               style: ElevatedButton.styleFrom(
-                backgroundColor: const Color(0xFFDC143C),
+                backgroundColor: _isMinimumOrderMet
+                    ? const Color(0xFFDC143C)
+                    : Colors.grey[400],
                 foregroundColor: Colors.white,
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(16),
                 ),
-                elevation: 4,
+                elevation: _isMinimumOrderMet ? 4 : 0,
               ),
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  const Icon(Icons.payment, size: 24),
+                  Icon(
+                    _isMinimumOrderMet ? Icons.payment : Icons.block,
+                    size: 24,
+                  ),
                   const SizedBox(width: 12),
                   Text(
-                    'Proceed to Checkout • ${_cartManager.formatCurrency(_cartManager.total)}',
+                    _isMinimumOrderMet
+                        ? 'Proceed to Checkout • ${_cartManager.formatCurrency(_cartManager.total)}'
+                        : 'Minimum £15 Required',
                     style: const TextStyle(
                       fontSize: 18,
                       fontWeight: FontWeight.w700,
@@ -684,6 +788,12 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
   }
 
   void _proceedToCheckout() {
+    // Check minimum order first
+    if (!_isMinimumOrderMet) {
+      _showErrorSnackBar('Minimum order of £15 required');
+      return;
+    }
+
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
@@ -831,7 +941,7 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
 
                       const SizedBox(height: 24),
 
-                      // NEW: Contact Information and Address Section (only show if delivery)
+                      // Contact Information and Address Section (only show if delivery)
                       if (_cartManager.orderType == 'delivery') ...[
                         _buildCheckoutSection(
                           'Contact Information',
@@ -1393,8 +1503,14 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
     );
   }
 
-  // UPDATED: Enhanced order placement method with validation
+  // Enhanced order placement method with minimum order validation
   void _placeOrder() async {
+    // Double-check minimum order requirement
+    if (!_isMinimumOrderMet) {
+      _showErrorSnackBar('Minimum order of £15 required to place an order');
+      return;
+    }
+
     // Enhanced validation for delivery orders
     if (_cartManager.orderType == 'delivery') {
       // Validate phone number
@@ -1488,7 +1604,7 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
         deliveryAddress = 'Dine In - Tandoori Nights Restaurant';
       }
 
-      // NEW: Create the order with phone number
+      // Create the order with phone number
       final orderId = await OrderService.createOrder(
         items: orderItems,
         total: _cartManager.total,
@@ -1502,7 +1618,7 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
             : _instructionsController.text.trim(),
         phoneNumber: _cartManager.orderType == 'delivery'
             ? _phoneController.text.trim()
-            : null, // Include phone number for delivery orders
+            : null,
       );
 
       setState(() {

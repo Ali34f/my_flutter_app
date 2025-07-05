@@ -21,11 +21,12 @@ dependencies:
   firebase_auth: ^5.6.0
   cloud_firestore: ^5.6.9
   
-  # NEW: HTTP for API calls (Postcode lookup)
+  # Date formatting (REQUIRED for reservation_service.dart)
+  intl: ^0.19.0
+  
+  # HTTP for API calls (Postcode lookup)
   http: ^1.1.0
-  
-  
-  
+
 dev_dependencies:
   flutter_test:
     sdk: flutter
@@ -37,5 +38,3 @@ flutter:
   # Assets
   assets:
     - assets/data/
-    
-  

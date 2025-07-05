@@ -54,7 +54,7 @@ class Order {
   final String? specialInstructions;
   final String deliveryAddress;
   final String orderType; // 'delivery', 'collection', 'dine-in'
-  final String? phoneNumber; // 🔥 NEW: Added phone number field
+  final String? phoneNumber;
 
   Order({
     required this.id,
@@ -66,7 +66,7 @@ class Order {
     this.specialInstructions,
     required this.deliveryAddress,
     required this.orderType,
-    this.phoneNumber, // 🔥 NEW: Added phone number parameter
+    this.phoneNumber,
   });
 
   double get totalItems => items.fold(0, (sum, item) => sum + item.quantity);
@@ -93,7 +93,7 @@ class OrderService {
     required String deliveryAddress,
     required String orderType,
     String? specialInstructions,
-    String? phoneNumber, // 🔥 NEW: Added phone number parameter
+    String? phoneNumber,
   }) async {
     try {
       final user = _currentUser;

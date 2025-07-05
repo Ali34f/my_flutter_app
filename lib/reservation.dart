@@ -1,4 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'info.dart';
+import 'reservation_service.dart';
 
 class ReservationScreen extends StatefulWidget {
   const ReservationScreen({super.key});
@@ -23,6 +26,7 @@ class _ReservationScreenState extends State<ReservationScreen>
   String? selectedTime;
   int? numberOfGuests;
   DateTime? selectedDate;
+  bool _isSubmitting = false;
 
   // Animation controllers
   late AnimationController _fadeController;
@@ -405,12 +409,14 @@ class _ReservationScreenState extends State<ReservationScreen>
             children: [
               const Icon(Icons.location_on, color: Color(0xFFDC143C), size: 20),
               const SizedBox(width: 8),
-              const Text(
-                '286 Torquay Road, Paignton, UK',
-                style: TextStyle(
-                  fontSize: 14,
-                  color: Color(0xFF7F8C8D),
-                  fontWeight: FontWeight.w500,
+              const Expanded(
+                child: Text(
+                  '286 Torquay Road, Paignton, UK',
+                  style: TextStyle(
+                    fontSize: 14,
+                    color: Color(0xFF7F8C8D),
+                    fontWeight: FontWeight.w500,
+                  ),
                 ),
               ),
             ],
@@ -487,6 +493,15 @@ class _ReservationScreenState extends State<ReservationScreen>
               hintText: 'Enter your full name',
               isRequired: true,
               icon: Icons.person_outline,
+              validator: (value) {
+                if (value == null || value.trim().isEmpty) {
+                  return 'Please enter your full name';
+                }
+                if (value.trim().length < 2) {
+                  return 'Name must be at least 2 characters';
+                }
+                return null;
+              },
             ),
 
             const SizedBox(height: 20),
@@ -499,6 +514,20 @@ class _ReservationScreenState extends State<ReservationScreen>
               isRequired: true,
               icon: Icons.phone_outlined,
               keyboardType: TextInputType.phone,
+              inputFormatters: [
+                FilteringTextInputFormatter.allow(RegExp(r'[0-9+\-\s\(\)]')),
+              ],
+              validator: (value) {
+                if (value == null || value.trim().isEmpty) {
+                  return 'Please enter your phone number';
+                }
+                // Remove all non-digits to check length
+                String digitsOnly = value.replaceAll(RegExp(r'[^0-9]'), '');
+                if (digitsOnly.length < 10) {
+                  return 'Please enter a valid phone number';
+                }
+                return null;
+              },
             ),
 
             const SizedBox(height: 20),
@@ -507,10 +536,21 @@ class _ReservationScreenState extends State<ReservationScreen>
             _buildFormField(
               label: 'Email Address',
               controller: _emailController,
-              hintText: 'Enter your email',
+              hintText: 'Enter your email (optional)',
               isRequired: false,
               icon: Icons.email_outlined,
               keyboardType: TextInputType.emailAddress,
+              validator: (value) {
+                if (value != null && value.isNotEmpty) {
+                  final emailRegex = RegExp(
+                    r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$',
+                  );
+                  if (!emailRegex.hasMatch(value)) {
+                    return 'Please enter a valid email address';
+                  }
+                }
+                return null;
+              },
             ),
 
             const SizedBox(height: 20),
@@ -555,6 +595,8 @@ class _ReservationScreenState extends State<ReservationScreen>
     required bool isRequired,
     required IconData icon,
     TextInputType? keyboardType,
+    List<TextInputFormatter>? inputFormatters,
+    String? Function(String?)? validator,
   }) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -581,6 +623,7 @@ class _ReservationScreenState extends State<ReservationScreen>
         TextFormField(
           controller: controller,
           keyboardType: keyboardType,
+          inputFormatters: inputFormatters,
           decoration: InputDecoration(
             hintText: hintText,
             prefixIcon: Icon(icon, color: const Color(0xFFDC143C)),
@@ -592,6 +635,14 @@ class _ReservationScreenState extends State<ReservationScreen>
               borderRadius: BorderRadius.circular(12),
               borderSide: const BorderSide(color: Color(0xFFDC143C), width: 2),
             ),
+            errorBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(12),
+              borderSide: const BorderSide(color: Colors.red, width: 1),
+            ),
+            focusedErrorBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(12),
+              borderSide: const BorderSide(color: Colors.red, width: 2),
+            ),
             contentPadding: const EdgeInsets.symmetric(
               horizontal: 16,
               vertical: 16,
@@ -599,14 +650,7 @@ class _ReservationScreenState extends State<ReservationScreen>
             filled: true,
             fillColor: const Color(0xFFF8F9FA),
           ),
-          validator: isRequired
-              ? (value) {
-                  if (value == null || value.isEmpty) {
-                    return 'This field is required';
-                  }
-                  return null;
-                }
-              : null,
+          validator: validator,
         ),
       ],
     );
@@ -617,7 +661,7 @@ class _ReservationScreenState extends State<ReservationScreen>
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         RichText(
-          text: TextSpan(
+          text: const TextSpan(
             text: 'Date',
             style: TextStyle(
               fontSize: 16,
@@ -637,7 +681,7 @@ class _ReservationScreenState extends State<ReservationScreen>
           controller: _dateController,
           readOnly: true,
           decoration: InputDecoration(
-            hintText: 'dd/mm/yyyy',
+            hintText: 'Select reservation date',
             prefixIcon: const Icon(
               Icons.calendar_today,
               color: Color(0xFFDC143C),
@@ -654,6 +698,10 @@ class _ReservationScreenState extends State<ReservationScreen>
               borderRadius: BorderRadius.circular(12),
               borderSide: const BorderSide(color: Color(0xFFDC143C), width: 2),
             ),
+            errorBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(12),
+              borderSide: const BorderSide(color: Colors.red, width: 1),
+            ),
             contentPadding: const EdgeInsets.symmetric(
               horizontal: 16,
               vertical: 16,
@@ -662,11 +710,12 @@ class _ReservationScreenState extends State<ReservationScreen>
             fillColor: const Color(0xFFF8F9FA),
           ),
           onTap: () async {
+            final DateTime now = DateTime.now();
             final DateTime? picked = await showDatePicker(
               context: context,
-              initialDate: DateTime.now(),
-              firstDate: DateTime.now(),
-              lastDate: DateTime.now().add(const Duration(days: 90)),
+              initialDate: now,
+              firstDate: now,
+              lastDate: now.add(const Duration(days: 90)),
               builder: (context, child) {
                 return Theme(
                   data: Theme.of(context).copyWith(
@@ -691,7 +740,7 @@ class _ReservationScreenState extends State<ReservationScreen>
           },
           validator: (value) {
             if (value == null || value.isEmpty) {
-              return 'Please select a date';
+              return 'Please select a reservation date';
             }
             return null;
           },
@@ -705,7 +754,7 @@ class _ReservationScreenState extends State<ReservationScreen>
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         RichText(
-          text: TextSpan(
+          text: const TextSpan(
             text: 'Time',
             style: TextStyle(
               fontSize: 16,
@@ -724,7 +773,7 @@ class _ReservationScreenState extends State<ReservationScreen>
         DropdownButtonFormField<String>(
           value: selectedTime,
           decoration: InputDecoration(
-            hintText: 'Select time',
+            hintText: 'Select time slot',
             prefixIcon: const Icon(Icons.access_time, color: Color(0xFFDC143C)),
             border: OutlineInputBorder(
               borderRadius: BorderRadius.circular(12),
@@ -733,6 +782,10 @@ class _ReservationScreenState extends State<ReservationScreen>
             focusedBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(12),
               borderSide: const BorderSide(color: Color(0xFFDC143C), width: 2),
+            ),
+            errorBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(12),
+              borderSide: const BorderSide(color: Colors.red, width: 1),
             ),
             contentPadding: const EdgeInsets.symmetric(
               horizontal: 16,
@@ -751,7 +804,7 @@ class _ReservationScreenState extends State<ReservationScreen>
           },
           validator: (value) {
             if (value == null) {
-              return 'Please select a time';
+              return 'Please select a time slot';
             }
             return null;
           },
@@ -765,7 +818,7 @@ class _ReservationScreenState extends State<ReservationScreen>
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         RichText(
-          text: TextSpan(
+          text: const TextSpan(
             text: 'Number of Guests',
             style: TextStyle(
               fontSize: 16,
@@ -784,7 +837,7 @@ class _ReservationScreenState extends State<ReservationScreen>
         DropdownButtonFormField<int>(
           value: numberOfGuests,
           decoration: InputDecoration(
-            hintText: 'Select guests',
+            hintText: 'Select number of guests',
             prefixIcon: const Icon(
               Icons.people_outline,
               color: Color(0xFFDC143C),
@@ -796,6 +849,10 @@ class _ReservationScreenState extends State<ReservationScreen>
             focusedBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(12),
               borderSide: const BorderSide(color: Color(0xFFDC143C), width: 2),
+            ),
+            errorBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(12),
+              borderSide: const BorderSide(color: Colors.red, width: 1),
             ),
             contentPadding: const EdgeInsets.symmetric(
               horizontal: 16,
@@ -842,6 +899,7 @@ class _ReservationScreenState extends State<ReservationScreen>
         TextFormField(
           controller: _specialRequestsController,
           maxLines: 4,
+          maxLength: 500,
           decoration: InputDecoration(
             hintText:
                 'Any special occasions, dietary requirements, or seating preferences...',
@@ -874,24 +932,47 @@ class _ReservationScreenState extends State<ReservationScreen>
       width: double.infinity,
       height: 56,
       child: ElevatedButton(
-        onPressed: _submitReservation,
+        onPressed: _isSubmitting ? null : _submitReservation,
         style: ElevatedButton.styleFrom(
           backgroundColor: const Color(0xFFDC143C),
           foregroundColor: Colors.white,
+          disabledBackgroundColor: Colors.grey.shade400,
+          disabledForegroundColor: Colors.grey.shade600,
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(16),
           ),
-          elevation: 4,
+          elevation: _isSubmitting ? 0 : 4,
           shadowColor: const Color(0xFFDC143C).withOpacity(0.3),
         ),
-        child: const Text(
-          'Request Reservation',
-          style: TextStyle(
-            fontSize: 18,
-            fontWeight: FontWeight.w700,
-            letterSpacing: 0.5,
-          ),
-        ),
+        child: _isSubmitting
+            ? Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  SizedBox(
+                    width: 20,
+                    height: 20,
+                    child: CircularProgressIndicator(
+                      strokeWidth: 2,
+                      valueColor: AlwaysStoppedAnimation<Color>(
+                        Colors.grey.shade600,
+                      ),
+                    ),
+                  ),
+                  const SizedBox(width: 12),
+                  const Text(
+                    'Submitting...',
+                    style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
+                  ),
+                ],
+              )
+            : const Text(
+                'Request Reservation',
+                style: TextStyle(
+                  fontSize: 18,
+                  fontWeight: FontWeight.w700,
+                  letterSpacing: 0.5,
+                ),
+              ),
       ),
     );
   }
@@ -966,18 +1047,9 @@ class _ReservationScreenState extends State<ReservationScreen>
               }),
               _buildNavItem(Icons.calendar_today, 'Reserve', true, () {}),
               _buildNavItem(Icons.phone, 'Contact', false, () {
-                ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(
-                    content: const Text(
-                      'Contact feature coming soon! 📞',
-                      style: TextStyle(fontWeight: FontWeight.w600),
-                    ),
-                    backgroundColor: const Color(0xFF006A4E),
-                    behavior: SnackBarBehavior.floating,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                  ),
+                Navigator.pushReplacement(
+                  context,
+                  MaterialPageRoute(builder: (context) => const InfoScreen()),
                 );
               }),
             ],
@@ -1052,90 +1124,358 @@ class _ReservationScreenState extends State<ReservationScreen>
     );
   }
 
-  void _submitReservation() {
-    if (_formKey.currentState!.validate()) {
-      // Show loading dialog
-      showDialog(
-        context: context,
-        barrierDismissible: false,
-        builder: (BuildContext context) {
-          return AlertDialog(
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(16),
-            ),
-            content: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                const CircularProgressIndicator(
-                  valueColor: AlwaysStoppedAnimation<Color>(Color(0xFFDC143C)),
-                ),
-                const SizedBox(height: 16),
-                const Text(
-                  'Submitting your reservation...',
-                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
-                ),
-              ],
-            ),
-          );
-        },
+  Future<void> _submitReservation() async {
+    if (!_formKey.currentState!.validate()) {
+      // Show error message if form is invalid
+      _showErrorSnackBar('Please fill in all required fields correctly.');
+      return;
+    }
+
+    setState(() {
+      _isSubmitting = true;
+    });
+
+    try {
+      // Check availability first
+      final isAvailable = await ReservationService.isTimeSlotAvailable(
+        selectedDate!,
+        selectedTime!,
+        numberOfGuests!,
       );
 
-      // Simulate API call
-      Future.delayed(const Duration(seconds: 2), () {
-        Navigator.pop(context); // Close loading dialog
+      if (!isAvailable) {
+        _showErrorSnackBar(
+          'Sorry, this time slot is not available. Please choose a different time.',
+        );
+        setState(() {
+          _isSubmitting = false;
+        });
+        return;
+      }
 
-        // Show success dialog
-        showDialog(
-          context: context,
-          builder: (BuildContext context) {
-            return AlertDialog(
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(16),
+      // Create the reservation
+      final reservationId = await ReservationService.createReservation(
+        name: _nameController.text.trim(),
+        phone: _phoneController.text.trim(),
+        email: _emailController.text.trim().isEmpty
+            ? null
+            : _emailController.text.trim(),
+        date: selectedDate!,
+        time: selectedTime!,
+        guests: numberOfGuests!,
+        specialRequests: _specialRequestsController.text.trim().isEmpty
+            ? null
+            : _specialRequestsController.text.trim(),
+      );
+
+      setState(() {
+        _isSubmitting = false;
+      });
+
+      // Show success dialog
+      _showSuccessDialog(reservationId);
+    } catch (e) {
+      setState(() {
+        _isSubmitting = false;
+      });
+
+      // Show error dialog
+      _showErrorDialog(e.toString());
+    }
+  }
+
+  void _showErrorSnackBar(String message) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Row(
+          children: [
+            const Icon(Icons.error_outline, color: Colors.white),
+            const SizedBox(width: 12),
+            Expanded(
+              child: Text(
+                message,
+                style: const TextStyle(fontWeight: FontWeight.w600),
               ),
-              content: Column(
-                mainAxisSize: MainAxisSize.min,
+            ),
+          ],
+        ),
+        backgroundColor: Colors.red.shade600,
+        behavior: SnackBarBehavior.floating,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+        margin: const EdgeInsets.all(16),
+      ),
+    );
+  }
+
+  void _showSuccessDialog(String reservationId) {
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(20),
+          ),
+          contentPadding: const EdgeInsets.all(24),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              // Success Icon
+              Container(
+                width: 80,
+                height: 80,
+                decoration: BoxDecoration(
+                  gradient: const LinearGradient(
+                    colors: [Color(0xFF27AE60), Color(0xFF2ECC71)],
+                  ),
+                  shape: BoxShape.circle,
+                  boxShadow: [
+                    BoxShadow(
+                      color: const Color(0xFF27AE60).withOpacity(0.3),
+                      blurRadius: 12,
+                      offset: const Offset(0, 4),
+                    ),
+                  ],
+                ),
+                child: const Icon(
+                  Icons.check_rounded,
+                  color: Colors.white,
+                  size: 40,
+                ),
+              ),
+
+              const SizedBox(height: 24),
+
+              // Success Title
+              const Text(
+                'Reservation Submitted!',
+                style: TextStyle(
+                  fontSize: 22,
+                  fontWeight: FontWeight.w800,
+                  color: Color(0xFF2C3E50),
+                ),
+              ),
+
+              const SizedBox(height: 12),
+
+              // Reservation ID
+              Container(
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 16,
+                  vertical: 8,
+                ),
+                decoration: BoxDecoration(
+                  color: const Color(0xFFF8F9FA),
+                  borderRadius: BorderRadius.circular(8),
+                  border: Border.all(
+                    color: const Color(0xFF27AE60).withOpacity(0.3),
+                  ),
+                ),
+                child: Text(
+                  'Reservation ID: $reservationId',
+                  style: const TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.w600,
+                    color: Color(0xFF27AE60),
+                    fontFamily: 'monospace',
+                  ),
+                ),
+              ),
+
+              const SizedBox(height: 16),
+
+              // Success Message
+              const Text(
+                'Thank you for your reservation request. We\'ll contact you within 30 minutes to confirm your booking.',
+                textAlign: TextAlign.center,
+                style: TextStyle(
+                  fontSize: 15,
+                  color: Color(0xFF7F8C8D),
+                  height: 1.5,
+                ),
+              ),
+
+              const SizedBox(height: 24),
+
+              // Action Buttons
+              Column(
                 children: [
-                  Container(
-                    width: 80,
-                    height: 80,
-                    decoration: BoxDecoration(
-                      gradient: const LinearGradient(
-                        colors: [Color(0xFF27AE60), Color(0xFF2ECC71)],
-                      ),
-                      shape: BoxShape.circle,
-                    ),
-                    child: const Icon(
-                      Icons.check,
-                      color: Colors.white,
-                      size: 40,
-                    ),
-                  ),
-                  const SizedBox(height: 20),
-                  const Text(
-                    'Reservation Submitted!',
-                    style: TextStyle(
-                      fontSize: 20,
-                      fontWeight: FontWeight.w700,
-                      color: Color(0xFF2C3E50),
-                    ),
-                  ),
-                  const SizedBox(height: 12),
-                  const Text(
-                    'Thank you for your reservation request. We\'ll contact you within 30 minutes to confirm your booking.',
-                    textAlign: TextAlign.center,
-                    style: TextStyle(
-                      fontSize: 14,
-                      color: Color(0xFF7F8C8D),
-                      height: 1.4,
-                    ),
-                  ),
-                  const SizedBox(height: 20),
+                  // Primary Button
                   SizedBox(
                     width: double.infinity,
                     child: ElevatedButton(
                       onPressed: () {
-                        Navigator.pop(context); // Close success dialog
-                        Navigator.pop(context); // Go back to home screen
+                        Navigator.pop(context); // Close dialog
+                        Navigator.pop(context); // Go back to previous screen
+                      },
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: const Color(0xFFDC143C),
+                        foregroundColor: Colors.white,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                        padding: const EdgeInsets.symmetric(vertical: 16),
+                        elevation: 2,
+                      ),
+                      child: const Text(
+                        'Back to Menu',
+                        style: TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.w700,
+                        ),
+                      ),
+                    ),
+                  ),
+
+                  const SizedBox(height: 12),
+
+                  // Secondary Button
+                  SizedBox(
+                    width: double.infinity,
+                    child: TextButton(
+                      onPressed: () {
+                        Navigator.pop(context); // Close dialog
+                        _resetForm(); // Reset form for new reservation
+                      },
+                      style: TextButton.styleFrom(
+                        foregroundColor: const Color(0xFF27AE60),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12),
+                          side: BorderSide(
+                            color: const Color(0xFF27AE60).withOpacity(0.3),
+                          ),
+                        ),
+                        padding: const EdgeInsets.symmetric(vertical: 16),
+                      ),
+                      child: const Text(
+                        'Make Another Reservation',
+                        style: TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ],
+          ),
+        );
+      },
+    );
+  }
+
+  void _showErrorDialog(String error) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(20),
+          ),
+          contentPadding: const EdgeInsets.all(24),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              // Error Icon
+              Container(
+                width: 80,
+                height: 80,
+                decoration: BoxDecoration(
+                  gradient: LinearGradient(
+                    colors: [Colors.red.shade400, Colors.red.shade600],
+                  ),
+                  shape: BoxShape.circle,
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.red.withOpacity(0.3),
+                      blurRadius: 12,
+                      offset: const Offset(0, 4),
+                    ),
+                  ],
+                ),
+                child: const Icon(
+                  Icons.error_outline_rounded,
+                  color: Colors.white,
+                  size: 40,
+                ),
+              ),
+
+              const SizedBox(height: 24),
+
+              // Error Title
+              const Text(
+                'Reservation Failed',
+                style: TextStyle(
+                  fontSize: 22,
+                  fontWeight: FontWeight.w800,
+                  color: Color(0xFF2C3E50),
+                ),
+              ),
+
+              const SizedBox(height: 16),
+
+              // Error Message
+              Text(
+                'Sorry, we couldn\'t process your reservation. Please try again.',
+                textAlign: TextAlign.center,
+                style: TextStyle(
+                  fontSize: 15,
+                  color: const Color(0xFF7F8C8D),
+                  height: 1.5,
+                ),
+              ),
+
+              const SizedBox(height: 8),
+
+              // Technical Error (if needed for debugging)
+              Container(
+                padding: const EdgeInsets.all(12),
+                decoration: BoxDecoration(
+                  color: Colors.red.shade50,
+                  borderRadius: BorderRadius.circular(8),
+                  border: Border.all(color: Colors.red.shade200),
+                ),
+                child: Text(
+                  error.replaceAll('Exception: ', ''),
+                  style: TextStyle(
+                    fontSize: 12,
+                    color: Colors.red.shade700,
+                    fontFamily: 'monospace',
+                  ),
+                ),
+              ),
+
+              const SizedBox(height: 24),
+
+              // Action Buttons
+              Row(
+                children: [
+                  Expanded(
+                    child: TextButton(
+                      onPressed: () => Navigator.pop(context),
+                      style: TextButton.styleFrom(
+                        foregroundColor: const Color(0xFF7F8C8D),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                        padding: const EdgeInsets.symmetric(vertical: 16),
+                      ),
+                      child: const Text(
+                        'Cancel',
+                        style: TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                    ),
+                  ),
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: ElevatedButton(
+                      onPressed: () {
+                        Navigator.pop(context);
+                        _submitReservation(); // Retry
                       },
                       style: ElevatedButton.styleFrom(
                         backgroundColor: const Color(0xFFDC143C),
@@ -1146,20 +1486,36 @@ class _ReservationScreenState extends State<ReservationScreen>
                         padding: const EdgeInsets.symmetric(vertical: 16),
                       ),
                       child: const Text(
-                        'Back to Menu',
+                        'Try Again',
                         style: TextStyle(
                           fontSize: 16,
-                          fontWeight: FontWeight.w600,
+                          fontWeight: FontWeight.w700,
                         ),
                       ),
                     ),
                   ),
                 ],
               ),
-            );
-          },
+            ],
+          ),
         );
-      });
-    }
+      },
+    );
+  }
+
+  void _resetForm() {
+    _formKey.currentState?.reset();
+    _nameController.clear();
+    _phoneController.clear();
+    _emailController.clear();
+    _dateController.clear();
+    _specialRequestsController.clear();
+
+    setState(() {
+      selectedTime = null;
+      numberOfGuests = null;
+      selectedDate = null;
+      _isSubmitting = false;
+    });
   }
 }

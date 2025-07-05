@@ -50,6 +50,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
   @override
   void initState() {
     super.initState();
+    _selectedBottomIndex = 0;
     _loadMenuData();
 
     _bottomNavController = AnimationController(
@@ -2923,28 +2924,43 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
   }
 
   Widget _buildEnhancedNavItem(IconData icon, String label, int index) {
-    final isSelected = _selectedBottomIndex == index;
-
+    final bool isSelected = _selectedBottomIndex == index;
     return Expanded(
       child: GestureDetector(
-        onTap: () {
+        onTap: () async {
+          // Temporarily set the selected index
           setState(() {
             _selectedBottomIndex = index;
           });
 
           if (index == 1) {
-            Navigator.push(
+            // Navigate to reservation screen
+            await Navigator.push(
               context,
               MaterialPageRoute(
                 builder: (context) => const ReservationScreen(),
               ),
             );
+            // Always reset to menu (index 0) after returning
+            if (mounted) {
+              setState(() {
+                _selectedBottomIndex = 0;
+              });
+            }
           } else if (index == 2) {
-            Navigator.push(
+            // Navigate to contact screen
+            await Navigator.push(
               context,
               MaterialPageRoute(builder: (context) => const InfoScreen()),
             );
+            // Always reset to menu (index 0) after returning
+            if (mounted) {
+              setState(() {
+                _selectedBottomIndex = 0;
+              });
+            }
           }
+          // If index == 0 (Menu), do nothing as we're already on the menu screen
         },
         child: Container(
           margin: const EdgeInsets.symmetric(horizontal: 4),

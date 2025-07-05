@@ -38,6 +38,9 @@ class CartManager extends ChangeNotifier {
   // Payment method: 'cash' or 'card'
   String _paymentMethod = 'cash'; // Default to cash (no card charge)
 
+  // Minimum order constants
+  static const double minimumOrderValue = 15.0;
+
   List<CartItem> get items => List.unmodifiable(_items);
   String get orderType => _orderType;
   String get paymentMethod => _paymentMethod;
@@ -62,6 +65,21 @@ class CartManager extends ChangeNotifier {
   // Free delivery threshold (for future use)
   double get freeDeliveryThreshold => 25.0;
 
+  // Check if order meets minimum
+  bool get meetsMinimumOrder => subtotal >= minimumOrderValue;
+
+  // Get remaining amount needed
+  double get remainingForMinimum => minimumOrderValue - subtotal;
+
+  // Get formatted minimum order message
+  String get minimumOrderMessage {
+    if (meetsMinimumOrder) {
+      return 'Minimum order met ✓';
+    } else {
+      return 'Add ${formatCurrency(remainingForMinimum)} more to reach £${minimumOrderValue.toStringAsFixed(0)} minimum';
+    }
+  }
+
   void addItem({
     required String id,
     required String name,
@@ -71,7 +89,6 @@ class CartManager extends ChangeNotifier {
     String imageUrl = '',
   }) {
     final existingIndex = _items.indexWhere((item) => item.id == id);
-
     if (existingIndex >= 0) {
       _items[existingIndex].quantity++;
     } else {
