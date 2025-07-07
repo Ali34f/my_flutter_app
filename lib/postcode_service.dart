@@ -2,12 +2,12 @@ import 'package:http/http.dart' as http;
 import 'dart:convert';
 
 class PostcodeService {
-  // Using free Postcodes.io API
+  // Postcodes.io API
   static const String baseUrl = 'https://api.postcodes.io';
 
   static Future<Map<String, String>> lookupPostcode(String postcode) async {
     try {
-      // Clean postcode - remove spaces and convert to uppercase
+      // Clean postcode
       final cleanPostcode = postcode.replaceAll(' ', '').toUpperCase();
 
       // Make API call

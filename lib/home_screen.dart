@@ -2819,9 +2819,9 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                     ),
                     SizedBox(height: 2),
                     Text(
-                      'Authentic Indian Cuisine',
+                      'Authentic Bangladeshi Cuisine',
                       style: TextStyle(
-                        fontSize: 13,
+                        fontSize: 11.5,
                         color: Color(0xFFF8F9FA),
                         fontWeight: FontWeight.w400,
                         letterSpacing: 0.3,

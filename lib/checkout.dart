@@ -3,6 +3,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'cart_manager.dart';
 import 'order_service.dart';
 import 'postcode_service.dart';
+import 'order_tracking_screen.dart';
 
 class CheckoutScreen extends StatefulWidget {
   const CheckoutScreen({super.key});
@@ -22,9 +23,17 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
   final TextEditingController _streetController = TextEditingController();
   final TextEditingController _cityController = TextEditingController();
 
+  // Guest user controllers
+  final TextEditingController _guestNameController = TextEditingController();
+  final TextEditingController _guestEmailController = TextEditingController();
+
   // Loading states
   bool _isPlacingOrder = false;
   bool _isLoadingAddress = false;
+
+  // User state helpers
+  bool get _isLoggedIn => FirebaseAuth.instance.currentUser != null;
+  User? get _currentUser => FirebaseAuth.instance.currentUser;
 
   // Minimum order amount
   static const double minimumOrderAmount = 15.0;
@@ -33,6 +42,11 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
   void initState() {
     super.initState();
     _cartManager.addListener(_updateUI);
+
+    // Pre-fill user email if logged in
+    if (_isLoggedIn && _currentUser?.email != null) {
+      _guestEmailController.text = _currentUser!.email!;
+    }
   }
 
   @override
@@ -44,6 +58,8 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
     _postcodeController.dispose();
     _streetController.dispose();
     _cityController.dispose();
+    _guestNameController.dispose();
+    _guestEmailController.dispose();
     super.dispose();
   }
 
@@ -148,6 +164,11 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
     return RegExp(r'^(\+44|0)[1-9]\d{8,9}$').hasMatch(cleanPhone);
   }
 
+  // Email validation
+  bool _isValidEmail(String email) {
+    return RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$').hasMatch(email);
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -171,6 +192,37 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
             fontFamily: 'Georgia',
           ),
         ),
+        actions: [
+          Container(
+            margin: const EdgeInsets.only(right: 16),
+            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+            decoration: BoxDecoration(
+              color: _isLoggedIn
+                  ? const Color(0xFF27AE60)
+                  : const Color(0xFFF39C12),
+              borderRadius: BorderRadius.circular(16),
+            ),
+            child: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Icon(
+                  _isLoggedIn ? Icons.person : Icons.person_outline,
+                  color: Colors.white,
+                  size: 16,
+                ),
+                const SizedBox(width: 4),
+                Text(
+                  _isLoggedIn ? 'User' : 'Guest',
+                  style: const TextStyle(
+                    color: Colors.white,
+                    fontSize: 12,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
       ),
       body: SafeArea(
         child: _cartManager.items.isEmpty
@@ -232,6 +284,67 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
                                 ),
                               ),
                             ],
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+
+                // Guest User Notice (if not logged in)
+                if (!_isLoggedIn)
+                  Container(
+                    width: double.infinity,
+                    padding: const EdgeInsets.all(16),
+                    margin: const EdgeInsets.only(bottom: 16),
+                    decoration: BoxDecoration(
+                      color: const Color(0xFFE3F2FD),
+                      borderRadius: BorderRadius.circular(12),
+                      border: Border.all(
+                        color: const Color(0xFF2196F3),
+                        width: 1,
+                      ),
+                    ),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Row(
+                          children: [
+                            const Icon(
+                              Icons.info_outline,
+                              color: Color(0xFF1976D2),
+                              size: 24,
+                            ),
+                            const SizedBox(width: 12),
+                            const Expanded(
+                              child: Text(
+                                'Ordering as Guest',
+                                style: TextStyle(
+                                  fontWeight: FontWeight.w700,
+                                  color: Color(0xFF1976D2),
+                                  fontSize: 16,
+                                ),
+                              ),
+                            ),
+                            TextButton(
+                              onPressed: () {
+                                Navigator.pushNamed(context, '/login');
+                              },
+                              child: const Text(
+                                'Login',
+                                style: TextStyle(
+                                  color: Color(0xFF1976D2),
+                                  fontWeight: FontWeight.w600,
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                        const SizedBox(height: 8),
+                        const Text(
+                          'You can still place orders as a guest. We\'ll send updates via phone/email.',
+                          style: TextStyle(
+                            color: Color(0xFF1976D2),
+                            fontSize: 14,
                           ),
                         ),
                       ],
@@ -849,19 +962,19 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
                             ),
                           ],
                         ),
-                        child: const Row(
+                        child: Row(
                           children: [
-                            Icon(
+                            const Icon(
                               Icons.restaurant,
                               color: Colors.white,
                               size: 30,
                             ),
-                            SizedBox(width: 16),
+                            const SizedBox(width: 16),
                             Expanded(
                               child: Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
-                                  Text(
+                                  const Text(
                                     'Complete Your Order',
                                     style: TextStyle(
                                       fontSize: 24,
@@ -869,10 +982,12 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
                                       color: Colors.white,
                                     ),
                                   ),
-                                  SizedBox(height: 4),
+                                  const SizedBox(height: 4),
                                   Text(
-                                    'Authentic Bangladeshi Cuisine 🇧🇩',
-                                    style: TextStyle(
+                                    _isLoggedIn
+                                        ? 'Authenticated User 🇧🇩'
+                                        : 'Guest Order 🇧🇩',
+                                    style: const TextStyle(
                                       fontSize: 14,
                                       color: Colors.white,
                                       fontWeight: FontWeight.w400,
@@ -886,6 +1001,74 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
                       ),
 
                       const SizedBox(height: 24),
+
+                      // Guest Information Section (only for guests)
+                      if (!_isLoggedIn) ...[
+                        _buildCheckoutSection(
+                          'Your Information',
+                          Icons.person,
+                          Column(
+                            children: [
+                              // Guest Name Field
+                              TextFormField(
+                                controller: _guestNameController,
+                                decoration: InputDecoration(
+                                  labelText: 'Full Name *',
+                                  hintText: 'e.g., John Smith',
+                                  border: OutlineInputBorder(
+                                    borderRadius: BorderRadius.circular(12),
+                                    borderSide: BorderSide(
+                                      color: Colors.grey[300]!,
+                                    ),
+                                  ),
+                                  focusedBorder: OutlineInputBorder(
+                                    borderRadius: BorderRadius.circular(12),
+                                    borderSide: const BorderSide(
+                                      color: Color(0xFF006A4E),
+                                      width: 2,
+                                    ),
+                                  ),
+                                  prefixIcon: const Icon(
+                                    Icons.person,
+                                    color: Color(0xFF006A4E),
+                                  ),
+                                  contentPadding: const EdgeInsets.all(16),
+                                ),
+                              ),
+                              const SizedBox(height: 16),
+
+                              // Guest Email Field
+                              TextFormField(
+                                controller: _guestEmailController,
+                                keyboardType: TextInputType.emailAddress,
+                                decoration: InputDecoration(
+                                  labelText: 'Email Address *',
+                                  hintText: 'e.g., john@example.com',
+                                  border: OutlineInputBorder(
+                                    borderRadius: BorderRadius.circular(12),
+                                    borderSide: BorderSide(
+                                      color: Colors.grey[300]!,
+                                    ),
+                                  ),
+                                  focusedBorder: OutlineInputBorder(
+                                    borderRadius: BorderRadius.circular(12),
+                                    borderSide: const BorderSide(
+                                      color: Color(0xFF006A4E),
+                                      width: 2,
+                                    ),
+                                  ),
+                                  prefixIcon: const Icon(
+                                    Icons.email,
+                                    color: Color(0xFF006A4E),
+                                  ),
+                                  contentPadding: const EdgeInsets.all(16),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                        const SizedBox(height: 24),
+                      ],
 
                       // Order Type Selection
                       _buildCheckoutSection(
@@ -941,11 +1124,14 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
 
                       const SizedBox(height: 24),
 
-                      // Contact Information and Address Section (only show if delivery)
-                      if (_cartManager.orderType == 'delivery') ...[
+                      // Contact Information Section - Show phone for delivery OR for guests
+                      if (_cartManager.orderType == 'delivery' ||
+                          !_isLoggedIn) ...[
                         _buildCheckoutSection(
-                          'Contact Information',
-                          Icons.person,
+                          _cartManager.orderType == 'delivery'
+                              ? 'Contact Information'
+                              : 'Phone Number',
+                          Icons.phone,
                           Column(
                             children: [
                               // Phone Number Field
@@ -974,15 +1160,15 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
                                   ),
                                   contentPadding: const EdgeInsets.all(16),
                                 ),
-                                onChanged: (value) {
-                                  // Optional: Real-time validation
-                                },
                               ),
                             ],
                           ),
                         ),
                         const SizedBox(height: 24),
+                      ],
 
+                      // Delivery Address Section (only for delivery)
+                      if (_cartManager.orderType == 'delivery') ...[
                         _buildCheckoutSection(
                           'Delivery Address',
                           Icons.location_on,
@@ -1022,7 +1208,6 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
                                         ),
                                       ),
                                       onChanged: (value) {
-                                        // Auto-update full address when postcode changes
                                         if (value.isNotEmpty) {
                                           _updateFullAddress();
                                         }
@@ -1503,7 +1688,7 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
     );
   }
 
-  // Enhanced order placement method with minimum order validation
+  // Enhanced order placement method with guest support
   void _placeOrder() async {
     // Double-check minimum order requirement
     if (!_isMinimumOrderMet) {
@@ -1511,15 +1696,44 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
       return;
     }
 
-    // Enhanced validation for delivery orders
-    if (_cartManager.orderType == 'delivery') {
-      // Validate phone number
+    // Validate guest information if not logged in
+    if (!_isLoggedIn) {
+      if (_guestNameController.text.trim().isEmpty) {
+        _showErrorSnackBar('Please enter your full name');
+        return;
+      }
+
+      if (_guestEmailController.text.trim().isEmpty) {
+        _showErrorSnackBar('Please enter your email address');
+        return;
+      }
+
+      if (!_isValidEmail(_guestEmailController.text.trim())) {
+        _showErrorSnackBar('Please enter a valid email address');
+        return;
+      }
+
       if (_phoneController.text.trim().isEmpty) {
         _showErrorSnackBar('Please enter your phone number');
         return;
       }
 
       if (!_isValidUKPhoneNumber(_phoneController.text.trim())) {
+        _showErrorSnackBar('Please enter a valid UK phone number');
+        return;
+      }
+    }
+
+    // Enhanced validation for delivery orders
+    if (_cartManager.orderType == 'delivery') {
+      // For logged in users, still need phone for delivery
+      if (_isLoggedIn && _phoneController.text.trim().isEmpty) {
+        _showErrorSnackBar('Please enter your phone number for delivery');
+        return;
+      }
+
+      if (_phoneController.text.trim().isNotEmpty &&
+          !_isValidUKPhoneNumber(_phoneController.text.trim())) {
         _showErrorSnackBar('Please enter a valid UK phone number');
         return;
       }
@@ -1552,29 +1766,6 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
           '${_streetController.text.trim()}, ${_cityController.text.trim()}, ${PostcodeService.formatPostcode(_postcodeController.text.trim())}, United Kingdom';
     }
 
-    // Check if user is authenticated
-    final user = FirebaseAuth.instance.currentUser;
-    if (user == null) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: const Text('Please log in to place an order'),
-          backgroundColor: const Color(0xFFE74C3C),
-          behavior: SnackBarBehavior.floating,
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(12),
-          ),
-          action: SnackBarAction(
-            label: 'LOGIN',
-            textColor: Colors.white,
-            onPressed: () {
-              Navigator.pushNamed(context, '/login');
-            },
-          ),
-        ),
-      );
-      return;
-    }
-
     setState(() {
       _isPlacingOrder = true;
     });
@@ -1604,7 +1795,7 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
         deliveryAddress = 'Dine In - Tandoori Nights Restaurant';
       }
 
-      // Create the order with phone number
+      // Create the order with guest support
       final orderId = await OrderService.createOrder(
         items: orderItems,
         total: _cartManager.total,
@@ -1616,16 +1807,19 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
         specialInstructions: _instructionsController.text.trim().isEmpty
             ? null
             : _instructionsController.text.trim(),
-        phoneNumber: _cartManager.orderType == 'delivery'
-            ? _phoneController.text.trim()
-            : null,
+        phoneNumber: _phoneController.text.trim().isEmpty
+            ? null
+            : _phoneController.text.trim(),
+        // Guest information
+        guestName: !_isLoggedIn ? _guestNameController.text.trim() : null,
+        guestEmail: !_isLoggedIn ? _guestEmailController.text.trim() : null,
       );
 
       setState(() {
         _isPlacingOrder = false;
       });
 
-      // Show success dialog with real order ID
+      // Show success dialog with tracking option
       _showSuccessDialog(orderId);
     } catch (e) {
       setState(() {
@@ -1723,25 +1917,6 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
                         const Text(
-                          'Order Type:',
-                          style: TextStyle(fontWeight: FontWeight.w600),
-                        ),
-                        Text(
-                          _cartManager.orderType == 'delivery'
-                              ? 'Delivery'
-                              : 'Collection',
-                          style: const TextStyle(
-                            color: Color(0xFF006A4E),
-                            fontWeight: FontWeight.w600,
-                          ),
-                        ),
-                      ],
-                    ),
-                    const SizedBox(height: 8),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        const Text(
                           'Payment:',
                           style: TextStyle(fontWeight: FontWeight.w600),
                         ),
@@ -1782,26 +1957,32 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
               ),
               const SizedBox(height: 24),
 
-              // Action buttons with proper navigation
-              Row(
+              // Action buttons with tracking option
+              Column(
                 children: [
-                  Expanded(
-                    child: OutlinedButton.icon(
+                  // Track Order button
+                  SizedBox(
+                    width: double.infinity,
+                    child: ElevatedButton.icon(
                       onPressed: () {
                         Navigator.of(context).pop(); // Close dialog
-                        Navigator.pushNamed(
+                        Navigator.push(
                           context,
-                          '/order-history',
-                        ); // Navigate to order history
+                          MaterialPageRoute(
+                            builder: (context) => OrderTrackingScreen(
+                              orderId: orderId,
+                              orderPhone: _phoneController.text.trim().isEmpty
+                                  ? null
+                                  : _phoneController.text.trim(),
+                            ),
+                          ),
+                        );
                       },
-                      icon: const Icon(Icons.history, size: 20),
-                      label: const Text('View Orders'),
-                      style: OutlinedButton.styleFrom(
-                        foregroundColor: const Color(0xFF006A4E),
-                        side: const BorderSide(
-                          color: Color(0xFF006A4E),
-                          width: 2,
-                        ),
+                      icon: const Icon(Icons.track_changes, size: 20),
+                      label: const Text('Track Your Order'),
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: const Color(0xFF006A4E),
+                        foregroundColor: Colors.white,
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(12),
                         ),
@@ -1809,39 +1990,62 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
                       ),
                     ),
                   ),
-                  const SizedBox(width: 12),
-                  Expanded(
-                    child: ElevatedButton(
-                      onPressed: () async {
-                        // Clear the cart
-                        _cartManager.clearCart();
-
-                        // Close the dialog first
-                        Navigator.of(context).pop();
-
-                        // Navigate back to home screen (remove all previous routes)
-                        Navigator.pushNamedAndRemoveUntil(
-                          context,
-                          '/home', // Make sure this route name matches your home_screen.dart route
-                          (route) => false, // This removes all previous routes
-                        );
-                      },
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: const Color(0xFF006A4E),
-                        foregroundColor: Colors.white,
-                        padding: const EdgeInsets.symmetric(vertical: 12),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(12),
+                  const SizedBox(height: 12),
+                  Row(
+                    children: [
+                      if (_isLoggedIn) ...[
+                        Expanded(
+                          child: OutlinedButton.icon(
+                            onPressed: () {
+                              Navigator.of(context).pop(); // Close dialog
+                              Navigator.pushNamed(context, '/order-history');
+                            },
+                            icon: const Icon(Icons.history, size: 20),
+                            label: const Text('View Orders'),
+                            style: OutlinedButton.styleFrom(
+                              foregroundColor: const Color(0xFF006A4E),
+                              side: const BorderSide(
+                                color: Color(0xFF006A4E),
+                                width: 2,
+                              ),
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(12),
+                              ),
+                              padding: const EdgeInsets.symmetric(vertical: 12),
+                            ),
+                          ),
+                        ),
+                        const SizedBox(width: 12),
+                      ],
+                      Expanded(
+                        child: ElevatedButton(
+                          onPressed: () async {
+                            _cartManager.clearCart();
+                            Navigator.of(context).pop();
+                            Navigator.pushNamedAndRemoveUntil(
+                              context,
+                              '/home',
+                              (route) => false,
+                            );
+                          },
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: const Color(0xFFDC143C),
+                            foregroundColor: Colors.white,
+                            padding: const EdgeInsets.symmetric(vertical: 12),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(12),
+                            ),
+                          ),
+                          child: const Text(
+                            'Back to Menu',
+                            style: TextStyle(
+                              fontSize: 16,
+                              fontWeight: FontWeight.w600,
+                            ),
+                          ),
                         ),
                       ),
-                      child: const Text(
-                        'Back to Menu',
-                        style: TextStyle(
-                          fontSize: 16,
-                          fontWeight: FontWeight.w600,
-                        ),
-                      ),
-                    ),
+                    ],
                   ),
                 ],
               ),

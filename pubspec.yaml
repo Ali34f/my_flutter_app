@@ -13,7 +13,7 @@ dependencies:
   # UI & Icons
   cupertino_icons: ^1.0.8
   
-  # URL Launcher
+  # URL Launcher for phone calls and WhatsApp
   url_launcher: ^6.3.1
   
   # Firebase dependencies - LATEST VERSIONS
@@ -21,11 +21,14 @@ dependencies:
   firebase_auth: ^5.6.0
   cloud_firestore: ^5.6.9
   
-  # Date formatting (REQUIRED for reservation_service.dart)
+  # Date formatting (REQUIRED for reservation_service.dart and order tracking)
   intl: ^0.19.0
   
-  # HTTP for API calls (Postcode lookup)
+  # HTTP for API calls (Postcode lookup and address validation)
   http: ^1.1.0
+  
+  # REQUIRED: Crypto for guest order verification hashing
+  crypto: ^3.0.3
 
 dev_dependencies:
   flutter_test:
@@ -38,3 +41,5 @@ flutter:
   # Assets
   assets:
     - assets/data/
+    
+ 

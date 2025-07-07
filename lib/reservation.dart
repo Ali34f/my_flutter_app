@@ -222,7 +222,7 @@ class _ReservationScreenState extends State<ReservationScreen>
                       'Tandoori Nights',
                       style: TextStyle(
                         fontFamily: 'Georgia',
-                        fontSize: 21,
+                        fontSize: 20,
                         fontWeight: FontWeight.w800,
                         color: Colors.white,
                         letterSpacing: 0.5,
@@ -230,9 +230,9 @@ class _ReservationScreenState extends State<ReservationScreen>
                     ),
                     SizedBox(height: 2),
                     Text(
-                      'Authentic Indian Cuisine',
+                      'Authentic Bangladeshi Cuisine',
                       style: TextStyle(
-                        fontSize: 14,
+                        fontSize: 11.5,
                         color: Color(0xFFF8F9FA),
                         fontWeight: FontWeight.w400,
                         letterSpacing: 0.3,
