@@ -3,6 +3,7 @@ import 'package:intl/intl.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'order_service.dart';
 import 'order_history.dart';
+import 'guest_order_storage.dart';
 
 class OrderTrackingScreen extends StatefulWidget {
   final String? orderId; // If coming from checkout
@@ -22,6 +23,8 @@ class _OrderTrackingScreenState extends State<OrderTrackingScreen> {
   String? currentPhone;
   bool isLoggedIn = false;
   bool isLoading = false;
+  bool hasGuestOrder = false;
+  GuestOrderInfo? guestOrderInfo;
 
   @override
   void initState() {
@@ -36,6 +39,22 @@ class _OrderTrackingScreenState extends State<OrderTrackingScreen> {
     if (widget.orderPhone != null) {
       currentPhone = widget.orderPhone;
       _phoneController.text = widget.orderPhone!;
+    }
+
+    // Check for guest order info
+    _checkGuestOrderInfo();
+  }
+
+  void _checkGuestOrderInfo() {
+    if (!isLoggedIn) {
+      guestOrderInfo = GuestOrderStorage.getStoredGuestOrder();
+      hasGuestOrder = guestOrderInfo != null;
+
+      // Auto-fill if guest has recent order
+      if (hasGuestOrder && currentOrderId == null) {
+        _orderIdController.text = guestOrderInfo!.orderId;
+        _phoneController.text = guestOrderInfo!.phoneNumber;
+      }
     }
   }
 
@@ -216,6 +235,113 @@ class _OrderTrackingScreenState extends State<OrderTrackingScreen> {
 
           const SizedBox(height: 24),
 
+          // GUEST RECENT ORDER CARD (NEW)
+          if (!isLoggedIn && hasGuestOrder) ...[
+            Container(
+              padding: const EdgeInsets.all(20),
+              decoration: BoxDecoration(
+                gradient: LinearGradient(
+                  colors: [
+                    const Color(0xFF006A4E).withOpacity(0.1),
+                    const Color(0xFFDC143C).withOpacity(0.1),
+                  ],
+                ),
+                borderRadius: BorderRadius.circular(16),
+                border: Border.all(
+                  color: const Color(0xFF006A4E).withOpacity(0.3),
+                ),
+              ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    children: [
+                      Container(
+                        padding: const EdgeInsets.all(8),
+                        decoration: BoxDecoration(
+                          color: const Color(0xFF006A4E).withOpacity(0.2),
+                          borderRadius: BorderRadius.circular(8),
+                        ),
+                        child: const Icon(
+                          Icons.access_time,
+                          color: Color(0xFF006A4E),
+                          size: 20,
+                        ),
+                      ),
+                      const SizedBox(width: 12),
+                      const Expanded(
+                        child: Text(
+                          'Your Recent Order',
+                          style: TextStyle(
+                            fontSize: 18,
+                            fontWeight: FontWeight.w700,
+                            color: Color(0xFF006A4E),
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 16),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            'Order: ${guestOrderInfo!.orderId.substring(guestOrderInfo!.orderId.length - 6).toUpperCase()}',
+                            style: const TextStyle(
+                              fontSize: 16,
+                              fontWeight: FontWeight.w600,
+                              color: Color(0xFF2C3E50),
+                            ),
+                          ),
+                          const SizedBox(height: 4),
+                          Text(
+                            'Total: £${guestOrderInfo!.total.toStringAsFixed(2)}',
+                            style: const TextStyle(
+                              fontSize: 14,
+                              color: Color(0xFF7F8C8D),
+                            ),
+                          ),
+                          const SizedBox(height: 4),
+                          Text(
+                            '${GuestOrderStorage.getOrderAgeInHours()} hours ago',
+                            style: const TextStyle(
+                              fontSize: 12,
+                              color: Color(0xFF7F8C8D),
+                            ),
+                          ),
+                        ],
+                      ),
+                      ElevatedButton.icon(
+                        onPressed: () {
+                          currentOrderId = guestOrderInfo!.orderId;
+                          currentPhone = guestOrderInfo!.phoneNumber;
+                          setState(() {});
+                        },
+                        icon: const Icon(Icons.track_changes, size: 16),
+                        label: const Text('Track Now'),
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: const Color(0xFF006A4E),
+                          foregroundColor: Colors.white,
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 16,
+                            vertical: 8,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+            ),
+            const SizedBox(height: 24),
+          ],
+
           // Lookup Form
           Container(
             padding: const EdgeInsets.all(24),
@@ -233,13 +359,34 @@ class _OrderTrackingScreenState extends State<OrderTrackingScreen> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                const Text(
-                  'Order Lookup',
-                  style: TextStyle(
-                    fontSize: 22,
-                    fontWeight: FontWeight.w700,
-                    color: Color(0xFF2C3E50),
-                  ),
+                Row(
+                  children: [
+                    const Expanded(
+                      child: Text(
+                        'Order Lookup',
+                        style: TextStyle(
+                          fontSize: 22,
+                          fontWeight: FontWeight.w700,
+                          color: Color(0xFF2C3E50),
+                        ),
+                      ),
+                    ),
+                    if (!isLoggedIn && hasGuestOrder)
+                      TextButton(
+                        onPressed: () {
+                          _orderIdController.clear();
+                          _phoneController.clear();
+                          setState(() {});
+                        },
+                        child: const Text(
+                          'Enter Different Order',
+                          style: TextStyle(
+                            color: Color(0xFFDC143C),
+                            fontSize: 12,
+                          ),
+                        ),
+                      ),
+                  ],
                 ),
                 const SizedBox(height: 20),
 
@@ -392,6 +539,8 @@ class _OrderTrackingScreenState extends State<OrderTrackingScreen> {
                         child: Text(
                           isLoggedIn
                               ? 'Enter your Order ID to track your order'
+                              : hasGuestOrder
+                              ? 'Track your recent order above, or enter different order details'
                               : 'Use the Order ID and phone number from your order confirmation',
                           style: const TextStyle(
                             fontSize: 14,
@@ -1458,6 +1607,9 @@ class _OrderTrackingScreenState extends State<OrderTrackingScreen> {
       currentPhone = null;
       _orderIdController.clear();
       _phoneController.clear();
+
+      // Re-check guest order info in case they want to track recent order again
+      _checkGuestOrderInfo();
     });
   }
 

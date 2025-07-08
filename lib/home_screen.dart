@@ -6,6 +6,7 @@ import 'cart_manager.dart';
 import 'order_history.dart';
 import 'checkout.dart';
 import 'menu_service.dart';
+import 'order_tracking_screen.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -3160,6 +3161,21 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                     );
                   },
                 ),
+
+                _buildEnhancedDrawerItem(
+                  Icons.track_changes,
+                  'Track Order',
+                  () {
+                    Navigator.pop(context);
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => const OrderTrackingScreen(),
+                      ),
+                    );
+                  },
+                ),
+
                 _buildEnhancedDrawerItem(
                   Icons.calendar_today,
                   'Book a Table',

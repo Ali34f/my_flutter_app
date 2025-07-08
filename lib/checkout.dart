@@ -4,6 +4,7 @@ import 'cart_manager.dart';
 import 'order_service.dart';
 import 'postcode_service.dart';
 import 'order_tracking_screen.dart';
+import 'guest_order_storage.dart';
 
 class CheckoutScreen extends StatefulWidget {
   const CheckoutScreen({super.key});
@@ -1814,6 +1815,14 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
         guestName: !_isLoggedIn ? _guestNameController.text.trim() : null,
         guestEmail: !_isLoggedIn ? _guestEmailController.text.trim() : null,
       );
+
+      if (!_isLoggedIn && _phoneController.text.trim().isNotEmpty) {
+        GuestOrderStorage.storeGuestOrder(
+          orderId: orderId,
+          phoneNumber: _phoneController.text.trim(),
+          total: _cartManager.total,
+        );
+      }
 
       setState(() {
         _isPlacingOrder = false;
