@@ -4,6 +4,7 @@ import 'package:url_launcher/url_launcher.dart';
 import 'order_service.dart';
 import 'order_history.dart';
 import 'guest_order_storage.dart';
+import 'notification_service.dart';
 
 class OrderTrackingScreen extends StatefulWidget {
   final String? orderId; // If coming from checkout
@@ -45,6 +46,13 @@ class _OrderTrackingScreenState extends State<OrderTrackingScreen> {
     _checkGuestOrderInfo();
   }
 
+  void _startNotificationListening() {
+    if (currentOrderId != null) {
+      NotificationService.startListeningForOrderUpdates(currentOrderId!);
+      print('🔔 Started notification listening for: $currentOrderId');
+    }
+  }
+
   void _checkGuestOrderInfo() {
     if (!isLoggedIn) {
       guestOrderInfo = GuestOrderStorage.getStoredGuestOrder();
@@ -60,6 +68,7 @@ class _OrderTrackingScreenState extends State<OrderTrackingScreen> {
 
   @override
   void dispose() {
+    NotificationService.stopListening();
     _orderIdController.dispose();
     _phoneController.dispose();
     super.dispose();
@@ -1587,6 +1596,7 @@ class _OrderTrackingScreenState extends State<OrderTrackingScreen> {
           currentPhone = phone;
           isLoading = false;
         });
+        _startNotificationListening();
       } else {
         setState(() {
           isLoading = false;
@@ -1622,7 +1632,7 @@ class _OrderTrackingScreenState extends State<OrderTrackingScreen> {
   }
 
   void _callRestaurant() async {
-    const phoneNumber = '+441803123456';
+    const phoneNumber = '+441803522364';
     final uri = Uri.parse('tel:$phoneNumber');
 
     try {
@@ -1637,7 +1647,7 @@ class _OrderTrackingScreenState extends State<OrderTrackingScreen> {
   }
 
   void _openWhatsApp() async {
-    const whatsappNumber = '+441803123456';
+    const whatsappNumber = '+447411925097';
     final message = 'Hi, I need help with my order: ${currentOrderId ?? ""}';
     final whatsappUrl =
         'https://wa.me/${whatsappNumber.replaceAll('+', '')}?text=${Uri.encodeComponent(message)}';

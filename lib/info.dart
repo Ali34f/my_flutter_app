@@ -233,7 +233,7 @@ class _InfoScreenState extends State<InfoScreen> with TickerProviderStateMixin {
                         Text(
                           'Get in touch with Tandoori Nights',
                           style: TextStyle(
-                            fontSize: 14,
+                            fontSize: 12.5,
                             color: Color(0xFFF8F9FA),
                             fontWeight: FontWeight.w400,
                             letterSpacing: 0.3,

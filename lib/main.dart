@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'register.dart';
 import 'login.dart';
@@ -6,10 +7,19 @@ import 'home_screen.dart';
 import 'checkout.dart';
 import 'order_history.dart';
 import 'order_tracking_screen.dart';
+import 'notification_service.dart' as notif;
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+
+  await SystemChrome.setPreferredOrientations([
+    DeviceOrientation.portraitUp,
+    DeviceOrientation.portraitDown,
+  ]);
+
   await Firebase.initializeApp();
+  await notif.NotificationService.initialize();
+
   runApp(const TandooriNightsApp());
 }
 
@@ -20,7 +30,13 @@ class TandooriNightsApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       title: 'Tandoori Nights',
-      theme: ThemeData(primarySwatch: Colors.green, fontFamily: null),
+      theme: ThemeData(
+        primarySwatch: Colors.green,
+        fontFamily: null,
+        // Enhanced theme for better portrait experience
+        visualDensity: VisualDensity.adaptivePlatformDensity,
+        useMaterial3: true,
+      ),
       home: FutureBuilder(
         future: _initializeApp(),
         builder: (context, snapshot) {
@@ -33,7 +49,26 @@ class TandooriNightsApp extends StatelessWidget {
             return const WelcomeScreen();
           }
           return const Scaffold(
-            body: Center(child: CircularProgressIndicator()),
+            backgroundColor: Color(0xFF006A4E),
+            body: Center(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  CircularProgressIndicator(
+                    valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+                  ),
+                  SizedBox(height: 16),
+                  Text(
+                    'Loading Tandoori Nights...',
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontSize: 16,
+                      fontWeight: FontWeight.w500,
+                    ),
+                  ),
+                ],
+              ),
+            ),
           );
         },
       ),
@@ -44,15 +79,21 @@ class TandooriNightsApp extends StatelessWidget {
         '/home': (context) => const HomeScreen(),
         '/checkout': (context) => const CheckoutScreen(),
         '/order-history': (context) => const OrderHistoryScreen(),
-        '/order-tracking': (context) =>
-            const OrderTrackingScreen(), // ADDED THIS
+        '/order-tracking': (context) => const OrderTrackingScreen(),
       },
       debugShowCheckedModeBanner: false,
     );
   }
 
   Future<void> _initializeApp() async {
-    await Future.delayed(const Duration(milliseconds: 100));
+    // Enhanced initialization with error handling
+    try {
+      await Future.delayed(const Duration(milliseconds: 100));
+      // Additional app initialization can go here
+    } catch (e) {
+      print('App initialization error: $e');
+      rethrow;
+    }
   }
 }
 
@@ -77,6 +118,12 @@ class _WelcomeScreenState extends State<WelcomeScreen>
   @override
   void initState() {
     super.initState();
+
+    // Ensure portrait mode is maintained for this screen specifically
+    SystemChrome.setPreferredOrientations([
+      DeviceOrientation.portraitUp,
+      DeviceOrientation.portraitDown,
+    ]);
 
     _circleController = AnimationController(
       duration: const Duration(milliseconds: 1200),
@@ -340,16 +387,16 @@ class _WelcomeScreenState extends State<WelcomeScreen>
 
                           const SizedBox(height: 10),
 
-                          Row(
+                          const Row(
                             mainAxisAlignment: MainAxisAlignment.center,
                             children: [
-                              const Icon(
+                              Icon(
                                 Icons.location_on,
                                 color: Color(0xFFF4D03F),
                                 size: 16,
                               ),
-                              const SizedBox(width: 6),
-                              const Text(
+                              SizedBox(width: 6),
+                              Text(
                                 '286 Torquay Road, Paignton',
                                 style: TextStyle(
                                   fontSize: 13,

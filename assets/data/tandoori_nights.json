@@ -5,7 +5,7 @@
     "category": "Starters",
     "description": "Selection of tandoori chicken, lamb tikka and sheek kebab with salad",
     "isVeg": false,
-    "imageUrl": "",
+    "imageUrl": "assets/images/mixed_kebab.jpg",
     "available": true,
     "size_or_type": "",
     "spiceLevel": "medium"

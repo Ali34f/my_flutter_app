@@ -5,6 +5,12 @@ import 'order_service.dart';
 import 'postcode_service.dart';
 import 'order_tracking_screen.dart';
 import 'guest_order_storage.dart';
+// TODO: Replace with the actual import if NotificationService exists elsewhere
+class NotificationService {
+  static void startListeningForOrderUpdates(String orderId) {
+    // Stub implementation: add your notification logic here
+  }
+}
 
 class CheckoutScreen extends StatefulWidget {
   const CheckoutScreen({super.key});
@@ -1975,6 +1981,7 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
                     child: ElevatedButton.icon(
                       onPressed: () {
                         Navigator.of(context).pop(); // Close dialog
+                        NotificationService.startListeningForOrderUpdates(orderId);
                         Navigator.push(
                           context,
                           MaterialPageRoute(
