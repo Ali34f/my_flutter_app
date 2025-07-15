@@ -16,7 +16,7 @@
     "category": "Starters",
     "description": "Spiced king prawns served on crispy puri bread with fresh salad",
     "isVeg": false,
-    "imageUrl": "",
+    "imageUrl": "assets/images/king_prawn_puri.jpg",
     "available": true,
     "size_or_type": "",
     "spiceLevel": "medium"
@@ -27,7 +27,7 @@
     "category": "Starters",
     "description": "Large prawns coated in breadcrumbs, deep fried until golden",
     "isVeg": false,
-    "imageUrl": "",
+    "imageUrl": "assets/images/king_prawn_butterfly.jpg",
     "available": true,
     "size_or_type": "",
     "spiceLevel": "medium"
@@ -38,7 +38,7 @@
     "category": "Starters",
     "description": "Marinated king prawns cooked in the tandoor oven with yogurt, herbs and traditional spices.",
     "isVeg": false,
-    "imageUrl": "",
+    "imageUrl": "assets/images/tandoori_king_prawn_starter_.jpg",
     "available": true,
     "size_or_type": "",
     "spiceLevel": "medium"
@@ -49,7 +49,7 @@
     "category": "Starters",
     "description": "Spiced prawns served on light, crispy puri bread",
     "isVeg": false,
-    "imageUrl": "",
+    "imageUrl": "assets/images/prawn_&_puri.jpg",
     "available": true,
     "size_or_type": "",
     "spiceLevel": "medium"
@@ -60,7 +60,7 @@
     "category": "Starters",
     "description": "Chicken marinated in yogurt and spices, cooked in tandoori oven",
     "isVeg": false,
-    "imageUrl": "",
+    "imageUrl": "assets/images/tandori_chicken_starter_.jpg",
     "available": true,
     "size_or_type": "",
     "spiceLevel": "medium"
@@ -71,7 +71,7 @@
     "category": "Starters",
     "description": "Boneless chicken pieces marinated in spices and grilled in tandoori oven",
     "isVeg": false,
-    "imageUrl": "",
+    "imageUrl": "assets/images/chicken_tikka_.jpg",
     "available": true,
     "size_or_type": "chicken",
     "spiceLevel": "medium"
@@ -82,7 +82,7 @@
     "category": "Starters",
     "description": "Tender lamb pieces marinated in aromatic spices and tandoori grilled",
     "isVeg": false,
-    "imageUrl": "",
+    "imageUrl": "assets/images/lamb_tikka.jpg",
     "available": true,
     "size_or_type": "lamb",
     "spiceLevel": "medium"
@@ -93,7 +93,7 @@
     "category": "Starters",
     "description": "Fresh prawns served with crisp lettuce, tomatoes, cucumber and our signature cocktail sauce.",
     "isVeg": false,
-    "imageUrl": "",
+    "imageUrl": "assets/images/prawn_cocktail.jpg",
     "available": true,
     "size_or_type": "",
     "spiceLevel": "mild"
@@ -104,7 +104,7 @@
     "category": "Starters",
     "description": "Spiced chickpeas served on crispy puri bread with fresh salad",
     "isVeg": true,
-    "imageUrl": "",
+    "imageUrl": "assets/images/chana_puri_.jpg",
     "available": true,
     "size_or_type": "",
     "spiceLevel": "medium"
@@ -115,7 +115,7 @@
     "category": "Starters",
     "description": "Spiced minced lamb grilled on skewers in the tandoori oven",
     "isVeg": false,
-    "imageUrl": "",
+    "imageUrl": "assets/images/sheek_kebab_starter_.jpg",
     "available": true,
     "size_or_type": "",
     "spiceLevel": "medium"
@@ -126,7 +126,7 @@
     "category": "Starters",
     "description": "Spiced mined lamb grilled on skewers in the tandooir oven",
     "isVeg": false,
-    "imageUrl": "",
+    "imageUrl": "assets/images/shami_kebab_starter.jpg",
     "available": true,
     "size_or_type": "",
     "spiceLevel": "medium"
@@ -137,7 +137,7 @@
     "category": "Starters",
     "description": "Crispy pastry triangles filled with spiced chicken mince",
     "isVeg": false,
-    "imageUrl": "",
+    "imageUrl": "assets/images/chicken_samosa_.jpg",
     "available": true,
     "size_or_type": "",
     "spiceLevel": "medium"
@@ -148,7 +148,7 @@
     "category": "Starters",
     "description": "Golden pastry parcels filled with seasoned minced lamb",
     "isVeg": false,
-    "imageUrl": "",
+    "imageUrl": "assets/images/lamb_samosa_.jpg",
     "available": true,
     "size_or_type": "",
     "spiceLevel": "medium"
@@ -159,7 +159,7 @@
     "category": "Starters",
     "description": "Crispy triangular pastries filled with spiced mixed vegetables",
     "isVeg": true,
-    "imageUrl": "",
+    "imageUrl": "assets/images/vegetable_samosa.jpg",
     "available": true,
     "size_or_type": "",
     "spiceLevel": "medium"
@@ -170,7 +170,7 @@
     "category": "Starters",
     "description": "Diced chicken with chickpeas, tomatoes and tangy chat masala",
     "isVeg": false,
-    "imageUrl": "",
+    "imageUrl": "assets/images/chicken_chat_.jpg",
     "available": true,
     "size_or_type": "",
     "spiceLevel": "medium"
@@ -181,7 +181,7 @@
     "category": "Starters",
     "description": "Spicy chicken pieces with peppers, onions and hot chilli sauce",
     "isVeg": false,
-    "imageUrl": "",
+    "imageUrl": "assets/images/chicken_chilli_chat_.jpg",
     "available": true,
     "size_or_type": "",
     "spiceLevel": "hot"
@@ -192,7 +192,7 @@
     "category": "Starters",
     "description": "Spiced potato cubes with chickpeas, yogurt and tamarind chutney",
     "isVeg": true,
-    "imageUrl": "",
+    "imageUrl": "assets/images/aloo_chat.jpg",
     "available": true,
     "size_or_type": "",
     "spiceLevel": "medium"
@@ -203,7 +203,7 @@
     "category": "Starters",
     "description": "Sliced onions mixed in spiced gram flour batter and deep-fried until golden and crispy.",
     "isVeg": true,
-    "imageUrl": "",
+    "imageUrl": "assets/images/onion_bhajis.jpg",
     "available": true,
     "size_or_type": "",
     "spiceLevel": "mild"
@@ -214,7 +214,7 @@
     "category": "Starters",
     "description": "Tender chicken pieces coated in seasoned gram flour batter and deep-fried until crispy.",
     "isVeg": false,
-    "imageUrl": "",
+    "imageUrl": "assets/images/chicken_pakora_.jpg",
     "available": true,
     "size_or_type": "",
     "spiceLevel": "medium"
@@ -225,7 +225,7 @@
     "category": "Starters",
     "description": "Mixed vegetables dipped in spiced gram flour batter and fried until golden. Served with mint chutney.",
     "isVeg": true,
-    "imageUrl": "",
+    "imageUrl": "assets/images/vegetable_pakora.jpg",
     "available": true,
     "size_or_type": "",
     "spiceLevel": "medium"
@@ -236,7 +236,7 @@
     "category": "Starters",
     "description": "Hard-boiled eggs wrapped in spiced minced meat, coated in breadcrumbs and deep-fried until golden.",
     "isVeg": false,
-    "imageUrl": "",
+    "imageUrl": "assets/images/nargis_kebab.jpg",
     "available": true,
     "size_or_type": "",
     "spiceLevel": "medium"
@@ -247,7 +247,7 @@
     "category": "Tandoori",
     "description": "A feast of tandoori specialties including chicken tikka, lamb tikka, sheek kebab and tandoori chicken served with naan, bombay aloo and salad.",
     "isVeg": true,
-    "imageUrl": "",
+    "imageUrl": "assets/images/tandoori_mixed_grill_.jpg",
     "available": true,
     "size_or_type": "",
     "spiceLevel": "medium"
@@ -258,7 +258,7 @@
     "category": "Tandoori",
     "description": "Jumbo king prawns marinated in yogurt and spices, cooked in our clay tandoor oven. Served with pilau rice and fresh salad.",
     "isVeg": false,
-    "imageUrl": "",
+    "imageUrl": "assets/images/tandoori_king_prawn_main.jpg",
     "available": true,
     "size_or_type": "",
     "spiceLevel": "medium"
@@ -269,7 +269,7 @@
     "category": "Tandoori",
     "description": "Tender chicken pieces grilled with onions, peppers and tomatoes on skewers. Served sizzling hot with rice and mint sauce.",
     "isVeg": false,
-    "imageUrl": "",
+    "imageUrl": "assets/images/chicken_shashlik.jpg",
     "available": true,
     "size_or_type": "",
     "spiceLevel": "medium"
@@ -280,7 +280,7 @@
     "category": "Tandoori",
     "description": "Succulent boneless chicken marinated in aromatic spices and grilled in the tandoor. Served with pilau rice and fresh naan bread.",
     "isVeg": false,
-    "imageUrl": "",
+    "imageUrl": "assets/images/chicken_tikka_main_.jpg",
     "available": true,
     "size_or_type": "",
     "spiceLevel": "medium"
@@ -291,7 +291,7 @@
     "category": "Tandoori",
     "description": "Premium lamb pieces marinated overnight in traditional spices and cooked to perfection in our tandoor oven with rice.",
     "isVeg": false,
-    "imageUrl": "",
+    "imageUrl": "assets/images/lamb_tikka_main_.jpg",
     "available": true,
     "size_or_type": "",
     "spiceLevel": "medium"
@@ -302,7 +302,7 @@
     "category": "Tandoori",
     "description": "Half spring chicken marinated in yogurt and authentic spices, roasted in the tandoor until tender and smoky.",
     "isVeg": false,
-    "imageUrl": "",
+    "imageUrl": "assets/images/half_tandoori_chicken_main_.jpg",
     "available": true,
     "size_or_type": "",
     "spiceLevel": "medium"
@@ -313,7 +313,7 @@
     "category": "Tandoori",
     "description": "Marinated lamb cubes grilled with fresh vegetables on skewers in the tandoor. Served sizzling with rice and salad.",
     "isVeg": false,
-    "imageUrl": "",
+    "imageUrl": "assets/images/lamb_shashlik_.jpg",
     "available": true,
     "size_or_type": "",
     "spiceLevel": "medium"
@@ -324,494 +324,252 @@
     "category": "Tandoori",
     "description": "Spiced minced lamb shaped on skewers and grilled in the tandoor oven. Served with pilau rice, salad and mint sauce",
     "isVeg": false,
-    "imageUrl": "",
+    "imageUrl": "assets/images/sheek_kebab_main_.jpg",
     "available": true,
     "size_or_type": "",
     "spiceLevel": "medium"
   },
   {
-    "Name": "Chicken Curry",
+    "Name": "Curry",
     "price": "£11.50",
     "category": "Curries",
-    "description": "Classic chicken curry in aromatic spiced sauce with onions and tomatoes",
-    "isVeg": false,
-    "imageUrl": "",
+    "description": "Spiced minced lamb shaped on skewers and grilled in the tandoor oven. Served with pilau rice, salad and mint sauce",
+    "isVeg": true,
+    "imageUrl": "assets/images/curry_.jpg",
     "available": true,
     "size_or_type": "chicken",
     "spiceLevel": "medium"
   },
   {
-    "Name": "Lamb Curry",
-    "price": "£12.50",
+    "Name": "Korma",
+    "price": "£11.50",
     "category": "Curries",
-    "description": "Traditional lamb curry in spiced sauce with onions and tomatoes",
-    "isVeg": false,
-    "imageUrl": "",
+    "description": "Spiced minced lamb shaped on skewers and grilled in the tandoor oven. Served with pilau rice, salad and mint sauce",
+    "isVeg": true,
+    "imageUrl": "assets/images/korma_.jpg",
     "available": true,
     "size_or_type": "lamb",
     "spiceLevel": "mild"
   },
   {
-    "Name": "Chicken Korma",
+    "Name": "Madras",
     "price": "£11.50",
     "category": "Curries",
-    "description": "Mild creamy chicken curry with coconut, almonds and fragrant spices",
-    "isVeg": false,
-    "imageUrl": "",
+    "description": "Spiced minced lamb shaped on skewers and grilled in the tandoor oven. Served with pilau rice, salad and mint sauce",
+    "isVeg": true,
+    "imageUrl": "assets/images/madras.jpg",
     "available": true,
     "size_or_type": "chicken",
     "spiceLevel": "hot"
   },
   {
-    "Name": "Lamb Korma",
-    "price": "£12.50",
+    "Name": "Vindaloo",
+    "price": "£11.50",
     "category": "Curries",
-    "description": "Tender lamb in mild creamy sauce with coconut and almonds",
-    "isVeg": false,
-    "imageUrl": "",
+    "description": "Spiced minced lamb shaped on skewers and grilled in the tandoor oven. Served with pilau rice, salad and mint sauce",
+    "isVeg": true,
+    "imageUrl": "assets/images/vindaloo.jpg",
     "available": true,
     "size_or_type": "lamb",
     "spiceLevel": "hot"
   },
   {
-    "Name": "Chicken Madras",
+    "Name": "Dopiaza",
     "price": "£11.50",
     "category": "Curries",
-    "description": "Hot and spicy chicken curry with traditional madras spices",
-    "isVeg": false,
-    "imageUrl": "",
+    "description": "Spiced minced lamb shaped on skewers and grilled in the tandoor oven. Served with pilau rice, salad and mint sauce",
+    "isVeg": true,
+    "imageUrl": "assets/images/dopiaza.jpg",
     "available": true,
     "size_or_type": "chicken",
     "spiceLevel": "hot"
   },
   {
-    "Name": "Lamb Madras",
-    "price": "£12.50",
+    "Name": "Rogan",
+    "price": "£11.50",
     "category": "Curries",
-    "description": "Fiery lamb curry cooked with hot madras spices",
-    "isVeg": false,
-    "imageUrl": "",
+    "description": "Spiced minced lamb shaped on skewers and grilled in the tandoor oven. Served with pilau rice, salad and mint sauce",
+    "isVeg": true,
+    "imageUrl": "assets/images/rogan.jpg",
     "available": true,
     "size_or_type": "lamb",
     "spiceLevel": "hot"
   },
   {
-    "Name": "Chicken Vindaloo",
+    "Name": "Jalfrezi",
     "price": "£11.50",
     "category": "Curries",
-    "description": "Very hot chicken curry with potatoes in tangy vindaloo sauce",
-    "isVeg": false,
-    "imageUrl": "",
+    "description": "Spiced minced lamb shaped on skewers and grilled in the tandoor oven. Served with pilau rice, salad and mint sauce",
+    "isVeg": true,
+    "imageUrl": "assets/images/jalfrezi.jpg",
     "available": true,
     "size_or_type": "chicken",
     "spiceLevel": "hot"
   },
   {
-    "Name": "Lamb Vindaloo",
-    "price": "£12.50",
+    "Name": "Dansak",
+    "price": "£11.50",
     "category": "Curries",
-    "description": "Extremely hot lamb curry with potatoes in spicy vindaloo sauce",
-    "isVeg": false,
-    "imageUrl": "",
+    "description": "Spiced minced lamb shaped on skewers and grilled in the tandoor oven. Served with pilau rice, salad and mint sauce",
+    "isVeg": true,
+    "imageUrl": "assets/images/dansak.jpg",
     "available": true,
     "size_or_type": "lamb",
     "spiceLevel": "hot"
   },
   {
-    "Name": "Chicken Dopiaza",
+    "Name": "Bhuna",
     "price": "£11.50",
     "category": "Curries",
-    "description": "Medium spiced chicken curry with plenty of onions and peppers",
-    "isVeg": false,
-    "imageUrl": "",
+    "description": "Spiced minced lamb shaped on skewers and grilled in the tandoor oven. Served with pilau rice, salad and mint sauce",
+    "isVeg": true,
+    "imageUrl": "assets/images/bhuna.jpg",
     "available": true,
     "size_or_type": "chicken",
     "spiceLevel": "medium"
   },
   {
-    "Name": "Lamb Dopiaza",
-    "price": "£12.50",
+    "Name": "Saag",
+    "price": "£11.50",
     "category": "Curries",
-    "description": "Lamb curry cooked with lots of onions and peppers",
-    "isVeg": false,
-    "imageUrl": "",
+    "description": "Spiced minced lamb shaped on skewers and grilled in the tandoor oven. Served with pilau rice, salad and mint sauce",
+    "isVeg": true,
+    "imageUrl": "assets/images/saag.jpg",
     "available": true,
     "size_or_type": "lamb",
     "spiceLevel": "medium"
   },
   {
-    "Name": "Chicken Rogan",
+    "Name": "Karahi",
     "price": "£11.50",
     "category": "Curries",
-    "description": "Chicken in rich tomato-based sauce with aromatic spices",
-    "isVeg": false,
-    "imageUrl": "",
+    "description": "Spiced minced lamb shaped on skewers and grilled in the tandoor oven. Served with pilau rice, salad and mint sauce",
+    "isVeg": true,
+    "imageUrl": "assets/images/karahi.jpg",
     "available": true,
     "size_or_type": "chicken",
     "spiceLevel": "medium"
   },
   {
-    "Name": "Lamb Rogan",
-    "price": "£12.50",
+    "Name": "Ceylon",
+    "price": "£11.50",
     "category": "Curries",
-    "description": "Lamb cooked in rich tomato sauce with traditional spices",
-    "isVeg": false,
-    "imageUrl": "",
+    "description": "Spiced minced lamb shaped on skewers and grilled in the tandoor oven. Served with pilau rice, salad and mint sauce",
+    "isVeg": true,
+    "imageUrl": "assets/images/ceylon_.jpg",
     "available": true,
     "size_or_type": "lamb",
     "spiceLevel": "medium"
   },
   {
-    "Name": "Chicken Jalfrezi",
+    "Name": "Chana",
     "price": "£11.50",
     "category": "Curries",
-    "description": "Chicken stir-fried with peppers, onions and tomatoes in spicy sauce",
-    "isVeg": false,
-    "imageUrl": "",
-    "available": true,
-    "size_or_type": "chicken",
-    "spiceLevel": "hot"
-  },
-  {
-    "Name": "Lamb Jalfrezi",
-    "price": "£12.50",
-    "category": "Curries",
-    "description": "Lamb stir-fried with peppers, onions and tomatoes",
-    "isVeg": false,
-    "imageUrl": "",
-    "available": true,
-    "size_or_type": "lamb",
-    "spiceLevel": "hot"
-  },
-  {
-    "Name": "Chicken Dansak",
-    "price": "£11.50",
-    "category": "Curries",
-    "description": "Sweet and sour chicken curry with lentils and aromatic spices",
-    "isVeg": false,
-    "imageUrl": "",
+    "description": "Spiced minced lamb shaped on skewers and grilled in the tandoor oven. Served with pilau rice, salad and mint sauce",
+    "isVeg": true,
+    "imageUrl": "assets/images/chana__.jpg",
     "available": true,
     "size_or_type": "chicken",
     "spiceLevel": "hot"
   },
   {
-    "Name": "Lamb Dansak",
-    "price": "£12.50",
+    "Name": "Malaya",
+    "price": "£11.50",
     "category": "Curries",
-    "description": "Sweet and sour lamb curry with lentils and traditional spices",
-    "isVeg": false,
-    "imageUrl": "",
+    "description": "Spiced minced lamb shaped on skewers and grilled in the tandoor oven. Served with pilau rice, salad and mint sauce",
+    "isVeg": true,
+    "imageUrl": "assets/images/malaya.jpg",
     "available": true,
     "size_or_type": "lamb",
     "spiceLevel": "hot"
   },
   {
-    "Name": "Chicken Bhuna",
+    "Name": "Kashmir",
     "price": "£11.50",
     "category": "Curries",
-    "description": "Dry-style chicken curry with thick spiced sauce and fresh herbs",
-    "isVeg": false,
-    "imageUrl": "",
-    "available": true,
-    "size_or_type": "chicken",
-    "spiceLevel": "medium"
-  },
-  {
-    "Name": "Lamb Bhuna",
-    "price": "£12.50",
-    "category": "Curries",
-    "description": "Dry lamb curry in thick spiced sauce with herb",
-    "isVeg": false,
-    "imageUrl": "",
-    "available": true,
-    "size_or_type": "lamb",
-    "spiceLevel": "medium"
-  },
-  {
-    "Name": "Chicken Saag",
-    "price": "£11.50",
-    "category": "Curries",
-    "description": "hicken curry with spinach and aromatic Indian spices",
-    "isVeg": false,
-    "imageUrl": "",
-    "available": true,
-    "size_or_type": "chicken",
-    "spiceLevel": "medium"
-  },
-  {
-    "Name": "Lamb Saag",
-    "price": "£12.50",
-    "category": "Curries",
-    "description": "Tender lamb cooked with spinach and fragrant spices",
-    "isVeg": false,
-    "imageUrl": "",
-    "available": true,
-    "size_or_type": "lamb",
-    "spiceLevel": "medium"
-  },
-  {
-    "Name": "Chicken Karahi",
-    "price": "£11.50",
-    "category": "Curries",
-    "description": "Chicken stir-fried with peppers, onions and tomatoes in traditional karahi",
-    "isVeg": false,
-    "imageUrl": "",
-    "available": true,
-    "size_or_type": "chicken",
-    "spiceLevel": "medium"
-  },
-  {
-    "Name": "Lamb Karahi",
-    "price": "£12.50",
-    "category": "Curries",
-    "description": "Lamb cooked with peppers, onions and tomatoes in karahi style",
-    "isVeg": false,
-    "imageUrl": "",
-    "available": true,
-    "size_or_type": "lamb",
-    "spiceLevel": "medium"
-  },
-  {
-    "Name": "Chicken Ceylon",
-    "price": "£11.50",
-    "category": "Curries",
-    "description": "Chicken curry with coconut and lemon in mild spiced sauce",
-    "isVeg": false,
-    "imageUrl": "",
+    "description": "Spiced minced lamb shaped on skewers and grilled in the tandoor oven. Served with pilau rice, salad and mint sauce",
+    "isVeg": true,
+    "imageUrl": "assets/images/kashmir.jpg",
     "available": true,
     "size_or_type": "chicken",
     "spiceLevel": "hot"
   },
   {
-    "Name": "Lamb Ceylon",
-    "price": "£12.50",
+    "Name": "Pathia",
+    "price": "£11.50",
     "category": "Curries",
-    "description": "Lamb cooked with coconut and lemon in aromatic spices",
-    "isVeg": false,
-    "imageUrl": "",
+    "description": "Spiced minced lamb shaped on skewers and grilled in the tandoor oven. Served with pilau rice, salad and mint sauce",
+    "isVeg": true,
+    "imageUrl": "assets/images/pathia.jpg",
     "available": true,
     "size_or_type": "lamb",
     "spiceLevel": "hot"
   },
   {
-    "Name": "Chicken Chana",
+    "Name": "Mushrom",
     "price": "£11.50",
     "category": "Curries",
-    "description": "Chicken curry with chickpeas in spiced tomato sauce",
-    "isVeg": false,
-    "imageUrl": "",
+    "description": "Spiced minced lamb shaped on skewers and grilled in the tandoor oven. Served with pilau rice, salad and mint sauce",
+    "isVeg": true,
+    "imageUrl": "assets/images/mushrom_.jpg",
     "available": true,
     "size_or_type": "chicken",
     "spiceLevel": "medium"
   },
   {
-    "Name": "Lamb Chana",
-    "price": "£12.50",
+    "Name": "Bombay",
+    "price": "£11.50",
     "category": "Curries",
-    "description": "Lamb cooked with chickpeas in traditional spiced sauce",
-    "isVeg": false,
-    "imageUrl": "",
+    "description": "Spiced minced lamb shaped on skewers and grilled in the tandoor oven. Served with pilau rice, salad and mint sauce",
+    "isVeg": true,
+    "imageUrl": "assets/images/bombay.jpg",
     "available": true,
     "size_or_type": "lamb",
     "spiceLevel": "medium"
   },
   {
-    "Name": "Chicken Malaya",
+    "Name": "Methi",
     "price": "£11.50",
     "category": "Curries",
-    "description": "Mild chicken curry with pineapple and coconut",
-    "isVeg": false,
-    "imageUrl": "",
-    "available": true,
-    "size_or_type": "chicken",
-    "spiceLevel": "mild"
-  },
-  {
-    "Name": "Lamb Malaya",
-    "price": "£12.50",
-    "category": "Curries",
-    "description": "Tender lamb curry with pineapple and mild spice",
-    "isVeg": false,
-    "imageUrl": "",
-    "available": true,
-    "size_or_type": "lamb",
-    "spiceLevel": "mild"
-  },
-  {
-    "Name": "Chicken Kashmir",
-    "price": "£11.50",
-    "category": "Curries",
-    "description": "Mild chicken curry with bananas and aromatic spices",
-    "isVeg": false,
-    "imageUrl": "",
-    "available": true,
-    "size_or_type": "chicken",
-    "spiceLevel": "mild"
-  },
-  {
-    "Name": "Lamb Kashmir",
-    "price": "£12.50",
-    "category": "Curries",
-    "description": "Lamb cooked with bananas in mild fragrant sauce",
-    "isVeg": false,
-    "imageUrl": "",
-    "available": true,
-    "size_or_type": "lamb",
-    "spiceLevel": "mild"
-  },
-  {
-    "Name": "Chicken Pathia",
-    "price": "£11.50",
-    "category": "Curries",
-    "description": "Sweet, sour and hot chicken curry with tomatoes and tamarind",
-    "isVeg": false,
-    "imageUrl": "",
-    "available": true,
-    "size_or_type": "chicken",
-    "spiceLevel": "hot"
-  },
-  {
-    "Name": "Lamb Pathia",
-    "price": "£12.50",
-    "category": "Curries",
-    "description": "Sweet, sour and spicy lamb curry with tamarind",
-    "isVeg": false,
-    "imageUrl": "",
-    "available": true,
-    "size_or_type": "lamb",
-    "spiceLevel": "hot"
-  },
-  {
-    "Name": "Chicken Mushroom",
-    "price": "£11.50",
-    "category": "Curries",
-    "description": "Chicken curry with mushrooms in medium spiced sauce",
-    "isVeg": false,
-    "imageUrl": "",
+    "description": "Spiced minced lamb shaped on skewers and grilled in the tandoor oven. Served with pilau rice, salad and mint sauce",
+    "isVeg": true,
+    "imageUrl": "assets/images/methi.jpg",
     "available": true,
     "size_or_type": "chicken",
     "spiceLevel": "medium"
   },
   {
-    "Name": "Lamb Mushroom",
-    "price": "£12.50",
+    "Name": "Aloo Madras",
+    "price": "£11.50",
     "category": "Curries",
-    "description": "Lamb cooked with mushrooms in aromatic curry sauce",
-    "isVeg": false,
-    "imageUrl": "",
+    "description": "Spiced minced lamb shaped on skewers and grilled in the tandoor oven. Served with pilau rice, salad and mint sauce",
+    "isVeg": true,
+    "imageUrl": "assets/images/aloo_madras.jpg",
     "available": true,
     "size_or_type": "lamb",
     "spiceLevel": "medium"
   },
   {
-    "Name": "Chicken Bombay",
+    "Name": "Dhaka",
     "price": "£11.50",
     "category": "Curries",
-    "description": "Chicken curry with egg and potato in spiced sauce",
-    "isVeg": false,
-    "imageUrl": "",
+    "description": "Spiced minced lamb shaped on skewers and grilled in the tandoor oven. Served with pilau rice, salad and mint sauce",
+    "isVeg": true,
+    "imageUrl": "assets/images/dhaka_.jpg",
     "available": true,
     "size_or_type": "chicken",
     "spiceLevel": "medium"
   },
   {
-    "Name": "Lamb Bombay",
-    "price": "£12.50",
+    "Name": "Phall",
+    "price": "£11.50",
     "category": "Curries",
-    "description": "Lamb cooked with egg and potato in traditional spices",
-    "isVeg": false,
-    "imageUrl": "",
+    "description": "Spiced minced lamb shaped on skewers and grilled in the tandoor oven. Served with pilau rice, salad and mint sauce",
+    "isVeg": true,
+    "imageUrl": "assets/images/phall_.jpg",
     "available": true,
     "size_or_type": "lamb",
     "spiceLevel": "medium"
-  },
-  {
-    "Name": "Chicken Methi",
-    "price": "£11.50",
-    "category": "Curries",
-    "description": "Chicken curry with fenugreek leaves and aromatic spices",
-    "isVeg": false,
-    "imageUrl": "",
-    "available": true,
-    "size_or_type": "chicken",
-    "spiceLevel": "medium"
-  },
-  {
-    "Name": "Lamb Methi",
-    "price": "£12.50",
-    "category": "Curries",
-    "description": "Lamb cooked with fenugreek leaves in spiced sauce",
-    "isVeg": false,
-    "imageUrl": "",
-    "available": true,
-    "size_or_type": "lamb",
-    "spiceLevel": "medium"
-  },
-  {
-    "Name": "Chicken Aloo Madras",
-    "price": "£11.50",
-    "category": "Curries",
-    "description": "Hot chicken curry with potatoes in madras spices",
-    "isVeg": false,
-    "imageUrl": "",
-    "available": true,
-    "size_or_type": "chicken",
-    "spiceLevel": "hot"
-  },
-  {
-    "Name": "Lamb Aloo Madras",
-    "price": "£12.50",
-    "category": "Curries",
-    "description": "Spicy lamb curry with potatoes in hot madras sauce",
-    "isVeg": false,
-    "imageUrl": "",
-    "available": true,
-    "size_or_type": "lamb",
-    "spiceLevel": "hot"
-  },
-  {
-    "Name": "Chicken Dhaka",
-    "price": "£11.50",
-    "category": "Curries",
-    "description": "Chicken curry with mixed fruits in aromatic spiced sauce",
-    "isVeg": false,
-    "imageUrl": "",
-    "available": true,
-    "size_or_type": "chicken",
-    "spiceLevel": "mild"
-  },
-  {
-    "Name": "Lamb Dhaka",
-    "price": "£12.50",
-    "category": "Curries",
-    "description": "Chicken curry with mixed fruits in aromatic spiced sauce",
-    "isVeg": false,
-    "imageUrl": "",
-    "available": true,
-    "size_or_type": "lamb",
-    "spiceLevel": "mild"
-  },
-  {
-    "Name": "Chicken Phall",
-    "price": "£11.50",
-    "category": "Curries",
-    "description": "Extremely hot chicken curry with ghost peppers and fierce spices",
-    "isVeg": false,
-    "imageUrl": "",
-    "available": true,
-    "size_or_type": "chicken",
-    "spiceLevel": "hot"
-  },
-  {
-    "Name": "Lamb Phall",
-    "price": "£12.50",
-    "category": "Curries",
-    "description": "Fiery hot lamb curry with ghost peppers and intense spices",
-    "isVeg": false,
-    "imageUrl": "",
-    "available": true,
-    "size_or_type": "lamb",
-    "spiceLevel": "hot"
   },
   {
     "Name": "Prawn Curry",
@@ -819,7 +577,7 @@
     "category": "Seafood",
     "description": "Classic prawn curry in aromatic spiced sauce with onions and tomatoes",
     "isVeg": false,
-    "imageUrl": "",
+    "imageUrl": "assets/images/prawn_curry_.jpg",
     "available": true,
     "size_or_type": "",
     "spiceLevel": "medium"
@@ -830,7 +588,7 @@
     "category": "Seafood",
     "description": "Mild creamy prawn curry with coconut, almonds and fragrant spices",
     "isVeg": false,
-    "imageUrl": "",
+    "imageUrl": "assets/images/prawn_korma_.jpg",
     "available": true,
     "size_or_type": "",
     "spiceLevel": "mild"
@@ -841,7 +599,7 @@
     "category": "Seafood",
     "description": "Hot and spicy prawn curry with traditional madras spices",
     "isVeg": false,
-    "imageUrl": "",
+    "imageUrl": "assets/images/prawn_madras.jpg",
     "available": true,
     "size_or_type": "",
     "spiceLevel": "hot"
@@ -852,7 +610,7 @@
     "category": "Seafood",
     "description": "Fiery hot prawn curry with potatoes in tangy vindaloo sauce",
     "isVeg": false,
-    "imageUrl": "",
+    "imageUrl": "assets/images/prawn_vindaloo_.jpg",
     "available": true,
     "size_or_type": "",
     "spiceLevel": "hot"
@@ -863,7 +621,7 @@
     "category": "Seafood",
     "description": "Medium spiced prawn curry with plenty of onions and peppers",
     "isVeg": false,
-    "imageUrl": "",
+    "imageUrl": "assets/images/prawn_dopiaza_.jpg",
     "available": true,
     "size_or_type": "",
     "spiceLevel": "medium"
@@ -874,7 +632,7 @@
     "category": "Seafood",
     "description": "Sweet and sour prawn curry with lentils and pineapple",
     "isVeg": false,
-    "imageUrl": "",
+    "imageUrl": "assets/images/prawn_dansak.jpg",
     "available": true,
     "size_or_type": "",
     "spiceLevel": "hot"
@@ -885,7 +643,7 @@
     "category": "Seafood",
     "description": "Dry-style prawn curry with thick spiced sauce and fresh herbs",
     "isVeg": false,
-    "imageUrl": "",
+    "imageUrl": "assets/images/prawn_bhuna.jpg",
     "available": true,
     "size_or_type": "",
     "spiceLevel": "medium"
@@ -896,7 +654,7 @@
     "category": "Seafood",
     "description": "Prawn curry with spinach and aromatic Indian spices",
     "isVeg": false,
-    "imageUrl": "",
+    "imageUrl": "assets/images/prawn_&_saag_.jpg",
     "available": true,
     "size_or_type": "",
     "spiceLevel": "medium"
@@ -907,7 +665,7 @@
     "category": "Seafood",
     "description": "Prawn curry with mushrooms in medium spiced sauce",
     "isVeg": false,
-    "imageUrl": "",
+    "imageUrl": "assets/images/prawn_&_mushroom_.jpg",
     "available": true,
     "size_or_type": "",
     "spiceLevel": "medium"
@@ -918,7 +676,7 @@
     "category": "Seafood",
     "description": "Sweet, sour and hot prawn curry with tomatoes and tamarind",
     "isVeg": false,
-    "imageUrl": "",
+    "imageUrl": "assets/images/prawn_pathia_.jpg",
     "available": true,
     "size_or_type": "",
     "spiceLevel": "hot"
@@ -929,7 +687,7 @@
     "category": "Seafood",
     "description": "Coconut-based prawn curry with curry leaves and mild spices",
     "isVeg": false,
-    "imageUrl": "",
+    "imageUrl": "assets/images/prawn_ceylon_.jpg",
     "available": true,
     "size_or_type": "",
     "spiceLevel": "hot"
@@ -940,7 +698,7 @@
     "category": "Seafood",
     "description": "Classic king prawn curry in aromatic spiced sauce with onions and tomatoes",
     "isVeg": false,
-    "imageUrl": "",
+    "imageUrl": "assets/images/king_prawn_curry_.jpg",
     "available": true,
     "size_or_type": "",
     "spiceLevel": "medium"
@@ -951,7 +709,7 @@
     "category": "Seafood",
     "description": "Mild creamy king prawn curry with coconut, almonds and fragrant spices",
     "isVeg": false,
-    "imageUrl": "",
+    "imageUrl": "assets/images/king_prawn_korma_.jpg",
     "available": true,
     "size_or_type": "",
     "spiceLevel": "mild"
@@ -962,7 +720,7 @@
     "category": "Seafood",
     "description": "Hot and spicy king prawn curry with traditional madras spices",
     "isVeg": false,
-    "imageUrl": "",
+    "imageUrl": "assets/images/king_prawn_madras.jpg",
     "available": true,
     "size_or_type": "",
     "spiceLevel": "hot"
@@ -973,7 +731,7 @@
     "category": "Seafood",
     "description": "Fiery hot king prawn curry with potatoes in tangy vindaloo sauce",
     "isVeg": false,
-    "imageUrl": "",
+    "imageUrl": "assets/images/king_prawn_vindaloo_.jpg",
     "available": true,
     "size_or_type": "",
     "spiceLevel": "hot"
@@ -984,7 +742,7 @@
     "category": "Seafood",
     "description": "Medium spiced king prawn curry with plenty of onions and peppers",
     "isVeg": false,
-    "imageUrl": "",
+    "imageUrl": "assets/images/king_prawn_dopiaza.jpg",
     "available": true,
     "size_or_type": "",
     "spiceLevel": "medium"
@@ -995,7 +753,7 @@
     "category": "Seafood",
     "description": "King prawns stir-fried with peppers, onions and tomatoes in spicy sauce",
     "isVeg": false,
-    "imageUrl": "",
+    "imageUrl": "assets/images/king_prawn_jalfrezi_.jpg",
     "available": true,
     "size_or_type": "",
     "spiceLevel": "hot"
@@ -1006,7 +764,7 @@
     "category": "Seafood",
     "description": "Sweet and sour king prawn curry with lentils",
     "isVeg": false,
-    "imageUrl": "",
+    "imageUrl": "assets/images/king_prawn_dansak.jpg",
     "available": true,
     "size_or_type": "",
     "spiceLevel": "hot"
@@ -1017,7 +775,7 @@
     "category": "Seafood",
     "description": "Dry-style king prawn curry with thick spiced sauce and fresh herbs",
     "isVeg": false,
-    "imageUrl": "",
+    "imageUrl": "assets/images/king_prawn_bhuna_.jpg",
     "available": true,
     "size_or_type": "",
     "spiceLevel": "medium"
@@ -1028,7 +786,7 @@
     "category": "Seafood",
     "description": "Sweet, sour and hot king prawn curry with tomatoes and tamarind",
     "isVeg": false,
-    "imageUrl": "",
+    "imageUrl": "assets/images/king_prawn_pathia_.jpg",
     "available": true,
     "size_or_type": "",
     "spiceLevel": "hot"
@@ -1039,7 +797,7 @@
     "category": "Seafood",
     "description": "King prawn curry with mushrooms in medium spiced sauce",
     "isVeg": false,
-    "imageUrl": "",
+    "imageUrl": "assets/images/king_prawn_&_mushroom_.jpg",
     "available": true,
     "size_or_type": "",
     "spiceLevel": "medium"
@@ -1050,7 +808,7 @@
     "category": "Seafood",
     "description": "King prawns stir-fried with peppers, onions and tomatoes in traditional karahi",
     "isVeg": false,
-    "imageUrl": "",
+    "imageUrl": "assets/images/king_prawn_karahi_.jpg",
     "available": true,
     "size_or_type": "",
     "spiceLevel": "medium"
@@ -1061,7 +819,7 @@
     "category": "Seafood",
     "description": "Coconut-based king prawn curry with curry leaves and mild spices",
     "isVeg": false,
-    "imageUrl": "",
+    "imageUrl": "assets/images/king_prawn_ceylon_.jpg",
     "available": true,
     "size_or_type": "",
     "spiceLevel": "hot"
@@ -1072,7 +830,7 @@
     "category": "Seafood",
     "description": "King prawn curry with spinach and aromatic Indian spices",
     "isVeg": false,
-    "imageUrl": "",
+    "imageUrl": "assets/images/king_prawn_&_saag_.jpg",
     "available": true,
     "size_or_type": "",
     "spiceLevel": "medium"
@@ -1083,7 +841,7 @@
     "category": "Seafood",
     "description": "Fragrant king prawn curry with special blend of aromatic spices",
     "isVeg": false,
-    "imageUrl": "",
+    "imageUrl": "assets/images/king_prawn_khusbu_.jpg",
     "available": true,
     "size_or_type": "",
     "spiceLevel": "hot"
@@ -1094,7 +852,7 @@
     "category": "House Specials",
     "description": "Marinated chicken tikka cooked in a creamy thick sauce",
     "isVeg": false,
-    "imageUrl": "",
+    "imageUrl": "assets/images/chicken_tikka_masala_.jpg",
     "available": true,
     "size_or_type": "",
     "spiceLevel": "mild"
@@ -1105,7 +863,7 @@
     "category": "House Specials",
     "description": "Tender lamb tikka cooked in a creamy thick sauce",
     "isVeg": false,
-    "imageUrl": "",
+    "imageUrl": "assets/images/lamb_tikka_masala_.jpg",
     "available": true,
     "size_or_type": "",
     "spiceLevel": "mild"
@@ -1116,7 +874,7 @@
     "category": "House Specials",
     "description": "Chicken cooked in butter and cream with aromatic spices",
     "isVeg": false,
-    "imageUrl": "",
+    "imageUrl": "assets/images/chicken_makhani_.jpg",
     "available": true,
     "size_or_type": "",
     "spiceLevel": "mild"
@@ -1127,7 +885,7 @@
     "category": "House Specials",
     "description": "Succulent lamb cooked in butter and cream sauce",
     "isVeg": false,
-    "imageUrl": "",
+    "imageUrl": "assets/images/lamb_makhani_.jpg",
     "available": true,
     "size_or_type": "",
     "spiceLevel": "mild"
@@ -1138,7 +896,7 @@
     "category": "House Specials",
     "description": "Chicken cooked with garlic, spring onions and fresh herbs",
     "isVeg": false,
-    "imageUrl": "",
+    "imageUrl": "assets/images/garlic_&_herb_chicken_.jpg",
     "available": true,
     "size_or_type": "",
     "spiceLevel": "medum"
@@ -1149,7 +907,7 @@
     "category": "House Specials",
     "description": "Marinated king prawns charcoal grilled in thick cream sauce",
     "isVeg": false,
-    "imageUrl": "",
+    "imageUrl": "assets/images/tandoori_king_prawn_masala_.jpg",
     "available": true,
     "size_or_type": "",
     "spiceLevel": "medium"
@@ -1160,7 +918,7 @@
     "category": "House Specials",
     "description": "Chicken, lamb, prawn, boiled egg and mixed vegetables with spinach, garlic, chilli and chef's special spices",
     "isVeg": true,
-    "imageUrl": "",
+    "imageUrl": "assets/images/khan_special_curry_.jpg",
     "available": true,
     "size_or_type": "",
     "spiceLevel": "hot"
@@ -1171,7 +929,7 @@
     "category": "House Specials",
     "description": "Mild chicken curry in yogurt-based sauce with green chillies",
     "isVeg": false,
-    "imageUrl": "",
+    "imageUrl": "assets/images/chicken_rezela_.jpg",
     "available": true,
     "size_or_type": "",
     "spiceLevel": "medium"
@@ -1182,7 +940,7 @@
     "category": "House Specials",
     "description": "Tender lamb in mild yogurt sauce with fresh green chillies",
     "isVeg": false,
-    "imageUrl": "",
+    "imageUrl": "assets/images/lamb_rezela.jpg",
     "available": true,
     "size_or_type": "",
     "spiceLevel": "medium"
@@ -1193,7 +951,7 @@
     "category": "House Specials",
     "description": "Mild chicken curry in creamy almond and coconut sauce",
     "isVeg": false,
-    "imageUrl": "",
+    "imageUrl": "assets/images/chicken_pasanda.jpg",
     "available": true,
     "size_or_type": "",
     "spiceLevel": "mild"
@@ -1204,7 +962,7 @@
     "category": "House Specials",
     "description": "Succulent lamb in mild creamy sauce with almonds and coconut",
     "isVeg": false,
-    "imageUrl": "",
+    "imageUrl": "assets/images/lamb_pasanda.jpg",
     "available": true,
     "size_or_type": "",
     "spiceLevel": "mild"
@@ -1215,7 +973,7 @@
     "category": "House Specials",
     "description": "Chicken tikka in medium spiced sauce with peppers and onions",
     "isVeg": false,
-    "imageUrl": "",
+    "imageUrl": "assets/images/chicken_tikka_koray_.jpg",
     "available": true,
     "size_or_type": "",
     "spiceLevel": "medium"
@@ -1226,7 +984,7 @@
     "category": "House Specials",
     "description": "Lamb tikka in medium curry sauce with peppers and onions",
     "isVeg": false,
-    "imageUrl": "",
+    "imageUrl": "assets/images/lamb_tikka_koray.jpg",
     "available": true,
     "size_or_type": "",
     "spiceLevel": "medium"
@@ -1237,7 +995,7 @@
     "category": "House Specials",
     "description": "Chicken marinated in tandoori spices, cooked with onions, tomatoes and green peppers",
     "isVeg": false,
-    "imageUrl": "",
+    "imageUrl": "assets/images/chicken_peshwari_.jpg",
     "available": true,
     "size_or_type": "",
     "spiceLevel": "medium"
@@ -1248,7 +1006,7 @@
     "category": "House Specials",
     "description": "Lamb marinated in tandoori spices, cooked with onions, tomatoes and green peppers",
     "isVeg": false,
-    "imageUrl": "",
+    "imageUrl": "assets/images/lamb_peshwari_.jpg",
     "available": true,
     "size_or_type": "",
     "spiceLevel": "medium"
@@ -1259,7 +1017,7 @@
     "category": "House Specials",
     "description": "Chicken stir-fried with garlic, peppers, onions and tomatoes",
     "isVeg": false,
-    "imageUrl": "",
+    "imageUrl": "assets/images/chicken_garlic_jalfrezi.jpg",
     "available": true,
     "size_or_type": "",
     "spiceLevel": "medium"
@@ -1270,7 +1028,7 @@
     "category": "House Specials",
     "description": "Lamb stir-fried with garlic, peppers, onions and tomatoes",
     "isVeg": false,
-    "imageUrl": "",
+    "imageUrl": "assets/images/lamb_garlic_jalfrezi.jpg",
     "available": true,
     "size_or_type": "",
     "spiceLevel": "medium"
@@ -1281,7 +1039,7 @@
     "category": "House Specials",
     "description": "Creamy tomato curry with tender chicken and grated cheese on top",
     "isVeg": false,
-    "imageUrl": "",
+    "imageUrl": "assets/images/butter_chicken_.jpg",
     "available": true,
     "size_or_type": "",
     "spiceLevel": "mild"
@@ -1292,7 +1050,7 @@
     "category": "House Specials",
     "description": "Chicken cooked in thick creamy sauce with almonds, coconut and egg",
     "isVeg": false,
-    "imageUrl": "",
+    "imageUrl": "assets/images/chicken_mogalai_.jpg",
     "available": true,
     "size_or_type": "",
     "spiceLevel": "mild"
@@ -1303,7 +1061,7 @@
     "category": "House Specials",
     "description": "Lamb cooked in thick creamy sauce with almonds, coconut and egg",
     "isVeg": false,
-    "imageUrl": "",
+    "imageUrl": "assets/images/lamb_moglai_.jpg",
     "available": true,
     "size_or_type": "",
     "spiceLevel": "mild"
@@ -1314,7 +1072,7 @@
     "category": "House Specials",
     "description": "Fragrant chicken curry with chef's special blend of aromatic spices",
     "isVeg": false,
-    "imageUrl": "",
+    "imageUrl": "assets/images/chicken_khusbu_.jpg",
     "available": true,
     "size_or_type": "",
     "spiceLevel": "hot"
@@ -1325,7 +1083,7 @@
     "category": "House Specials",
     "description": "Tender lamb in fragrant sauce with special aromatic spices",
     "isVeg": false,
-    "imageUrl": "",
+    "imageUrl": "assets/images/lamb_khusbu_.jpg",
     "available": true,
     "size_or_type": "",
     "spiceLevel": "hot"
@@ -1336,7 +1094,7 @@
     "category": "House Specials",
     "description": "Spicy chicken tikka with garlic, chillies in masala sauce",
     "isVeg": false,
-    "imageUrl": "",
+    "imageUrl": "assets/images/chicken_tikka_garlic_chilli_masala_.jpg",
     "available": true,
     "size_or_type": "",
     "spiceLevel": "hot"
@@ -1347,7 +1105,7 @@
     "category": "House Specials",
     "description": "Hot lamb tikka with garlic and chillies in masala sauce",
     "isVeg": false,
-    "imageUrl": "",
+    "imageUrl": "assets/images/lamb_tikka_garlic_chilli_masala_.jpg",
     "available": true,
     "size_or_type": "",
     "spiceLevel": "hot"
@@ -1358,7 +1116,7 @@
     "category": "House Specials",
     "description": "Complete meal with chicken tikka, meat bhuna, prawn pathia, pilau rice and naan bread",
     "isVeg": true,
-    "imageUrl": "",
+    "imageUrl": "assets/images/non-vegeterian_thali_.jpg",
     "available": true,
     "size_or_type": "",
     "spiceLevel": "medium"
@@ -1369,7 +1127,7 @@
     "category": "House Specials",
     "description": "Complete vegetarian meal with mushroom bhaji, saag aloo, vegetable curry, yogurt, pilau rice and naan bread",
     "isVeg": true,
-    "imageUrl": "",
+    "imageUrl": "assets/images/vegeterian_thali_.jpg",
     "available": true,
     "size_or_type": "",
     "spiceLevel": "medium"
@@ -1380,7 +1138,7 @@
     "category": "Balti Dishes",
     "description": "Tender chicken cooked in traditional balti spices with peppers and onions",
     "isVeg": false,
-    "imageUrl": "",
+    "imageUrl": "assets/images/chicken_balti.jpg",
     "available": true,
     "size_or_type": "",
     "spiceLevel": "medium"
@@ -1391,7 +1149,7 @@
     "category": "Balti Dishes",
     "description": "Succulent lamb pieces cooked in aromatic balti spices with fresh vegetables",
     "isVeg": false,
-    "imageUrl": "",
+    "imageUrl": "assets/images/lamb_balti_.jpg",
     "available": true,
     "size_or_type": "",
     "spiceLevel": "medium"
@@ -1402,7 +1160,7 @@
     "category": "Balti Dishes",
     "description": "Fresh prawns cooked in balti spices with peppers, onions and tomatoes",
     "isVeg": false,
-    "imageUrl": "",
+    "imageUrl": "assets/images/prawn_balti_.jpg",
     "available": true,
     "size_or_type": "",
     "spiceLevel": "medium"
@@ -1413,7 +1171,7 @@
     "category": "Balti Dishes",
     "description": "King prawns cooked in traditional balti spices with mixed vegetables",
     "isVeg": false,
-    "imageUrl": "",
+    "imageUrl": "assets/images/king_prawn_balti_.jpg",
     "available": true,
     "size_or_type": "",
     "spiceLevel": "medium"
@@ -1424,7 +1182,7 @@
     "category": "Balti Dishes",
     "description": "Chicken, prawn and meat cooked together in rich balti sauce",
     "isVeg": true,
-    "imageUrl": "",
+    "imageUrl": "assets/images/balti_tandoori_nights_special.jpg",
     "available": true,
     "size_or_type": "",
     "spiceLevel": "medium"
@@ -1435,7 +1193,7 @@
     "category": "Balti Dishes",
     "description": "Chicken tikka, lamb tikka and mixed vegetables in fragrant balti spices",
     "isVeg": true,
-    "imageUrl": "",
+    "imageUrl": "assets/images/balti_tropical_.jpg",
     "available": true,
     "size_or_type": "",
     "spiceLevel": "hot"
@@ -1446,7 +1204,7 @@
     "category": "Balti Dishes",
     "description": "Chicken balti with fresh green chillies for a hot and spicy taste",
     "isVeg": false,
-    "imageUrl": "",
+    "imageUrl": "assets/images/balti_chicken_chilli_masala.jpg",
     "available": true,
     "size_or_type": "",
     "spiceLevel": "hot"
@@ -1457,7 +1215,7 @@
     "category": "Balti Dishes",
     "description": "Marinated chicken tikka pieces in creamy balti masala sauce",
     "isVeg": false,
-    "imageUrl": "",
+    "imageUrl": "assets/images/balti_chicken_tikka_masala_.jpg",
     "available": true,
     "size_or_type": "",
     "spiceLevel": "medium"
@@ -1468,7 +1226,7 @@
     "category": "Balti Dishes",
     "description": "Tender lamb tikka in rich and creamy balti masala sauce",
     "isVeg": false,
-    "imageUrl": "",
+    "imageUrl": "assets/images/balti_lamb_tikka_masala_.jpg",
     "available": true,
     "size_or_type": "",
     "spiceLevel": "medium"
@@ -1479,7 +1237,7 @@
     "category": "Balti Dishes",
     "description": "Spiced minced meat cooked in hot balti sauce with fresh chillies",
     "isVeg": false,
-    "imageUrl": "",
+    "imageUrl": "assets/images/balti_keema_chilli_.jpg",
     "available": true,
     "size_or_type": "",
     "spiceLevel": "hot"
@@ -1490,7 +1248,7 @@
     "category": "Balti Dishes",
     "description": "Mixed vegetables including cauliflower, carrots, chickpeas, mushrooms, beans, peas, cabbage and spinach in balti spices",
     "isVeg": true,
-    "imageUrl": "",
+    "imageUrl": "assets/images/balti_navrattan_multiveg.jpg",
     "available": true,
     "size_or_type": "",
     "spiceLevel": "medium"
@@ -1501,7 +1259,7 @@
     "category": "Biryani",
     "description": "Fragrant basmati rice layered with spiced chicken and aromatic herbs",
     "isVeg": false,
-    "imageUrl": "",
+    "imageUrl": "assets/images/chicken_biryani_.jpg",
     "available": true,
     "size_or_type": "",
     "spiceLevel": "medium"
@@ -1512,7 +1270,7 @@
     "category": "Biryani",
     "description": "Basmati rice cooked with marinated chicken tikka pieces and biryani spices",
     "isVeg": false,
-    "imageUrl": "",
+    "imageUrl": "assets/images/chicken_tikka_biryani_.jpg",
     "available": true,
     "size_or_type": "",
     "spiceLevel": "medium"
@@ -1523,7 +1281,7 @@
     "category": "Biryani",
     "description": "Tender lamb pieces layered with seasoned basmati rice and traditional spices",
     "isVeg": false,
-    "imageUrl": "",
+    "imageUrl": "assets/images/lamb_biryani_.jpg",
     "available": true,
     "size_or_type": "",
     "spiceLevel": "medium"
@@ -1534,7 +1292,7 @@
     "category": "Biryani",
     "description": "Aromatic basmati rice with succulent lamb tikka and fragrant biryani herbs",
     "isVeg": false,
-    "imageUrl": "",
+    "imageUrl": "assets/images/lamb_tikka_biryani_.jpg",
     "available": true,
     "size_or_type": "",
     "spiceLevel": "medium"
@@ -1545,7 +1303,7 @@
     "category": "Biryani",
     "description": "Basmati rice cooked with spiced mushrooms and aromatic biryani seasonings",
     "isVeg": true,
-    "imageUrl": "",
+    "imageUrl": "assets/images/mushroom_biryani_.jpg",
     "available": true,
     "size_or_type": "",
     "spiceLevel": "medium"
@@ -1556,7 +1314,7 @@
     "category": "Biryani",
     "description": "Mixed vegetables layered with fragrant basmati rice and traditional spices",
     "isVeg": true,
-    "imageUrl": "",
+    "imageUrl": "assets/images/vegetable_biryani_.jpg",
     "available": true,
     "size_or_type": "",
     "spiceLevel": "medium"
@@ -1567,7 +1325,7 @@
     "category": "Biryani",
     "description": "Fresh prawns cooked with seasoned basmati rice and biryani spices",
     "isVeg": false,
-    "imageUrl": "",
+    "imageUrl": "assets/images/prawn_biryani_.jpg",
     "available": true,
     "size_or_type": "",
     "spiceLevel": "medium"
@@ -1578,7 +1336,7 @@
     "category": "Biryani",
     "description": "King prawns layered with aromatic basmati rice and fragrant herbs",
     "isVeg": false,
-    "imageUrl": "",
+    "imageUrl": "assets/images/king_prawn_biryani_.jpg",
     "available": true,
     "size_or_type": "",
     "spiceLevel": "medium"
@@ -1589,7 +1347,7 @@
     "category": "Biryani",
     "description": "Chicken, lamb tikka, king prawn and egg with spiced basmati rice",
     "isVeg": true,
-    "imageUrl": "",
+    "imageUrl": "assets/images/chefs_special_biryani_.jpg",
     "available": true,
     "size_or_type": "",
     "spiceLevel": "medium"
@@ -1600,7 +1358,7 @@
     "category": "Biryani",
     "description": "Chicken, lamb and prawn cooked with fragrant basmati rice and traditional spices",
     "isVeg": true,
-    "imageUrl": "",
+    "imageUrl": "assets/images/tandoori_nights_special_biryani_.jpg",
     "available": true,
     "size_or_type": "",
     "spiceLevel": "medium"
@@ -1611,7 +1369,7 @@
     "category": "Vegetarian",
     "description": "Mixed vegetables in mild creamy sauce with coconut and almonds",
     "isVeg": true,
-    "imageUrl": "",
+    "imageUrl": "assets/images/vegetable_korma_.jpg",
     "available": true,
     "size_or_type": "",
     "spiceLevel": "mild"
@@ -1622,7 +1380,7 @@
     "category": "Vegetarian",
     "description": "Dry-style mixed vegetables in thick spiced sauce with fresh herbs",
     "isVeg": true,
-    "imageUrl": "",
+    "imageUrl": "assets/images/vegetable_bhuna.jpg",
     "available": true,
     "size_or_type": "",
     "spiceLevel": "medium"
@@ -1633,7 +1391,7 @@
     "category": "Vegetarian",
     "description": "Sweet and sour mixed vegetables with lentils and pineapple",
     "isVeg": true,
-    "imageUrl": "",
+    "imageUrl": "assets/images/vegetable_dansak_.jpg",
     "available": true,
     "size_or_type": "",
     "spiceLevel": "hot"
@@ -1644,7 +1402,7 @@
     "category": "Vegetarian",
     "description": "Mixed vegetables cooked with plenty of onions and peppers",
     "isVeg": true,
-    "imageUrl": "",
+    "imageUrl": "assets/images/vegetable_dopiaza_.jpg",
     "available": true,
     "size_or_type": "",
     "spiceLevel": "medium"
@@ -1655,7 +1413,7 @@
     "category": "Vegetarian",
     "description": "Fiery hot mixed vegetables with potatoes in tangy vindaloo sauce",
     "isVeg": true,
-    "imageUrl": "",
+    "imageUrl": "assets/images/vegetable_vindaloo_.jpg",
     "available": true,
     "size_or_type": "",
     "spiceLevel": "hot"
@@ -1666,7 +1424,7 @@
     "category": "Vegetarian",
     "description": "Hot and spicy mixed vegetables in traditional madras spices",
     "isVeg": true,
-    "imageUrl": "",
+    "imageUrl": "assets/images/vegetable_madras_.jpg",
     "available": true,
     "size_or_type": "",
     "spiceLevel": "hot"
@@ -1677,7 +1435,7 @@
     "category": "Vegetarian",
     "description": "Mixed vegetables in rich tomato-based sauce with aromatic spices",
     "isVeg": true,
-    "imageUrl": "",
+    "imageUrl": "assets/images/vegetable_rogan_.jpg",
     "available": true,
     "size_or_type": "",
     "spiceLevel": "medium"
@@ -1688,7 +1446,7 @@
     "category": "Vegetarian",
     "description": "Mixed vegetables stir-fried with peppers, onions and tomatoes",
     "isVeg": true,
-    "imageUrl": "",
+    "imageUrl": "assets/images/vegetable_jalfrezi_.jpg",
     "available": true,
     "size_or_type": "",
     "spiceLevel": "hot"
@@ -1699,7 +1457,7 @@
     "category": "Vegetarian",
     "description": "Classic mixed vegetables in aromatic spiced curry sauce",
     "isVeg": true,
-    "imageUrl": "",
+    "imageUrl": "assets/images/vegetable_curry_.jpg",
     "available": true,
     "size_or_type": "",
     "spiceLevel": "medium"
@@ -1710,7 +1468,7 @@
     "category": "Vegetarian",
     "description": "Sweet, sour and hot mixed vegetables with tomatoes and tamarind",
     "isVeg": true,
-    "imageUrl": "",
+    "imageUrl": "assets/images/vegetable_pathia_.jpg",
     "available": true,
     "size_or_type": "",
     "spiceLevel": "hot"
@@ -1721,7 +1479,7 @@
     "category": "Vegetarian",
     "description": "Mixed vegetables in rich creamy masala sauce with herbs",
     "isVeg": true,
-    "imageUrl": "",
+    "imageUrl": "assets/images/vegetable_masala_.jpg",
     "available": true,
     "size_or_type": "",
     "spiceLevel": "mild"
@@ -1732,7 +1490,7 @@
     "category": "Vegetarian",
     "description": "Mixed vegetables in mild creamy sauce with almonds and coconut",
     "isVeg": true,
-    "imageUrl": "",
+    "imageUrl": "assets/images/vegetable_pasanda_.jpg",
     "available": true,
     "size_or_type": "",
     "spiceLevel": "mild"
@@ -1743,7 +1501,7 @@
     "category": "Vegetarian",
     "description": "Extremely hot mixed vegetables with ghost peppers and fierce spices",
     "isVeg": true,
-    "imageUrl": "",
+    "imageUrl": "assets/images/vegetable_phall_.jpg",
     "available": true,
     "size_or_type": "",
     "spiceLevel": "hot"
@@ -1754,7 +1512,7 @@
     "category": "Vegetarian",
     "description": "Fresh mushrooms in mild creamy sauce with coconut and almonds",
     "isVeg": true,
-    "imageUrl": "",
+    "imageUrl": "assets/images/mushroom_korma_.jpg",
     "available": true,
     "size_or_type": "",
     "spiceLevel": "mild"
@@ -1765,7 +1523,7 @@
     "category": "English Dishes",
     "description": "Grilled chicken breast served with golden chips and peas",
     "isVeg": false,
-    "imageUrl": "",
+    "imageUrl": "assets/images/chicken_&_chips_.jpg",
     "available": true,
     "size_or_type": "",
     "spiceLevel": "mild"
@@ -1776,7 +1534,7 @@
     "category": "English Dishes",
     "description": "Fluffy plain omelette served with golden chips and peas",
     "isVeg": false,
-    "imageUrl": "",
+    "imageUrl": "assets/images/plain_omelette_&_chips_.jpg",
     "available": true,
     "size_or_type": "",
     "spiceLevel": "mild"
@@ -1787,7 +1545,7 @@
     "category": "English Dishes",
     "description": "Omelette filled with seasoned chicken pieces, served with chips and peas",
     "isVeg": false,
-    "imageUrl": "",
+    "imageUrl": "assets/images/chicken_omelette_&_chips_.jpg",
     "available": true,
     "size_or_type": "",
     "spiceLevel": "mild"
@@ -1798,7 +1556,7 @@
     "category": "English Dishes",
     "description": "Omelette filled with fresh mushrooms, served with chips and peas",
     "isVeg": false,
-    "imageUrl": "",
+    "imageUrl": "assets/images/mushroom_omelette_&_chips_.jpg",
     "available": true,
     "size_or_type": "",
     "spiceLevel": "mild"
@@ -1809,7 +1567,7 @@
     "category": "English Dishes",
     "description": "Omelette filled with prawns, served with golden chips and peas",
     "isVeg": false,
-    "imageUrl": "",
+    "imageUrl": "assets/images/prawn_omelette_&_chips_.jpg",
     "available": true,
     "size_or_type": "",
     "spiceLevel": "mild"
@@ -1820,7 +1578,7 @@
     "category": "Side Dishes",
     "description": "Assorted vegetables cooked in spiced curry sauce",
     "isVeg": true,
-    "imageUrl": "",
+    "imageUrl": "assets/images/mixed_vegetable_curry_.jpg",
     "available": true,
     "size_or_type": "side",
     "spiceLevel": "medium"
@@ -1831,7 +1589,7 @@
     "category": "Side Dishes",
     "description": "Assorted vegetables cooked in spiced curry sauce",
     "isVeg": true,
-    "imageUrl": "",
+    "imageUrl": "assets/images/mixed_vegetable_curry_.jpg",
     "available": true,
     "size_or_type": "main",
     "spiceLevel": "medium"
@@ -1842,7 +1600,7 @@
     "category": "Side Dishes",
     "description": "Mixed vegetables stir-fried with dry spices and herbs",
     "isVeg": true,
-    "imageUrl": "",
+    "imageUrl": "assets/images/mixed_dry_vegetables_.jpg",
     "available": true,
     "size_or_type": "side",
     "spiceLevel": "medium"
@@ -1853,7 +1611,7 @@
     "category": "Side Dishes",
     "description": "Mixed vegetables stir-fried with dry spices and herbs",
     "isVeg": true,
-    "imageUrl": "",
+    "imageUrl": "assets/images/mixed_dry_vegetables_.jpg",
     "available": true,
     "size_or_type": "main",
     "spiceLevel": "medium"
@@ -1864,7 +1622,7 @@
     "category": "Side Dishes",
     "description": "Spiced potatoes cooked with turmeric and aromatic herbs",
     "isVeg": true,
-    "imageUrl": "",
+    "imageUrl": "assets/images/bombay_aloo_.jpg",
     "available": true,
     "size_or_type": "side",
     "spiceLevel": "medium"
@@ -1875,7 +1633,7 @@
     "category": "Side Dishes",
     "description": "Spiced potatoes cooked with turmeric and aromatic herbs",
     "isVeg": true,
-    "imageUrl": "",
+    "imageUrl": "assets/images/bombay_aloo_.jpg",
     "available": true,
     "size_or_type": "main",
     "spiceLevel": "medium"
@@ -1886,7 +1644,7 @@
     "category": "Side Dishes",
     "description": "Potatoes and cauliflower cooked with traditional spices",
     "isVeg": true,
-    "imageUrl": "",
+    "imageUrl": "assets/images/aloo_gobi_.jpg",
     "available": true,
     "size_or_type": "side",
     "spiceLevel": "medium"
@@ -1897,7 +1655,7 @@
     "category": "Side Dishes",
     "description": "Potatoes and cauliflower cooked with traditional spices",
     "isVeg": true,
-    "imageUrl": "",
+    "imageUrl": "assets/images/aloo_gobi_.jpg",
     "available": true,
     "size_or_type": "main",
     "spiceLevel": "medium"
@@ -1908,7 +1666,7 @@
     "category": "Side Dishes",
     "description": "Spinach and potatoes cooked with garlic and spices",
     "isVeg": true,
-    "imageUrl": "",
+    "imageUrl": "assets/images/saag_aloo_.jpg",
     "available": true,
     "size_or_type": "side",
     "spiceLevel": "medium"
@@ -1919,7 +1677,7 @@
     "category": "Side Dishes",
     "description": "Spinach and potatoes cooked with garlic and spices",
     "isVeg": true,
-    "imageUrl": "",
+    "imageUrl": "assets/images/saag_aloo_.jpg",
     "available": true,
     "size_or_type": "main",
     "spiceLevel": "medium"
@@ -1930,7 +1688,7 @@
     "category": "Side Dishes",
     "description": "Dry spiced cauliflower with onions and herbs",
     "isVeg": true,
-    "imageUrl": "",
+    "imageUrl": "assets/images/cauliflower_bhaji_.jpg",
     "available": true,
     "size_or_type": "side",
     "spiceLevel": "medium"
@@ -1941,7 +1699,7 @@
     "category": "Side Dishes",
     "description": "Dry spiced cauliflower with onions and herbs",
     "isVeg": true,
-    "imageUrl": "",
+    "imageUrl": "assets/images/cauliflower_bhaji_.jpg",
     "available": true,
     "size_or_type": "main",
     "spiceLevel": "medium"
@@ -1952,7 +1710,7 @@
     "category": "Side Dishes",
     "description": "Fresh mushrooms cooked with onions and spices",
     "isVeg": true,
-    "imageUrl": "",
+    "imageUrl": "assets/images/mushroom_bhaji_.jpg",
     "available": true,
     "size_or_type": "side",
     "spiceLevel": "medium"
@@ -1963,7 +1721,7 @@
     "category": "Side Dishes",
     "description": "Fresh mushrooms cooked with onions and spices",
     "isVeg": true,
-    "imageUrl": "",
+    "imageUrl": "assets/images/mushroom_bhaji_.jpg",
     "available": true,
     "size_or_type": "main",
     "spiceLevel": "medium"
@@ -1974,7 +1732,7 @@
     "category": "Side Dishes",
     "description": "Okra cooked with onions, tomatoes and aromatic spices",
     "isVeg": true,
-    "imageUrl": "",
+    "imageUrl": "assets/images/bhindi_bhaji_.jpg",
     "available": true,
     "size_or_type": "side",
     "spiceLevel": "medium"
@@ -1985,7 +1743,7 @@
     "category": "Side Dishes",
     "description": "Okra cooked with onions, tomatoes and aromatic spices",
     "isVeg": true,
-    "imageUrl": "",
+    "imageUrl": "assets/images/bhindi_bhaji_.jpg",
     "available": true,
     "size_or_type": "main",
     "spiceLevel": "medium"
@@ -1996,7 +1754,7 @@
     "category": "Side Dishes",
     "description": "Yellow lentils tempered with garlic, cumin and herbs",
     "isVeg": true,
-    "imageUrl": "",
+    "imageUrl": "assets/images/tarka_daal_.jpg",
     "available": true,
     "size_or_type": "side",
     "spiceLevel": "medium"
@@ -2007,7 +1765,7 @@
     "category": "Side Dishes",
     "description": "Yellow lentils tempered with garlic, cumin and herbs",
     "isVeg": true,
-    "imageUrl": "",
+    "imageUrl": "assets/images/tarka_daal_.jpg",
     "available": true,
     "size_or_type": "main",
     "spiceLevel": "medium"
@@ -2018,7 +1776,7 @@
     "category": "Side Dishes",
     "description": "Chickpeas cooked in rich spiced tomato sauce",
     "isVeg": true,
-    "imageUrl": "",
+    "imageUrl": "assets/images/chana_masala.jpg",
     "available": true,
     "size_or_type": "side",
     "spiceLevel": "medium"
@@ -2029,7 +1787,7 @@
     "category": "Side Dishes",
     "description": "Chickpeas cooked in rich spiced tomato sauce",
     "isVeg": true,
-    "imageUrl": "",
+    "imageUrl": "assets/images/chana_masala.jpg",
     "available": true,
     "size_or_type": "main",
     "spiceLevel": "medium"
@@ -2040,7 +1798,7 @@
     "category": "Side Dishes",
     "description": "Potatoes and peas cooked in mild spiced sauce",
     "isVeg": true,
-    "imageUrl": "",
+    "imageUrl": "assets/images/aloo_peas_.jpg",
     "available": true,
     "size_or_type": "side",
     "spiceLevel": "medium"
@@ -2051,7 +1809,7 @@
     "category": "Side Dishes",
     "description": "Potatoes and peas cooked in mild spiced sauce",
     "isVeg": true,
-    "imageUrl": "",
+    "imageUrl": "assets/images/aloo_peas_.jpg",
     "available": true,
     "size_or_type": "main",
     "spiceLevel": "medium"
@@ -2062,7 +1820,7 @@
     "category": "Side Dishes",
     "description": "Fresh spinach cooked with garlic and aromatic spices",
     "isVeg": true,
-    "imageUrl": "",
+    "imageUrl": "assets/images/saag_bhaji_.jpg",
     "available": true,
     "size_or_type": "side",
     "spiceLevel": "medium"
@@ -2073,7 +1831,7 @@
     "category": "Side Dishes",
     "description": "Fresh spinach cooked with garlic and aromatic spices",
     "isVeg": true,
-    "imageUrl": "",
+    "imageUrl": "assets/images/saag_bhaji_.jpg",
     "available": true,
     "size_or_type": "main",
     "spiceLevel": "medium"
@@ -2084,7 +1842,7 @@
     "category": "Side Dishes",
     "description": "Potatoes and chickpeas cooked with traditional spices",
     "isVeg": true,
-    "imageUrl": "",
+    "imageUrl": "assets/images/aloo_chana_.jpg",
     "available": true,
     "size_or_type": "side",
     "spiceLevel": "medium"
@@ -2095,7 +1853,7 @@
     "category": "Side Dishes",
     "description": "Potatoes and chickpeas cooked with traditional spices",
     "isVeg": true,
-    "imageUrl": "",
+    "imageUrl": "assets/images/aloo_chana_.jpg",
     "available": true,
     "size_or_type": "main",
     "spiceLevel": "medium"
@@ -2106,7 +1864,7 @@
     "category": "Side Dishes",
     "description": "Aubergine cooked with onions, tomatoes and spices",
     "isVeg": true,
-    "imageUrl": "",
+    "imageUrl": "assets/images/aubergine_bhaji_.jpg",
     "available": true,
     "size_or_type": "side",
     "spiceLevel": "medium"
@@ -2117,7 +1875,7 @@
     "category": "Side Dishes",
     "description": "Aubergine cooked with onions, tomatoes and spices",
     "isVeg": true,
-    "imageUrl": "",
+    "imageUrl": "assets/images/aubergine_bhaji_.jpg",
     "available": true,
     "size_or_type": "main",
     "spiceLevel": "medium"
@@ -2128,7 +1886,7 @@
     "category": "Side Dishes",
     "description": "Mixed vegetables, lentils and spinach in spiced sauce",
     "isVeg": true,
-    "imageUrl": "",
+    "imageUrl": "assets/images/daal_samba_.jpg",
     "available": true,
     "size_or_type": "side",
     "spiceLevel": "medium"
@@ -2139,7 +1897,7 @@
     "category": "Side Dishes",
     "description": "Mixed vegetables, lentils and spinach in spiced sauce",
     "isVeg": true,
-    "imageUrl": "",
+    "imageUrl": "assets/images/daal_samba_.jpg",
     "available": true,
     "size_or_type": "main",
     "spiceLevel": "medium"
@@ -2150,7 +1908,7 @@
     "category": "Side Dishes",
     "description": "Fresh spinach with cottage cheese and aromatic spices",
     "isVeg": true,
-    "imageUrl": "",
+    "imageUrl": "assets/images/saag_paneer_.jpg",
     "available": true,
     "size_or_type": "side",
     "spiceLevel": "medium"
@@ -2161,7 +1919,7 @@
     "category": "Side Dishes",
     "description": "Fresh spinach with cottage cheese and aromatic spices",
     "isVeg": true,
-    "imageUrl": "",
+    "imageUrl": "assets/images/saag_paneer_.jpg",
     "available": true,
     "size_or_type": "main",
     "spiceLevel": "medium"
@@ -2172,7 +1930,7 @@
     "category": "Side Dishes",
     "description": "Green peas with cottage cheese in mild spiced sauce",
     "isVeg": true,
-    "imageUrl": "",
+    "imageUrl": "assets/images/mutter_paneer_.jpg",
     "available": true,
     "size_or_type": "side",
     "spiceLevel": "medium"
@@ -2183,7 +1941,7 @@
     "category": "Side Dishes",
     "description": "Green peas with cottage cheese in mild spiced sauce",
     "isVeg": true,
-    "imageUrl": "",
+    "imageUrl": "assets/images/mutter_paneer_.jpg",
     "available": true,
     "size_or_type": "main",
     "spiceLevel": "medium"
@@ -2194,7 +1952,7 @@
     "category": "Sundries",
     "description": "Simple steamed basmati rice",
     "isVeg": true,
-    "imageUrl": "",
+    "imageUrl": "assets/images/plain_rice_.jpg",
     "available": true,
     "size_or_type": "",
     "spiceLevel": "medium"
@@ -2205,7 +1963,7 @@
     "category": "Sundries",
     "description": "Fragrant basmati rice with aromatic spices and herbs",
     "isVeg": true,
-    "imageUrl": "",
+    "imageUrl": "assets/images/pilau_rice_.jpg",
     "available": true,
     "size_or_type": "",
     "spiceLevel": "medium"
@@ -2216,7 +1974,7 @@
     "category": "Sundries",
     "description": "Basmati rice cooked with fresh garlic and herbs",
     "isVeg": true,
-    "imageUrl": "",
+    "imageUrl": "assets/images/garlic_rice_.jpg",
     "available": true,
     "size_or_type": "",
     "spiceLevel": "medium"
@@ -2227,7 +1985,7 @@
     "category": "Sundries",
     "description": "Pilau rice with spiced minced meat",
     "isVeg": false,
-    "imageUrl": "",
+    "imageUrl": "assets/images/keema_rice_.jpg",
     "available": true,
     "size_or_type": "",
     "spiceLevel": "medium"
@@ -2238,7 +1996,7 @@
     "category": "Sundries",
     "description": "Basmati rice with mixed vegetables and spices",
     "isVeg": true,
-    "imageUrl": "",
+    "imageUrl": "assets/images/vegetable_rice_.jpg",
     "available": true,
     "size_or_type": "",
     "spiceLevel": "medium"
@@ -2249,7 +2007,7 @@
     "category": "Sundries",
     "description": "Fried rice with egg, peas and aromatic seasonings",
     "isVeg": true,
-    "imageUrl": "",
+    "imageUrl": "assets/images/special_fried_rice.jpg",
     "available": true,
     "size_or_type": "",
     "spiceLevel": "medium"
@@ -2260,7 +2018,7 @@
     "category": "Sundries",
     "description": "Basmati rice cooked with coconut and mild spices",
     "isVeg": true,
-    "imageUrl": "",
+    "imageUrl": "assets/images/coconut_rice_.jpg",
     "available": true,
     "size_or_type": "",
     "spiceLevel": "medium"
@@ -2271,7 +2029,7 @@
     "category": "Sundries",
     "description": "Pilau rice with fresh mushrooms and herbs",
     "isVeg": true,
-    "imageUrl": "",
+    "imageUrl": "assets/images/mushroom_rice_.jpg",
     "available": true,
     "size_or_type": "",
     "spiceLevel": "medium"
@@ -2282,7 +2040,7 @@
     "category": "Sundries",
     "description": "Fried basmati rice with scrambled egg",
     "isVeg": false,
-    "imageUrl": "",
+    "imageUrl": "assets/images/egg_fried_rice_.jpg",
     "available": true,
     "size_or_type": "",
     "spiceLevel": "medium"
@@ -2293,7 +2051,7 @@
     "category": "Sundries",
     "description": "Fragrant rice with fresh lemon and curry leaves",
     "isVeg": true,
-    "imageUrl": "",
+    "imageUrl": "assets/images/lemon_rice_.jpg",
     "available": true,
     "size_or_type": "",
     "spiceLevel": "medium"
@@ -2304,7 +2062,7 @@
     "category": "Sundries",
     "description": "Traditional leavened bread baked in tandoori oven",
     "isVeg": true,
-    "imageUrl": "",
+    "imageUrl": "assets/images/plain_naan_.jpg",
     "available": true,
     "size_or_type": "",
     "spiceLevel": "medium"
@@ -2315,7 +2073,7 @@
     "category": "Sundries",
     "description": "Naan bread with fresh chillies and onions",
     "isVeg": true,
-    "imageUrl": "",
+    "imageUrl": "assets/images/chilli_&_onion_naan_.jpg",
     "available": true,
     "size_or_type": "",
     "spiceLevel": "hoy"
@@ -2326,7 +2084,7 @@
     "category": "Sundries",
     "description": "Plain naan brushed with melted butter",
     "isVeg": true,
-    "imageUrl": "",
+    "imageUrl": "assets/images/butter_naan.jpg",
     "available": true,
     "size_or_type": "",
     "spiceLevel": "medium"
@@ -2337,7 +2095,7 @@
     "category": "Sundries",
     "description": "Naan stuffed with spiced minced meat",
     "isVeg": false,
-    "imageUrl": "",
+    "imageUrl": "assets/images/keema_naan_.jpg",
     "available": true,
     "size_or_type": "",
     "spiceLevel": "medium"
@@ -2348,7 +2106,7 @@
     "category": "Sundries",
     "description": "Naan bread topped with fresh garlic and herbs",
     "isVeg": true,
-    "imageUrl": "",
+    "imageUrl": "assets/images/garlic_naan_.jpg",
     "available": true,
     "size_or_type": "",
     "spiceLevel": "medium"
@@ -2359,7 +2117,7 @@
     "category": "Sundries",
     "description": "Sweet naan filled with coconut, almonds and sultanas",
     "isVeg": true,
-    "imageUrl": "",
+    "imageUrl": "assets/images/peshwari_naan_.jpg",
     "available": true,
     "size_or_type": "",
     "spiceLevel": "medium"
@@ -2370,7 +2128,7 @@
     "category": "Sundries",
     "description": "Naan stuffed with spiced mixed vegetables",
     "isVeg": true,
-    "imageUrl": "",
+    "imageUrl": "assets/images/vegetable_naan_.jpg",
     "available": true,
     "size_or_type": "",
     "spiceLevel": "medium"
@@ -2381,7 +2139,7 @@
     "category": "Sundries",
     "description": "Naan bread filled with melted cheese",
     "isVeg": true,
-    "imageUrl": "",
+    "imageUrl": "assets/images/cheese_naan_.jpg",
     "available": true,
     "size_or_type": "",
     "spiceLevel": "medium"
@@ -2392,7 +2150,7 @@
     "category": "Sundries",
     "description": "Wholemeal bread baked in tandoori oven",
     "isVeg": true,
-    "imageUrl": "",
+    "imageUrl": "assets/images/tandoori_roti.jpg",
     "available": true,
     "size_or_type": "",
     "spiceLevel": "medium"
@@ -2403,7 +2161,7 @@
     "category": "Sundries",
     "description": "Flaky layered bread cooked on griddle",
     "isVeg": true,
-    "imageUrl": "",
+    "imageUrl": "assets/images/paratha_.jpg",
     "available": true,
     "size_or_type": "",
     "spiceLevel": "medium"
@@ -2414,7 +2172,7 @@
     "category": "Sundries",
     "description": "Paratha filled with spiced vegetables",
     "isVeg": true,
-    "imageUrl": "",
+    "imageUrl": "assets/images/stuffed_paratha_.jpg",
     "available": true,
     "size_or_type": "",
     "spiceLevel": "medium"
@@ -2425,7 +2183,7 @@
     "category": "Sundries",
     "description": "Paratha stuffed with spiced potatoes",
     "isVeg": true,
-    "imageUrl": "",
+    "imageUrl": "assets/images/aloo_paratha_.jpg",
     "available": true,
     "size_or_type": "",
     "spiceLevel": "medium"
@@ -2436,7 +2194,7 @@
     "category": "Sundries",
     "description": "Thin unleavened wholemeal bread",
     "isVeg": true,
-    "imageUrl": "",
+    "imageUrl": "assets/images/chapatti_.jpg",
     "available": true,
     "size_or_type": "",
     "spiceLevel": "medium"
@@ -2447,18 +2205,18 @@
     "category": "Condiments",
     "description": "Deep fried puffed bread",
     "isVeg": true,
-    "imageUrl": "",
+    "imageUrl": "assets/images/puri_.jpg",
     "available": true,
     "size_or_type": "",
     "spiceLevel": "medium"
   },
   {
     "Name": "Papadom",
-    "price": "£1.00",
+    "price": "£2.75",
     "category": "Condiments",
     "description": "",
     "isVeg": true,
-    "imageUrl": "",
+    "imageUrl": "assets/images/papadom_.jpg",
     "available": true,
     "size_or_type": "",
     "spiceLevel": "medium"
@@ -2469,7 +2227,7 @@
     "category": "Condiments",
     "description": "Cooling yogurt dip with cucumber and mint",
     "isVeg": true,
-    "imageUrl": "",
+    "imageUrl": "assets/images/raitha_cucumber.jpg",
     "available": true,
     "size_or_type": "",
     "spiceLevel": "medium"
@@ -2480,7 +2238,7 @@
     "category": "Condiments",
     "description": "Cooling yogurt dip with onion and mint",
     "isVeg": true,
-    "imageUrl": "",
+    "imageUrl": "assets/images/raitha_onion_.jpg",
     "available": true,
     "size_or_type": "",
     "spiceLevel": "medium"
@@ -2491,7 +2249,7 @@
     "category": "Condiments",
     "description": "Fresh lettuce, cucumber, tomato and onion",
     "isVeg": true,
-    "imageUrl": "",
+    "imageUrl": "assets/images/green_salad.jpg",
     "available": true,
     "size_or_type": "",
     "spiceLevel": "medium"
@@ -2502,7 +2260,7 @@
     "category": "Condiments",
     "description": "",
     "isVeg": true,
-    "imageUrl": "",
+    "imageUrl": "assets/images/chips_.jpg",
     "available": true,
     "size_or_type": "",
     "spiceLevel": "medium"
@@ -2513,7 +2271,7 @@
     "category": "Condiments",
     "description": "",
     "isVeg": true,
-    "imageUrl": "",
+    "imageUrl": "assets/images/mango_chutney_.jpg",
     "available": true,
     "size_or_type": "",
     "spiceLevel": "medium"
@@ -2524,7 +2282,7 @@
     "category": "Condiments",
     "description": "",
     "isVeg": true,
-    "imageUrl": "",
+    "imageUrl": "assets/images/lime_pickle_.jpg",
     "available": true,
     "size_or_type": "",
     "spiceLevel": "medium"
@@ -2535,7 +2293,7 @@
     "category": "Condiments",
     "description": "",
     "isVeg": true,
-    "imageUrl": "",
+    "imageUrl": "assets/images/onion_salad.jpg",
     "available": true,
     "size_or_type": "",
     "spiceLevel": "medium"
@@ -2546,7 +2304,7 @@
     "category": "Condiments",
     "description": "",
     "isVeg": true,
-    "imageUrl": "",
+    "imageUrl": "assets/images/mint_sauce_.jpg",
     "available": true,
     "size_or_type": "",
     "spiceLevel": "medium"
@@ -2557,7 +2315,7 @@
     "category": "Drinks",
     "description": "",
     "isVeg": true,
-    "imageUrl": "",
+    "imageUrl": "assets/images/coke.jpg",
     "available": true,
     "size_or_type": "330ml",
     "spiceLevel": "medium"
@@ -2568,7 +2326,7 @@
     "category": "Drinks",
     "description": "",
     "isVeg": true,
-    "imageUrl": "",
+    "imageUrl": "assets/images/coke_.jpg",
     "available": true,
     "size_or_type": "2ltr",
     "spiceLevel": "medium"
@@ -2579,7 +2337,7 @@
     "category": "Drinks",
     "description": "",
     "isVeg": true,
-    "imageUrl": "",
+    "imageUrl": "assets/images/diet_coke_.jpg",
     "available": true,
     "size_or_type": "330ml",
     "spiceLevel": "medium"
@@ -2590,7 +2348,7 @@
     "category": "Drinks",
     "description": "",
     "isVeg": true,
-    "imageUrl": "",
+    "imageUrl": "assets/images/diet_coke_.jpg",
     "available": true,
     "size_or_type": "2ltr",
     "spiceLevel": "medium"
@@ -2601,7 +2359,7 @@
     "category": "Drinks",
     "description": "",
     "isVeg": true,
-    "imageUrl": "",
+    "imageUrl": "assets/images/sprite.jpg",
     "available": true,
     "size_or_type": "330ml",
     "spiceLevel": "medium"
@@ -2612,7 +2370,7 @@
     "category": "Drinks",
     "description": "",
     "isVeg": true,
-    "imageUrl": "",
+    "imageUrl": "assets/images/sprite.jpg",
     "available": true,
     "size_or_type": "2ltr",
     "spiceLevel": "medium"
@@ -2623,7 +2381,7 @@
     "category": "Drinks",
     "description": "",
     "isVeg": true,
-    "imageUrl": "",
+    "imageUrl": "assets/images/pepsi_.jpg",
     "available": true,
     "size_or_type": "330ml",
     "spiceLevel": "medium"
@@ -2634,7 +2392,7 @@
     "category": "Drinks",
     "description": "",
     "isVeg": true,
-    "imageUrl": "",
+    "imageUrl": "assets/images/pepsi_.jpg",
     "available": true,
     "size_or_type": "2ltr",
     "spiceLevel": "medium"
@@ -2645,7 +2403,7 @@
     "category": "Drinks",
     "description": "",
     "isVeg": true,
-    "imageUrl": "",
+    "imageUrl": "assets/images/7up_.jpg",
     "available": true,
     "size_or_type": "330ml",
     "spiceLevel": "medium"
@@ -2656,7 +2414,7 @@
     "category": "Drinks",
     "description": "",
     "isVeg": true,
-    "imageUrl": "",
+    "imageUrl": "assets/images/7up_.jpg",
     "available": true,
     "size_or_type": "2ltr",
     "spiceLevel": "medium"
@@ -2667,7 +2425,7 @@
     "category": "Drinks",
     "description": "",
     "isVeg": true,
-    "imageUrl": "",
+    "imageUrl": "assets/images/fanta_.jpg",
     "available": true,
     "size_or_type": "330ml",
     "spiceLevel": "medium"
@@ -2678,7 +2436,7 @@
     "category": "Drinks",
     "description": "",
     "isVeg": true,
-    "imageUrl": "",
+    "imageUrl": "assets/images/fanta_.jpg",
     "available": true,
     "size_or_type": "2ltr",
     "spiceLevel": "medium"
@@ -2689,7 +2447,7 @@
     "category": "Setmeal",
     "description": "Complete meal including onion bhajis, papadoms, mint sauce, onion salad, choice of any chicken or lamb main dish, Bombay aloo, choice of pilau rice or naan bread, plus drink",
     "isVeg": true,
-    "imageUrl": "",
+    "imageUrl": "assets/images/setmeal_.jpg",
     "available": true,
     "size_or_type": "",
     "spiceLevel": "medium"

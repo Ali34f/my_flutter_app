@@ -167,6 +167,17 @@ class _LoginScreenState extends State<LoginScreen>
 
   @override
   Widget build(BuildContext context) {
+    // Get screen size for responsive design
+    final screenHeight = MediaQuery.of(context).size.height;
+    final screenWidth = MediaQuery.of(context).size.width;
+
+    // Calculate responsive sizes for iPhone 15 Pro Max
+    final circleSize = screenWidth * 0.85; // 85% of screen width
+    final maxCircleSize = screenHeight * 0.55; // Max 55% of screen height
+    final finalCircleSize = circleSize > maxCircleSize
+        ? maxCircleSize
+        : circleSize;
+
     return Scaffold(
       body: Container(
         width: double.infinity,
@@ -188,10 +199,11 @@ class _LoginScreenState extends State<LoginScreen>
                 ),
               ),
 
-              // Main Content - Centered like Bangladesh Flag
+              // Main Content - Responsive Layout
               Center(
                 child: SingleChildScrollView(
                   physics: const BouncingScrollPhysics(),
+                  padding: const EdgeInsets.symmetric(vertical: 20),
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
@@ -199,8 +211,8 @@ class _LoginScreenState extends State<LoginScreen>
                       ScaleTransition(
                         scale: _circleAnimation,
                         child: Container(
-                          width: 350,
-                          height: 350,
+                          width: finalCircleSize,
+                          height: finalCircleSize,
                           decoration: BoxDecoration(
                             // Perfect Bangladesh Flag Red Color
                             color: const Color(0xFFDC143C),
@@ -216,7 +228,9 @@ class _LoginScreenState extends State<LoginScreen>
                           ),
                           child: ClipOval(
                             child: Container(
-                              padding: const EdgeInsets.all(38),
+                              padding: EdgeInsets.all(
+                                finalCircleSize * 0.1,
+                              ), // 10% padding
                               child: Form(
                                 key: _formKey,
                                 child: Column(
@@ -229,11 +243,13 @@ class _LoginScreenState extends State<LoginScreen>
                                         opacity: _contentAnimation,
                                         child: Column(
                                           children: [
-                                            const Text(
+                                            Text(
                                               'Welcome\nBack',
                                               textAlign: TextAlign.center,
                                               style: TextStyle(
-                                                fontSize: 24,
+                                                fontSize:
+                                                    finalCircleSize *
+                                                    0.065, // Responsive font size
                                                 fontWeight: FontWeight.w700,
                                                 color: Colors.white,
                                                 height: 1.1,
@@ -241,13 +257,16 @@ class _LoginScreenState extends State<LoginScreen>
                                                 fontFamily: 'Georgia',
                                               ),
                                             ),
-                                            const SizedBox(height: 3),
-                                            const Text(
+                                            SizedBox(
+                                              height: finalCircleSize * 0.008,
+                                            ),
+                                            Text(
                                               'Sign in to your account',
                                               textAlign: TextAlign.center,
                                               style: TextStyle(
-                                                fontSize: 10,
-                                                color: Color(0xFFF4F4F4),
+                                                fontSize:
+                                                    finalCircleSize * 0.03,
+                                                color: const Color(0xFFF4F4F4),
                                                 fontWeight: FontWeight.w300,
                                               ),
                                             ),
@@ -256,7 +275,7 @@ class _LoginScreenState extends State<LoginScreen>
                                       ),
                                     ),
 
-                                    const SizedBox(height: 12),
+                                    SizedBox(height: finalCircleSize * 0.035),
 
                                     // Email Field
                                     SlideTransition(
@@ -264,7 +283,9 @@ class _LoginScreenState extends State<LoginScreen>
                                       child: FadeTransition(
                                         opacity: _contentAnimation,
                                         child: SizedBox(
-                                          width: 190,
+                                          width:
+                                              finalCircleSize *
+                                              0.55, // Responsive width
                                           child: _buildCompactTextField(
                                             controller: _emailController,
                                             hintText: 'Enter your email',
@@ -272,12 +293,14 @@ class _LoginScreenState extends State<LoginScreen>
                                             keyboardType:
                                                 TextInputType.emailAddress,
                                             validator: _validateEmail,
+                                            fieldHeight: finalCircleSize * 0.09,
+                                            fontSize: finalCircleSize * 0.03,
                                           ),
                                         ),
                                       ),
                                     ),
 
-                                    const SizedBox(height: 8),
+                                    SizedBox(height: finalCircleSize * 0.025),
 
                                     // Password Field
                                     SlideTransition(
@@ -285,19 +308,21 @@ class _LoginScreenState extends State<LoginScreen>
                                       child: FadeTransition(
                                         opacity: _contentAnimation,
                                         child: SizedBox(
-                                          width: 190,
+                                          width: finalCircleSize * 0.55,
                                           child: _buildCompactTextField(
                                             controller: _passwordController,
                                             hintText: 'Enter your password',
                                             icon: Icons.lock_outline,
                                             isPassword: true,
                                             validator: _validatePassword,
+                                            fieldHeight: finalCircleSize * 0.09,
+                                            fontSize: finalCircleSize * 0.03,
                                           ),
                                         ),
                                       ),
                                     ),
 
-                                    const SizedBox(height: 4),
+                                    SizedBox(height: finalCircleSize * 0.015),
 
                                     // Forgot Password
                                     SlideTransition(
@@ -307,12 +332,12 @@ class _LoginScreenState extends State<LoginScreen>
                                         child: Align(
                                           alignment: Alignment.centerRight,
                                           child: Padding(
-                                            padding: const EdgeInsets.only(
-                                              right: 80,
+                                            padding: EdgeInsets.only(
+                                              right: finalCircleSize * 0.225,
                                             ),
                                             child: _AnimatedLink(
                                               text: 'Forgot Password?',
-                                              fontSize: 9,
+                                              fontSize: finalCircleSize * 0.025,
                                               onTap: () {
                                                 Navigator.push(
                                                   context,
@@ -327,7 +352,7 @@ class _LoginScreenState extends State<LoginScreen>
                                       ),
                                     ),
 
-                                    const SizedBox(height: 8),
+                                    SizedBox(height: finalCircleSize * 0.025),
 
                                     // Login Button
                                     SlideTransition(
@@ -335,16 +360,19 @@ class _LoginScreenState extends State<LoginScreen>
                                       child: FadeTransition(
                                         opacity: _contentAnimation,
                                         child: SizedBox(
-                                          width: 190,
+                                          width: finalCircleSize * 0.55,
                                           child: _AnimatedLoginButton(
                                             onPressed: _handleLogin,
                                             isLoading: _isLoading,
+                                            buttonHeight:
+                                                finalCircleSize * 0.12,
+                                            fontSize: finalCircleSize * 0.045,
                                           ),
                                         ),
                                       ),
                                     ),
 
-                                    const SizedBox(height: 8),
+                                    SizedBox(height: finalCircleSize * 0.025),
 
                                     // Create Account Link
                                     SlideTransition(
@@ -353,17 +381,20 @@ class _LoginScreenState extends State<LoginScreen>
                                         opacity: _contentAnimation,
                                         child: Column(
                                           children: [
-                                            const Text(
+                                            Text(
                                               "Don't have an account?",
                                               style: TextStyle(
-                                                color: Color(0xFFF4F4F4),
-                                                fontSize: 11,
+                                                color: const Color(0xFFF4F4F4),
+                                                fontSize:
+                                                    finalCircleSize * 0.03,
                                               ),
                                             ),
-                                            const SizedBox(height: 3),
+                                            SizedBox(
+                                              height: finalCircleSize * 0.008,
+                                            ),
                                             _AnimatedLink(
                                               text: 'Create one here',
-                                              fontSize: 11,
+                                              fontSize: finalCircleSize * 0.032,
                                               onTap: () {
                                                 Navigator.push(
                                                   context,
@@ -402,12 +433,14 @@ class _LoginScreenState extends State<LoginScreen>
     TextInputType? keyboardType,
     bool isPassword = false,
     String? Function(String?)? validator,
+    required double fieldHeight,
+    required double fontSize,
   }) {
     return Container(
-      height: 32,
+      height: fieldHeight,
       decoration: BoxDecoration(
         color: Colors.white.withOpacity(0.98),
-        borderRadius: BorderRadius.circular(16),
+        borderRadius: BorderRadius.circular(fieldHeight / 2),
         boxShadow: [
           BoxShadow(
             color: Colors.black.withOpacity(0.08),
@@ -424,37 +457,44 @@ class _LoginScreenState extends State<LoginScreen>
             ? TextInputAction.done
             : TextInputAction.next,
         validator: validator,
-        style: const TextStyle(
-          color: Color(0xFF333333),
-          fontSize: 10,
+        style: TextStyle(
+          color: const Color(0xFF333333),
+          fontSize: fontSize,
           fontWeight: FontWeight.w500,
         ),
         decoration: InputDecoration(
           hintText: hintText,
           hintStyle: TextStyle(
             color: Colors.grey.shade400,
-            fontSize: 10,
+            fontSize: fontSize,
             fontWeight: FontWeight.w400,
           ),
           prefixIcon: Padding(
-            padding: const EdgeInsets.only(left: 10, right: 6),
-            child: Icon(icon, color: const Color(0xFFDC143C), size: 14),
+            padding: EdgeInsets.only(
+              left: fieldHeight * 0.3,
+              right: fieldHeight * 0.2,
+            ),
+            child: Icon(
+              icon,
+              color: const Color(0xFFDC143C),
+              size: fontSize * 1.4,
+            ),
           ),
-          prefixIconConstraints: const BoxConstraints(
-            minWidth: 30,
-            minHeight: 32,
+          prefixIconConstraints: BoxConstraints(
+            minWidth: fieldHeight * 0.8,
+            minHeight: fieldHeight,
           ),
           suffixIcon: isPassword
               ? Padding(
-                  padding: const EdgeInsets.only(right: 6),
+                  padding: EdgeInsets.only(right: fieldHeight * 0.2),
                   child: IconButton(
-                    iconSize: 14,
+                    iconSize: fontSize * 1.4,
                     icon: Icon(
                       _isPasswordVisible
                           ? Icons.visibility_off_outlined
                           : Icons.visibility_outlined,
                       color: const Color(0xFFDC143C),
-                      size: 14,
+                      size: fontSize * 1.4,
                     ),
                     onPressed: () {
                       setState(() {
@@ -465,14 +505,14 @@ class _LoginScreenState extends State<LoginScreen>
                 )
               : null,
           border: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(16),
+            borderRadius: BorderRadius.circular(fieldHeight / 2),
             borderSide: BorderSide.none,
           ),
           filled: true,
           fillColor: Colors.transparent,
-          contentPadding: const EdgeInsets.symmetric(
-            horizontal: 12,
-            vertical: 6,
+          contentPadding: EdgeInsets.symmetric(
+            horizontal: fieldHeight * 0.3,
+            vertical: fieldHeight * 0.2,
           ),
         ),
       ),
@@ -586,10 +626,14 @@ class _AnimatedBackButtonState extends State<_AnimatedBackButton>
 class _AnimatedLoginButton extends StatefulWidget {
   final VoidCallback onPressed;
   final bool isLoading;
+  final double buttonHeight;
+  final double fontSize;
 
   const _AnimatedLoginButton({
     required this.onPressed,
     required this.isLoading,
+    required this.buttonHeight,
+    required this.fontSize,
   });
 
   @override
@@ -644,14 +688,14 @@ class _AnimatedLoginButtonState extends State<_AnimatedLoginButton>
               scale: _scaleAnimation.value,
               child: Container(
                 width: double.infinity,
-                height: 42,
+                height: widget.buttonHeight,
                 decoration: BoxDecoration(
                   color: widget.isLoading
                       ? Colors.white.withOpacity(0.8)
                       : _isPressed
                       ? const Color(0xFFF8F8F8)
                       : Colors.white,
-                  borderRadius: BorderRadius.circular(21),
+                  borderRadius: BorderRadius.circular(widget.buttonHeight / 2),
                   boxShadow: [
                     BoxShadow(
                       color: Colors.black.withOpacity(0.15),
@@ -662,22 +706,22 @@ class _AnimatedLoginButtonState extends State<_AnimatedLoginButton>
                 ),
                 child: Center(
                   child: widget.isLoading
-                      ? const SizedBox(
-                          width: 20,
-                          height: 20,
-                          child: CircularProgressIndicator(
+                      ? SizedBox(
+                          width: widget.fontSize * 1.2,
+                          height: widget.fontSize * 1.2,
+                          child: const CircularProgressIndicator(
                             strokeWidth: 2.0,
                             valueColor: AlwaysStoppedAnimation<Color>(
                               Color(0xFFDC143C),
                             ),
                           ),
                         )
-                      : const Text(
+                      : Text(
                           'Sign In',
                           style: TextStyle(
-                            fontSize: 16,
+                            fontSize: widget.fontSize,
                             fontWeight: FontWeight.w600,
-                            color: Color(0xFFDC143C),
+                            color: const Color(0xFFDC143C),
                           ),
                         ),
                 ),

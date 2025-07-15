@@ -232,7 +232,7 @@ class _ReservationScreenState extends State<ReservationScreen>
                     Text(
                       'Authentic Bangladeshi Cuisine',
                       style: TextStyle(
-                        fontSize: 10.5,
+                        fontSize: 11.5,
                         color: Color(0xFFF8F9FA),
                         fontWeight: FontWeight.w400,
                         letterSpacing: 0.3,

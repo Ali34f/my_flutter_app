@@ -446,6 +446,19 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
     String curryType,
     String category,
   ) {
+    if (category.toLowerCase().contains('curries')) {
+      return [
+        {'name': 'Chicken', 'price': 11.50, 'spiceLevel': 'mild'},
+        {'name': 'Lamb', 'price': 12.50, 'spiceLevel': 'mild'},
+      ];
+    }
+
+    if (category.toLowerCase().contains('seafood')) {
+      return [
+        {'name': 'Prawn', 'price': 12.50, 'spiceLevel': 'mild'},
+        {'name': 'King Prawn', 'price': 18.95, 'spiceLevel': 'mild'},
+      ];
+    }
     final items = MenuService.getItemsByCategory(category);
     final proteins = <Map<String, dynamic>>[];
 
@@ -947,23 +960,23 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                               Row(
                                 children: [
                                   Container(
-                                    width: 60,
-                                    height: 60,
+                                    width: 100,
+                                    height: 100,
                                     decoration: BoxDecoration(
-                                      gradient: const LinearGradient(
-                                        colors: [
-                                          Color(0xFFDC143C),
-                                          Color(0xFFE74C3C),
-                                        ],
-                                      ),
                                       borderRadius: BorderRadius.circular(15),
+                                      border: Border.all(
+                                        color: const Color(
+                                          0xFFDC143C,
+                                        ).withOpacity(0.2),
+                                        width: 1,
+                                      ),
                                     ),
-                                    child: const Icon(
-                                      Icons.restaurant,
-                                      color: Colors.white,
-                                      size: 30,
+                                    child: ClipRRect(
+                                      borderRadius: BorderRadius.circular(14),
+                                      child: _buildCurryPopupImage(curryType),
                                     ),
                                   ),
+
                                   const SizedBox(width: 16),
                                   Expanded(
                                     child: Column(
@@ -1169,6 +1182,53 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
           },
         );
       },
+    );
+  }
+
+  Widget _buildCurryPopupImage(String curryType) {
+    print('🔍 CURRY POPUP IMAGE: curryType="$curryType"');
+
+    final items = MenuService.getItemsByCategory('Curries');
+    String? imageUrl;
+
+    // Find the image for this curry type
+    for (final item in items) {
+      print('🔍 Popup checking: "${item.name}" vs "$curryType"');
+      if (item.name.toLowerCase().trim() == curryType.toLowerCase().trim()) {
+        imageUrl = item.imageUrl;
+        print('🔍 POPUP IMAGE FOUND! Using: $imageUrl');
+        break;
+      }
+    }
+
+    if (imageUrl != null && imageUrl.isNotEmpty) {
+      return Image.asset(
+        imageUrl, // This will be dynamic like 'assets/images/korma_.jpg'
+        width: 100,
+        height: 100,
+        fit: BoxFit.cover,
+        errorBuilder: (context, error, stackTrace) {
+          print('🔍 POPUP IMAGE FAILED: $error');
+          return Container(
+            width: 100,
+            height: 100,
+            color: Colors.grey[200],
+            child: const Icon(
+              Icons.restaurant,
+              size: 40,
+              color: Color(0xFFDC143C),
+            ),
+          );
+        },
+      );
+    }
+
+    print('🔍 NO IMAGE FOUND for curryType: $curryType');
+    return Container(
+      width: 100,
+      height: 100,
+      color: Colors.grey[200],
+      child: const Icon(Icons.restaurant, size: 40, color: Color(0xFFDC143C)),
     );
   }
 
@@ -1564,16 +1624,6 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                                     width: double.infinity,
                                     height: 200,
                                     decoration: BoxDecoration(
-                                      gradient: LinearGradient(
-                                        colors: [
-                                          const Color(
-                                            0xFFDC143C,
-                                          ).withOpacity(0.1),
-                                          const Color(
-                                            0xFFDC143C,
-                                          ).withOpacity(0.05),
-                                        ],
-                                      ),
                                       borderRadius: BorderRadius.circular(20),
                                       border: Border.all(
                                         color: const Color(
@@ -1582,27 +1632,12 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                                         width: 1,
                                       ),
                                     ),
-                                    child: Column(
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.center,
-                                      children: [
-                                        Icon(
-                                          categoryIcons[categories.indexOf(
-                                                category,
-                                              ) %
-                                              categoryIcons.length],
-                                          color: const Color(0xFFDC143C),
-                                          size: 60,
-                                        ),
-                                        const SizedBox(height: 12),
-                                        const Text(
-                                          'Image coming soon',
-                                          style: TextStyle(
-                                            color: Color(0xFF7F8C8D),
-                                            fontSize: 14,
-                                          ),
-                                        ),
-                                      ],
+                                    child: ClipRRect(
+                                      borderRadius: BorderRadius.circular(19),
+                                      child: _buildDetailedItemImage(
+                                        name,
+                                        category,
+                                      ),
                                     ),
                                   ),
                                   // Veg/Non-veg indicator
@@ -2029,6 +2064,131 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
       default:
         return [const Color(0xFF27AE60), const Color(0xFF2ECC71)];
     }
+  }
+
+  Widget _buildMenuItemImage(String name, String category) {
+    final items = MenuService.getItemsByCategory(category);
+    String? imageUrl;
+
+    // For curries, get the exact image URL from Excel
+    if (category.toLowerCase().contains('curries')) {
+      for (final item in items) {
+        if (item.name.toLowerCase().trim() == name.toLowerCase().trim()) {
+          imageUrl = item.imageUrl;
+          break;
+        }
+      }
+    } else {
+      // For other categories, exact name match
+      for (final item in items) {
+        if (item.name.toLowerCase().trim() == name.toLowerCase().trim()) {
+          imageUrl = item.imageUrl;
+          break;
+        }
+      }
+    }
+
+    // If we have an image URL, display it
+    if (imageUrl != null && imageUrl.isNotEmpty) {
+      return Image.asset(
+        imageUrl,
+        width: 80,
+        height: 80,
+        fit: BoxFit.cover,
+        errorBuilder: (context, error, stackTrace) {
+          return _buildFallbackIcon(category);
+        },
+      );
+    }
+
+    // Fallback to icon if no image
+    return _buildFallbackIcon(category);
+  }
+
+  Widget _buildFallbackIcon(String category) {
+    return Container(
+      width: 80,
+      height: 80,
+      decoration: BoxDecoration(
+        gradient: LinearGradient(
+          colors: [
+            const Color(0xFFDC143C).withOpacity(0.1),
+            const Color(0xFFDC143C).withOpacity(0.05),
+          ],
+        ),
+        borderRadius: BorderRadius.circular(15),
+      ),
+      child: Icon(
+        categoryIcons[categories.indexOf(category) % categoryIcons.length],
+        color: const Color(0xFFDC143C),
+        size: 40,
+      ),
+    );
+  }
+
+  Widget _buildDetailedItemImage(String name, String category) {
+    final items = MenuService.getItemsByCategory(category);
+    String? imageUrl;
+
+    // For curries, use the exact image path from Excel
+    if (category.toLowerCase().contains('curries')) {
+      // Find the exact item in Excel to get the correct image path
+      for (final item in items) {
+        if (item.name.toLowerCase().trim() == name.toLowerCase().trim()) {
+          imageUrl = item.imageUrl;
+          break;
+        }
+      }
+    } else {
+      // For all other categories, exact name match
+      for (final item in items) {
+        if (item.name.toLowerCase().trim() == name.toLowerCase().trim()) {
+          imageUrl = item.imageUrl;
+          break;
+        }
+      }
+    }
+
+    if (imageUrl != null && imageUrl.isNotEmpty) {
+      return Image.asset(
+        imageUrl,
+        width: double.infinity,
+        height: 200,
+        fit: BoxFit.cover,
+        errorBuilder: (context, error, stackTrace) {
+          return _buildImageFallback();
+        },
+      );
+    }
+
+    return _buildImageFallback();
+  }
+
+  Widget _buildImageFallback() {
+    return Container(
+      width: double.infinity,
+      height: 200,
+      decoration: BoxDecoration(
+        gradient: LinearGradient(
+          colors: [
+            const Color(0xFFDC143C).withOpacity(0.1),
+            const Color(0xFFDC143C).withOpacity(0.05),
+          ],
+        ),
+      ),
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Icon(Icons.restaurant, color: const Color(0xFFDC143C), size: 60),
+          const SizedBox(height: 12),
+          const Text(
+            'Image coming soon',
+            style: TextStyle(color: Color(0xFF7F8C8D), fontSize: 14),
+            textAlign: TextAlign.center,
+          ),
+        ],
+      ),
+    );
   }
 
   @override
@@ -2500,23 +2660,22 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                         width: 80,
                         height: 80,
                         decoration: BoxDecoration(
-                          gradient: LinearGradient(
-                            colors: [
-                              const Color(0xFFDC143C).withOpacity(0.1),
-                              const Color(0xFFDC143C).withOpacity(0.05),
-                            ],
-                          ),
                           borderRadius: BorderRadius.circular(15),
                           border: Border.all(
                             color: const Color(0xFFDC143C).withOpacity(0.2),
                             width: 1,
                           ),
+                          boxShadow: [
+                            BoxShadow(
+                              color: Colors.black.withOpacity(0.1),
+                              blurRadius: 8,
+                              offset: const Offset(0, 2),
+                            ),
+                          ],
                         ),
-                        child: Icon(
-                          categoryIcons[categories.indexOf(category) %
-                              categoryIcons.length],
-                          color: const Color(0xFFDC143C),
-                          size: 40,
+                        child: ClipRRect(
+                          borderRadius: BorderRadius.circular(14),
+                          child: _buildMenuItemImage(name, category),
                         ),
                       ),
                       // Veg/Non-veg indicator
