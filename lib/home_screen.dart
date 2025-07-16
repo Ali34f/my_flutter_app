@@ -74,6 +74,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
       setState(() {
         categories = MenuService.getCategories();
         _isLoading = false;
+        _debugCurryImages();
         _tabController = TabController(length: categories.length, vsync: this);
         _tabController.addListener(() {
           setState(() {});
@@ -1191,19 +1192,43 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
     final items = MenuService.getItemsByCategory('Curries');
     String? imageUrl;
 
-    // Find the image for this curry type
+    // Find the first available image for this curry type
+    // First try to find exact match
     for (final item in items) {
-      print('🔍 Popup checking: "${item.name}" vs "$curryType"');
       if (item.name.toLowerCase().trim() == curryType.toLowerCase().trim()) {
         imageUrl = item.imageUrl;
-        print('🔍 POPUP IMAGE FOUND! Using: $imageUrl');
+        print('🔍 EXACT MATCH FOUND! Using: $imageUrl');
         break;
+      }
+    }
+
+    // If no exact match, find first item containing this curry type
+    if (imageUrl == null || imageUrl.isEmpty) {
+      for (final item in items) {
+        final extractedType = _extractCurryType(item.name);
+        if (extractedType.toLowerCase().trim() ==
+            curryType.toLowerCase().trim()) {
+          imageUrl = item.imageUrl;
+          print('🔍 CURRY TYPE MATCH FOUND! Using: $imageUrl');
+          break;
+        }
+      }
+    }
+
+    // If still no match, try to find any curry with this name in it
+    if (imageUrl == null || imageUrl.isEmpty) {
+      for (final item in items) {
+        if (item.name.toLowerCase().contains(curryType.toLowerCase())) {
+          imageUrl = item.imageUrl;
+          print('🔍 PARTIAL MATCH FOUND! Using: $imageUrl');
+          break;
+        }
       }
     }
 
     if (imageUrl != null && imageUrl.isNotEmpty) {
       return Image.asset(
-        imageUrl, // This will be dynamic like 'assets/images/korma_.jpg'
+        imageUrl,
         width: 100,
         height: 100,
         fit: BoxFit.cover,
@@ -1230,6 +1255,20 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
       color: Colors.grey[200],
       child: const Icon(Icons.restaurant, size: 40, color: Color(0xFFDC143C)),
     );
+  }
+
+  // Debug method to understand curry data structure
+  void _debugCurryImages() {
+    print('🔍 === DEBUGGING CURRY IMAGES ===');
+    final items = MenuService.getItemsByCategory('Curries');
+
+    for (final item in items) {
+      print(
+        '🔍 Item: "${item.name}" | Image: "${item.imageUrl}" | Type: "${_extractCurryType(item.name)}"',
+      );
+    }
+
+    print('🔍 === END DEBUG ===');
   }
 
   Widget _buildCurrySelectionSection(
@@ -2070,16 +2109,69 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
     final items = MenuService.getItemsByCategory(category);
     String? imageUrl;
 
-    // For curries, get the exact image URL from Excel
+    // For curries, find the first available image for this curry type
     if (category.toLowerCase().contains('curries')) {
+      // First try to find exact match
       for (final item in items) {
         if (item.name.toLowerCase().trim() == name.toLowerCase().trim()) {
           imageUrl = item.imageUrl;
           break;
         }
       }
+
+      // If no exact match, find first item containing this curry type
+      if (imageUrl == null || imageUrl.isEmpty) {
+        for (final item in items) {
+          final extractedType = _extractCurryType(item.name);
+          if (extractedType.toLowerCase().trim() == name.toLowerCase().trim()) {
+            imageUrl = item.imageUrl;
+            break;
+          }
+        }
+      }
+
+      // If still no match, try to find any curry with this name in it
+      if (imageUrl == null || imageUrl.isEmpty) {
+        for (final item in items) {
+          if (item.name.toLowerCase().contains(name.toLowerCase())) {
+            imageUrl = item.imageUrl;
+            break;
+          }
+        }
+      }
+    }
+    // For House Specials, similar logic
+    else if (category.toLowerCase().contains('house specials')) {
+      // First try exact match
+      for (final item in items) {
+        if (item.name.toLowerCase().trim() == name.toLowerCase().trim()) {
+          imageUrl = item.imageUrl;
+          break;
+        }
+      }
+
+      // If no exact match, find first item containing this curry type
+      if (imageUrl == null || imageUrl.isEmpty) {
+        for (final item in items) {
+          final extractedType = _extractCurryType(item.name);
+          if (extractedType.toLowerCase().trim() == name.toLowerCase().trim()) {
+            imageUrl = item.imageUrl;
+            break;
+          }
+        }
+      }
+
+      // If still no match, try to find any item with this name in it
+      if (imageUrl == null || imageUrl.isEmpty) {
+        for (final item in items) {
+          if (item.name.toLowerCase().contains(name.toLowerCase())) {
+            imageUrl = item.imageUrl;
+            break;
+          }
+        }
+      }
     } else {
-      // For other categories, exact name match
+      // For all other categories, exact name match
       for (final item in items) {
         if (item.name.toLowerCase().trim() == name.toLowerCase().trim()) {
           imageUrl = item.imageUrl;
@@ -2096,6 +2188,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
         height: 80,
         fit: BoxFit.cover,
         errorBuilder: (context, error, stackTrace) {
+          print('🔍 IMAGE LOAD ERROR for $name: $error');
           return _buildFallbackIcon(category);
         },
       );
@@ -2130,13 +2223,65 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
     final items = MenuService.getItemsByCategory(category);
     String? imageUrl;
 
-    // For curries, use the exact image path from Excel
+    // For curries, find the first available image for this curry type
     if (category.toLowerCase().contains('curries')) {
-      // Find the exact item in Excel to get the correct image path
+      // First try to find exact match
       for (final item in items) {
         if (item.name.toLowerCase().trim() == name.toLowerCase().trim()) {
           imageUrl = item.imageUrl;
           break;
+        }
+      }
+
+      // If no exact match, find first item containing this curry type
+      if (imageUrl == null || imageUrl.isEmpty) {
+        for (final item in items) {
+          final extractedType = _extractCurryType(item.name);
+          if (extractedType.toLowerCase().trim() == name.toLowerCase().trim()) {
+            imageUrl = item.imageUrl;
+            break;
+          }
+        }
+      }
+
+      // If still no match, try to find any curry with this name in it
+      if (imageUrl == null || imageUrl.isEmpty) {
+        for (final item in items) {
+          if (item.name.toLowerCase().contains(name.toLowerCase())) {
+            imageUrl = item.imageUrl;
+            break;
+          }
+        }
+      }
+    }
+    // For House Specials, similar logic
+    else if (category.toLowerCase().contains('house specials')) {
+      // First try exact match
+      for (final item in items) {
+        if (item.name.toLowerCase().trim() == name.toLowerCase().trim()) {
+          imageUrl = item.imageUrl;
+          break;
+        }
+      }
+
+      // If no exact match, find first item containing this curry type
+      if (imageUrl == null || imageUrl.isEmpty) {
+        for (final item in items) {
+          final extractedType = _extractCurryType(item.name);
+          if (extractedType.toLowerCase().trim() == name.toLowerCase().trim()) {
+            imageUrl = item.imageUrl;
+            break;
+          }
+        }
+      }
+
+      // If still no match, try to find any item with this name in it
+      if (imageUrl == null || imageUrl.isEmpty) {
+        for (final item in items) {
+          if (item.name.toLowerCase().contains(name.toLowerCase())) {
+            imageUrl = item.imageUrl;
+            break;
+          }
         }
       }
     } else {
@@ -2156,6 +2301,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
         height: 200,
         fit: BoxFit.cover,
         errorBuilder: (context, error, stackTrace) {
+          print('🔍 DETAILED IMAGE LOAD ERROR for $name: $error');
           return _buildImageFallback();
         },
       );
