@@ -89,6 +89,32 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
     }
   }
 
+  // Debug method to understand curry data structure
+  void _debugCurryImages() {
+    print('🔍 === DEBUGGING CURRY IMAGES ===');
+    final items = MenuService.getItemsByCategory('Curries');
+
+    print('🔍 ALL CURRY ITEMS:');
+    for (final item in items) {
+      print('  - Name: "${item.name}" | Image: "${item.imageUrl}"');
+    }
+
+    print('🔍 TESTING CURRY TYPE EXTRACTION:');
+    final testItems = [
+      'Chicken Curry',
+      'Lamb Curry',
+      'Chicken Korma',
+      'Lamb Korma',
+      'Chicken Madras',
+    ];
+    for (final testName in testItems) {
+      final extracted = _extractCurryType(testName);
+      print('  - "$testName" -> extracted: "$extracted"');
+    }
+
+    print('🔍 === END DEBUG ===');
+  }
+
   @override
   void dispose() {
     if (!_isLoading && categories.isNotEmpty) {
@@ -136,7 +162,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
     return 'User';
   }
 
-  /// Gets the welcome message for the current user
+  /// Get the welcome message for the current user on the app
   String _getWelcomeMessage() {
     final User? currentUser = FirebaseAuth.instance.currentUser;
 
@@ -1192,41 +1218,44 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
     final items = MenuService.getItemsByCategory('Curries');
     String? imageUrl;
 
-    // Find the first available image for this curry type
-    // First try to find exact match
+    // For the curry selection popup, find the chicken version first
+    // Try to find "Chicken [CurryType]" first
+    String targetName = 'Chicken $curryType';
+
     for (final item in items) {
-      if (item.name.toLowerCase().trim() == curryType.toLowerCase().trim()) {
+      if (item.name.toLowerCase().trim() == targetName.toLowerCase().trim()) {
         imageUrl = item.imageUrl;
-        print('🔍 EXACT MATCH FOUND! Using: $imageUrl');
+        print('🔍 POPUP - FOUND CHICKEN CURRY: ${item.name} -> $imageUrl');
         break;
       }
     }
 
-    // If no exact match, find first item containing this curry type
+    // If no chicken version, try lamb
     if (imageUrl == null || imageUrl.isEmpty) {
+      targetName = 'Lamb $curryType';
       for (final item in items) {
-        final extractedType = _extractCurryType(item.name);
-        if (extractedType.toLowerCase().trim() ==
-            curryType.toLowerCase().trim()) {
+        if (item.name.toLowerCase().trim() == targetName.toLowerCase().trim()) {
           imageUrl = item.imageUrl;
-          print('🔍 CURRY TYPE MATCH FOUND! Using: $imageUrl');
+          print('🔍 POPUP - FOUND LAMB CURRY: ${item.name} -> $imageUrl');
           break;
         }
       }
     }
 
-    // If still no match, try to find any curry with this name in it
+    // Last resort: find any curry ending with this name
     if (imageUrl == null || imageUrl.isEmpty) {
       for (final item in items) {
-        if (item.name.toLowerCase().contains(curryType.toLowerCase())) {
+        if (item.name.toLowerCase().endsWith(curryType.toLowerCase())) {
           imageUrl = item.imageUrl;
-          print('🔍 PARTIAL MATCH FOUND! Using: $imageUrl');
+          print('🔍 POPUP - FOUND ANY CURRY: ${item.name} -> $imageUrl');
           break;
         }
       }
     }
 
     if (imageUrl != null && imageUrl.isNotEmpty) {
+      print('🔍 POPUP - USING IMAGE PATH: $imageUrl');
+
       return Image.asset(
         imageUrl,
         width: 100,
@@ -1248,27 +1277,13 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
       );
     }
 
-    print('🔍 NO IMAGE FOUND for curryType: $curryType');
+    print('🔍 POPUP - NO IMAGE FOUND for curryType: $curryType');
     return Container(
       width: 100,
       height: 100,
       color: Colors.grey[200],
       child: const Icon(Icons.restaurant, size: 40, color: Color(0xFFDC143C)),
     );
-  }
-
-  // Debug method to understand curry data structure
-  void _debugCurryImages() {
-    print('🔍 === DEBUGGING CURRY IMAGES ===');
-    final items = MenuService.getItemsByCategory('Curries');
-
-    for (final item in items) {
-      print(
-        '🔍 Item: "${item.name}" | Image: "${item.imageUrl}" | Type: "${_extractCurryType(item.name)}"',
-      );
-    }
-
-    print('🔍 === END DEBUG ===');
   }
 
   Widget _buildCurrySelectionSection(
