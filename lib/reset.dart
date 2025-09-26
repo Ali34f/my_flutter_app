@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'login.dart';
 
 class ResetScreen extends StatefulWidget {
@@ -13,6 +14,7 @@ class _ResetScreenState extends State<ResetScreen>
     with TickerProviderStateMixin {
   final _formKey = GlobalKey<FormState>();
   final _emailController = TextEditingController();
+  final FirebaseAuth _auth = FirebaseAuth.instance;
 
   late AnimationController _circleController;
   late AnimationController _contentController;
@@ -22,6 +24,7 @@ class _ResetScreenState extends State<ResetScreen>
 
   bool _isEmailSent = false;
   bool _isLoading = false;
+  String _errorMessage = '';
 
   @override
   void initState() {
@@ -77,38 +80,106 @@ class _ResetScreenState extends State<ResetScreen>
     if (_formKey.currentState!.validate()) {
       setState(() {
         _isLoading = true;
+        _errorMessage = '';
       });
 
       // Add haptic feedback
       HapticFeedback.lightImpact();
 
-      // Simulate email sending process
-      await Future.delayed(const Duration(seconds: 2));
+      try {
+        // Send password reset email using Firebase Auth
+        await _auth.sendPasswordResetEmail(email: _emailController.text.trim());
 
-      setState(() {
-        _isLoading = false;
-        _isEmailSent = true;
-      });
+        setState(() {
+          _isLoading = false;
+          _isEmailSent = true;
+        });
 
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: const Text(
-              'Password reset email sent! Check your inbox.',
-              style: TextStyle(
-                color: Colors.white,
-                fontWeight: FontWeight.w500,
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: const Text(
+                'Password reset email sent! Check your inbox.',
+                style: TextStyle(
+                  color: Colors.white,
+                  fontWeight: FontWeight.w500,
+                ),
+              ),
+              backgroundColor: const Color(0xFFDC143C),
+              duration: const Duration(seconds: 3),
+              behavior: SnackBarBehavior.floating,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(12),
               ),
             ),
-            backgroundColor: const Color(0xFFDC143C),
-            duration: const Duration(seconds: 3),
-            behavior: SnackBarBehavior.floating,
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(12),
+          );
+        }
+      } on FirebaseAuthException catch (e) {
+        setState(() {
+          _isLoading = false;
+          _errorMessage = _getErrorMessage(e.code);
+        });
+
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text(
+                _errorMessage,
+                style: const TextStyle(
+                  color: Colors.white,
+                  fontWeight: FontWeight.w500,
+                ),
+              ),
+              backgroundColor: Colors.red.shade600,
+              duration: const Duration(seconds: 4),
+              behavior: SnackBarBehavior.floating,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(12),
+              ),
             ),
-          ),
-        );
+          );
+        }
+      } catch (e) {
+        setState(() {
+          _isLoading = false;
+          _errorMessage = 'An unexpected error occurred. Please try again.';
+        });
+
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text(
+                _errorMessage,
+                style: const TextStyle(
+                  color: Colors.white,
+                  fontWeight: FontWeight.w500,
+                ),
+              ),
+              backgroundColor: Colors.red.shade600,
+              duration: const Duration(seconds: 4),
+              behavior: SnackBarBehavior.floating,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(12),
+              ),
+            ),
+          );
+        }
       }
+    }
+  }
+
+  String _getErrorMessage(String errorCode) {
+    switch (errorCode) {
+      case 'user-not-found':
+        return 'No user found with this email address.';
+      case 'invalid-email':
+        return 'Please enter a valid email address.';
+      case 'too-many-requests':
+        return 'Too many attempts. Please try again later.';
+      case 'network-request-failed':
+        return 'Network error. Please check your connection.';
+      default:
+        return 'Failed to send reset email. Please try again.';
     }
   }
 

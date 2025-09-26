@@ -108,7 +108,7 @@ class _InfoScreenState extends State<InfoScreen> with TickerProviderStateMixin {
   Future<void> _sendEmail() async {
     final Uri launchUri = Uri(
       scheme: 'mailto',
-      path: 'info@tandoorinights.com',
+      path: 'tandoorinightsinfo@gmail.com',
       query: 'subject=Inquiry about Tandoori Nights',
     );
 
@@ -408,7 +408,7 @@ class _InfoScreenState extends State<InfoScreen> with TickerProviderStateMixin {
           _buildInfoItem(
             icon: Icons.email,
             title: 'Email',
-            subtitle: 'info@tandoorinights.com',
+            subtitle: 'tandoorinightsinfo@gmail.com',
             iconColor: const Color(0xFFF39C12),
             onTap: _sendEmail,
           ),

@@ -74,7 +74,6 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
       setState(() {
         categories = MenuService.getCategories();
         _isLoading = false;
-        _debugCurryImages();
         _tabController = TabController(length: categories.length, vsync: this);
         _tabController.addListener(() {
           setState(() {});
@@ -87,32 +86,6 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
         categories = [];
       });
     }
-  }
-
-  // Debug method to understand curry data structure
-  void _debugCurryImages() {
-    print('🔍 === DEBUGGING CURRY IMAGES ===');
-    final items = MenuService.getItemsByCategory('Curries');
-
-    print('🔍 ALL CURRY ITEMS:');
-    for (final item in items) {
-      print('  - Name: "${item.name}" | Image: "${item.imageUrl}"');
-    }
-
-    print('🔍 TESTING CURRY TYPE EXTRACTION:');
-    final testItems = [
-      'Chicken Curry',
-      'Lamb Curry',
-      'Chicken Korma',
-      'Lamb Korma',
-      'Chicken Madras',
-    ];
-    for (final testName in testItems) {
-      final extracted = _extractCurryType(testName);
-      print('  - "$testName" -> extracted: "$extracted"');
-    }
-
-    print('🔍 === END DEBUG ===');
   }
 
   @override
@@ -419,7 +392,8 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
         !category.toLowerCase().contains('curry') &&
         !category.toLowerCase().contains('house specials') &&
         !category.toLowerCase().contains('vegetarian') &&
-        !category.toLowerCase().contains('balti')) {
+        !category.toLowerCase().contains('balti') &&
+        !category.toLowerCase().contains('tandoori')) {
       return false;
     }
 
@@ -473,6 +447,36 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
     String curryType,
     String category,
   ) {
+    // Special handling for Tandoori - return actual item details
+    if (category.toLowerCase().contains('tandoori')) {
+      final tandooriItems = MenuService.getItemsByCategory('Tandoori');
+
+      // Find the specific tandoori item
+      for (final item in tandooriItems) {
+        if (item.name.toLowerCase().contains(curryType.toLowerCase())) {
+          return [
+            {
+              'name': item.name,
+              'price': item.price,
+              'spiceLevel': item.spiceLevel ?? 'mild',
+            },
+          ];
+        }
+      }
+
+      // Fallback: return first tandoori item
+      if (tandooriItems.isNotEmpty) {
+        final item = tandooriItems.first;
+        return [
+          {
+            'name': item.name,
+            'price': item.price,
+            'spiceLevel': item.spiceLevel ?? 'mild',
+          },
+        ];
+      }
+    }
+
     if (category.toLowerCase().contains('curries')) {
       return [
         {'name': 'Chicken', 'price': 11.50, 'spiceLevel': 'mild'},
@@ -486,6 +490,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
         {'name': 'King Prawn', 'price': 18.95, 'spiceLevel': 'mild'},
       ];
     }
+
     final items = MenuService.getItemsByCategory(category);
     final proteins = <Map<String, dynamic>>[];
 
@@ -941,7 +946,11 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
       builder: (BuildContext context) {
         return StatefulBuilder(
           builder: (context, setModalState) {
-            bool canAddToCart = selectedProtein != null && selectedSide != null;
+            bool canAddToCart = category.toLowerCase().contains('tandoori')
+                ? selectedSide !=
+                      null // Tandoori only needs side
+                : selectedProtein != null &&
+                      selectedSide != null; // Others need both
             double sidePrice = selectedSide != null
                 ? sideOptions.firstWhere(
                         (s) => s['name'] == selectedSide,
@@ -983,54 +992,135 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              // Curry Header
-                              Row(
-                                children: [
-                                  Container(
-                                    width: 100,
-                                    height: 100,
-                                    decoration: BoxDecoration(
-                                      borderRadius: BorderRadius.circular(15),
-                                      border: Border.all(
-                                        color: const Color(
-                                          0xFFDC143C,
-                                        ).withOpacity(0.2),
-                                        width: 1,
+                              // Full-width image for Tandoori, Row layout for others
+                              if (category.toLowerCase().contains(
+                                'tandoori',
+                              )) ...[
+                                // Full-width curry image (same as normal details)
+                                Stack(
+                                  children: [
+                                    Container(
+                                      width: double.infinity,
+                                      height: 200,
+                                      decoration: BoxDecoration(
+                                        borderRadius: BorderRadius.circular(20),
+                                        border: Border.all(
+                                          color: const Color(
+                                            0xFFDC143C,
+                                          ).withOpacity(0.2),
+                                          width: 1,
+                                        ),
+                                      ),
+                                      child: ClipRRect(
+                                        borderRadius: BorderRadius.circular(19),
+                                        child: _buildCurryPopupImage(curryType),
                                       ),
                                     ),
-                                    child: ClipRRect(
-                                      borderRadius: BorderRadius.circular(14),
-                                      child: _buildCurryPopupImage(curryType),
-                                    ),
-                                  ),
-
-                                  const SizedBox(width: 16),
-                                  Expanded(
-                                    child: Column(
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.start,
-                                      children: [
-                                        Text(
-                                          _capitalizeFirst(curryType),
-                                          style: const TextStyle(
-                                            fontSize: 24,
-                                            fontWeight: FontWeight.w800,
-                                            color: Color(0xFF2C3E50),
+                                    // Veg indicator
+                                    Positioned(
+                                      top: 16,
+                                      right: 16,
+                                      child: Container(
+                                        padding: const EdgeInsets.symmetric(
+                                          horizontal: 10,
+                                          vertical: 4,
+                                        ),
+                                        decoration: BoxDecoration(
+                                          color: Colors.green,
+                                          borderRadius: BorderRadius.circular(
+                                            15,
                                           ),
                                         ),
-                                        const SizedBox(height: 4),
-                                        const Text(
-                                          'Choose your curry and side',
-                                          style: TextStyle(
-                                            fontSize: 14,
-                                            color: Color(0xFF7F8C8D),
-                                          ),
+                                        child: const Row(
+                                          mainAxisSize: MainAxisSize.min,
+                                          children: [
+                                            Icon(
+                                              Icons.eco,
+                                              color: Colors.white,
+                                              size: 14,
+                                            ),
+                                            SizedBox(width: 4),
+                                            Text(
+                                              'VEG',
+                                              style: TextStyle(
+                                                color: Colors.white,
+                                                fontSize: 10,
+                                                fontWeight: FontWeight.w700,
+                                              ),
+                                            ),
+                                          ],
                                         ),
-                                      ],
+                                      ),
                                     ),
+                                  ],
+                                ),
+                                const SizedBox(height: 20),
+                                // Curry title below image
+                                Text(
+                                  _capitalizeFirst(curryType),
+                                  style: const TextStyle(
+                                    fontSize: 24,
+                                    fontWeight: FontWeight.w800,
+                                    color: Color(0xFF2C3E50),
                                   ),
-                                ],
-                              ),
+                                ),
+                                const SizedBox(height: 4),
+                                const Text(
+                                  'Choose your side',
+                                  style: TextStyle(
+                                    fontSize: 14,
+                                    color: Color(0xFF7F8C8D),
+                                  ),
+                                ),
+                              ] else ...[
+                                // Original row layout for other categories
+                                Row(
+                                  children: [
+                                    Container(
+                                      width: 100,
+                                      height: 100,
+                                      decoration: BoxDecoration(
+                                        borderRadius: BorderRadius.circular(15),
+                                        border: Border.all(
+                                          color: const Color(
+                                            0xFFDC143C,
+                                          ).withOpacity(0.2),
+                                          width: 1,
+                                        ),
+                                      ),
+                                      child: ClipRRect(
+                                        borderRadius: BorderRadius.circular(14),
+                                        child: _buildCurryPopupImage(curryType),
+                                      ),
+                                    ),
+                                    const SizedBox(width: 16),
+                                    Expanded(
+                                      child: Column(
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.start,
+                                        children: [
+                                          Text(
+                                            _capitalizeFirst(curryType),
+                                            style: const TextStyle(
+                                              fontSize: 24,
+                                              fontWeight: FontWeight.w800,
+                                              color: Color(0xFF2C3E50),
+                                            ),
+                                          ),
+                                          const SizedBox(height: 4),
+                                          const Text(
+                                            'Choose your curry and side',
+                                            style: TextStyle(
+                                              fontSize: 14,
+                                              color: Color(0xFF7F8C8D),
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ],
 
                               const SizedBox(height: 24),
 
@@ -1046,27 +1136,30 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                                 const SizedBox(height: 24),
                               ],
 
-                              // Choose Curry
-                              _buildCurrySelectionSection(
-                                'Choose Your Curry',
-                                Icons.restaurant,
-                                availableProteins,
-                                selectedProtein,
-                                (String name) {
-                                  setModalState(() {
-                                    selectedProtein = name;
-                                    final protein = availableProteins
-                                        .firstWhere((p) => p['name'] == name);
-                                    selectedProteinPrice =
-                                        protein['price'] as double;
-                                    selectedSpiceLevel =
-                                        protein['spiceLevel'] as String;
-                                  });
-                                },
-                                showPrice: true,
-                              ),
-
-                              const SizedBox(height: 20),
+                              // Choose Curry (Skip for Tandoori)
+                              if (!category.toLowerCase().contains(
+                                'tandoori',
+                              )) ...[
+                                _buildCurrySelectionSection(
+                                  'Choose Your Curry',
+                                  Icons.restaurant,
+                                  availableProteins,
+                                  selectedProtein,
+                                  (String name) {
+                                    setModalState(() {
+                                      selectedProtein = name;
+                                      final protein = availableProteins
+                                          .firstWhere((p) => p['name'] == name);
+                                      selectedProteinPrice =
+                                          protein['price'] as double;
+                                      selectedSpiceLevel =
+                                          protein['spiceLevel'] as String;
+                                    });
+                                  },
+                                  showPrice: true,
+                                ),
+                                const SizedBox(height: 20),
+                              ],
 
                               // Step 2: Choose Side
                               _buildCurrySelectionSection(
@@ -1113,6 +1206,14 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                                         'Protein:',
                                         '$selectedProtein $curryType',
                                         selectedProteinPrice,
+                                      )
+                                    else if (category.toLowerCase().contains(
+                                      'tandoori',
+                                    ))
+                                      _buildSummaryItem(
+                                        'Dish:',
+                                        curryType,
+                                        0.0,
                                       ),
                                     if (selectedSide != null)
                                       _buildSummaryItem(
@@ -1157,13 +1258,47 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                                   onPressed: canAddToCart
                                       ? () {
                                           Navigator.pop(context);
-                                          _addCurryDishToCart(
-                                            curryType,
-                                            selectedProtein!,
-                                            selectedSide!,
-                                            totalPrice,
-                                            selectedSpiceLevel,
-                                          );
+                                          if (category.toLowerCase().contains(
+                                            'tandoori',
+                                          )) {
+                                            // Get the actual tandoori item details
+                                            final tandooriItems =
+                                                MenuService.getItemsByCategory(
+                                                  'Tandoori',
+                                                );
+                                            double actualPrice =
+                                                16.50; // Default fallback
+                                            String actualSpiceLevel = 'mild';
+
+                                            for (final item in tandooriItems) {
+                                              if (item.name
+                                                  .toLowerCase()
+                                                  .contains(
+                                                    curryType.toLowerCase(),
+                                                  )) {
+                                                actualPrice = item.price;
+                                                actualSpiceLevel =
+                                                    item.spiceLevel ?? 'mild';
+                                                break;
+                                              }
+                                            }
+
+                                            _addCurryDishToCart(
+                                              curryType,
+                                              '', // No protein for tandoori
+                                              selectedSide!,
+                                              sidePrice,
+                                              actualSpiceLevel,
+                                            );
+                                          } else {
+                                            _addCurryDishToCart(
+                                              curryType,
+                                              selectedProtein!,
+                                              selectedSide!,
+                                              totalPrice,
+                                              selectedSpiceLevel,
+                                            );
+                                          }
                                         }
                                       : null,
                                   style: ElevatedButton.styleFrom(
@@ -1213,77 +1348,91 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
   }
 
   Widget _buildCurryPopupImage(String curryType) {
-    print('🔍 CURRY POPUP IMAGE: curryType="$curryType"');
-
-    final items = MenuService.getItemsByCategory('Curries');
     String? imageUrl;
 
-    // For the curry selection popup, find the chicken version first
-    // Try to find "Chicken [CurryType]" first
-    String targetName = 'Chicken $curryType';
+    // For Tandoori category items, look in Tandoori category
+    if (curryType.toLowerCase().contains('tandoori') ||
+        curryType.toLowerCase().contains('mixed') ||
+        curryType.toLowerCase().contains('grill') ||
+        curryType.toLowerCase().contains('tikka')) {
+      final tandooriItems = MenuService.getItemsByCategory('Tandoori');
 
-    for (final item in items) {
-      if (item.name.toLowerCase().trim() == targetName.toLowerCase().trim()) {
-        imageUrl = item.imageUrl;
-        print('🔍 POPUP - FOUND CHICKEN CURRY: ${item.name} -> $imageUrl');
-        break;
-      }
-    }
-
-    // If no chicken version, try lamb
-    if (imageUrl == null || imageUrl.isEmpty) {
-      targetName = 'Lamb $curryType';
-      for (final item in items) {
-        if (item.name.toLowerCase().trim() == targetName.toLowerCase().trim()) {
+      // Try exact match first
+      for (final item in tandooriItems) {
+        if (item.name.toLowerCase().contains(curryType.toLowerCase())) {
           imageUrl = item.imageUrl;
-          print('🔍 POPUP - FOUND LAMB CURRY: ${item.name} -> $imageUrl');
           break;
         }
       }
-    }
 
-    // Last resort: find any curry ending with this name
-    if (imageUrl == null || imageUrl.isEmpty) {
+      // If no match, use first tandoori item with image
+      if (imageUrl == null || imageUrl.isEmpty) {
+        for (final item in tandooriItems) {
+          if (item.imageUrl.isNotEmpty) {
+            imageUrl = item.imageUrl;
+            break;
+          }
+        }
+      }
+    } else {
+      // Original curry logic for non-tandoori items
+      final items = MenuService.getItemsByCategory('Curries');
+
+      String targetName = 'Chicken $curryType';
       for (final item in items) {
-        if (item.name.toLowerCase().endsWith(curryType.toLowerCase())) {
+        if (item.name.toLowerCase().trim() == targetName.toLowerCase().trim()) {
           imageUrl = item.imageUrl;
-          print('🔍 POPUP - FOUND ANY CURRY: ${item.name} -> $imageUrl');
           break;
+        }
+      }
+
+      if (imageUrl == null || imageUrl.isEmpty) {
+        targetName = 'Lamb $curryType';
+        for (final item in items) {
+          if (item.name.toLowerCase().trim() ==
+              targetName.toLowerCase().trim()) {
+            imageUrl = item.imageUrl;
+            break;
+          }
+        }
+      }
+
+      if (imageUrl == null || imageUrl.isEmpty) {
+        for (final item in items) {
+          if (item.name.toLowerCase().endsWith(curryType.toLowerCase())) {
+            imageUrl = item.imageUrl;
+            break;
+          }
         }
       }
     }
 
     if (imageUrl != null && imageUrl.isNotEmpty) {
-      print('🔍 POPUP - USING IMAGE PATH: $imageUrl');
-
       return Image.asset(
         imageUrl,
-        width: 100,
-        height: 100,
+        width: double.infinity,
+        height: 200,
         fit: BoxFit.cover,
         errorBuilder: (context, error, stackTrace) {
-          print('🔍 POPUP IMAGE FAILED: $error');
-          return Container(
-            width: 100,
-            height: 100,
-            color: Colors.grey[200],
-            child: const Icon(
-              Icons.restaurant,
-              size: 40,
-              color: Color(0xFFDC143C),
-            ),
-          );
+          return _buildImageFallback();
         },
       );
     }
 
-    print('🔍 POPUP - NO IMAGE FOUND for curryType: $curryType');
-    return Container(
-      width: 100,
-      height: 100,
-      color: Colors.grey[200],
-      child: const Icon(Icons.restaurant, size: 40, color: Color(0xFFDC143C)),
-    );
+    return _buildImageFallback();
+  }
+
+  // Get the actual price for a tandoori item
+  double _getTandooriPrice(String curryType) {
+    final tandooriItems = MenuService.getItemsByCategory('Tandoori');
+
+    for (final item in tandooriItems) {
+      if (item.name.toLowerCase().contains(curryType.toLowerCase())) {
+        return item.price;
+      }
+    }
+
+    return 16.50; // Default fallback price
   }
 
   Widget _buildCurrySelectionSection(
@@ -1864,6 +2013,39 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                                     fontSize: 14,
                                     color: Color(0xFF7F8C8D),
                                     height: 1.5,
+                                  ),
+                                ),
+                                const SizedBox(height: 20),
+                              ],
+
+                              // Side Selection for Tandoori items
+                              if (category.toLowerCase().contains(
+                                'tandoori',
+                              )) ...[
+                                const Text(
+                                  'Choose Your Side',
+                                  style: TextStyle(
+                                    fontSize: 18,
+                                    fontWeight: FontWeight.w700,
+                                    color: Color(0xFF2C3E50),
+                                  ),
+                                ),
+                                const SizedBox(height: 12),
+                                const Text(
+                                  'Free: Plain Rice, Pilau Rice, Plain Naan, Chips',
+                                  style: TextStyle(
+                                    fontSize: 12,
+                                    color: Colors.green,
+                                    fontWeight: FontWeight.w600,
+                                  ),
+                                ),
+                                const SizedBox(height: 8),
+                                const Text(
+                                  'Extra £2.10: Cheese Naan, Coconut Rice, etc.',
+                                  style: TextStyle(
+                                    fontSize: 12,
+                                    color: Colors.orange,
+                                    fontWeight: FontWeight.w600,
                                   ),
                                 ),
                                 const SizedBox(height: 20),
