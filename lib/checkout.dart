@@ -5,6 +5,8 @@ import 'order_service.dart';
 import 'postcode_service.dart';
 import 'order_tracking_screen.dart';
 import 'guest_order_storage.dart';
+import 'square_service.dart';
+
 // TODO: Replace with the actual import if NotificationService exists elsewhere
 class NotificationService {
   static void startListeningForOrderUpdates(String orderId) {
@@ -159,6 +161,24 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
           ],
         ),
         backgroundColor: const Color(0xFF006A4E),
+        behavior: SnackBarBehavior.floating,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+      ),
+    );
+  }
+
+  // Add this helper method for info messages
+  void _showInfoSnackBar(String message) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Row(
+          children: [
+            const Icon(Icons.info_outline, color: Colors.white, size: 20),
+            const SizedBox(width: 8),
+            Expanded(child: Text(message)),
+          ],
+        ),
+        backgroundColor: const Color(0xFF2196F3),
         behavior: SnackBarBehavior.floating,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
       ),
@@ -1695,7 +1715,6 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
     );
   }
 
-  // Enhanced order placement method with guest support
   void _placeOrder() async {
     // Double-check minimum order requirement
     if (!_isMinimumOrderMet) {
@@ -1779,7 +1798,34 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
 
     Navigator.pop(context); // Close bottom sheet
 
+    String? paymentId;
+
     try {
+      // Handle card payment with Square
+      if (_cartManager.paymentMethod == 'card') {
+        _showInfoSnackBar('Processing card payment...');
+
+        final paymentResult = await SquareService.processPayment(
+          amount: _cartManager.total,
+          orderId: 'temp_${DateTime.now().millisecondsSinceEpoch}',
+          buyerEmailAddress: !_isLoggedIn
+              ? _guestEmailController.text.trim()
+              : _currentUser?.email,
+          note: 'Tandoori Nights Order - ${_cartManager.orderType}',
+        );
+
+        if (!paymentResult['success']) {
+          setState(() {
+            _isPlacingOrder = false;
+          });
+          _showErrorSnackBar('Payment failed: ${paymentResult['error']}');
+          return;
+        }
+
+        paymentId = paymentResult['payment_id'];
+        _showSuccessSnackBar('Payment successful!');
+      }
+
       // Convert cart items to OrderItem format
       final List<OrderItem> orderItems = _cartManager.items.map((cartItem) {
         return OrderItem(
@@ -1802,7 +1848,7 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
         deliveryAddress = 'Dine In - Tandoori Nights Restaurant';
       }
 
-      // Create the order with guest support
+      // Create the order with payment information
       final orderId = await OrderService.createOrder(
         items: orderItems,
         total: _cartManager.total,
@@ -1822,6 +1868,7 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
         guestEmail: !_isLoggedIn ? _guestEmailController.text.trim() : null,
       );
 
+      // Store guest order information if needed
       if (!_isLoggedIn && _phoneController.text.trim().isNotEmpty) {
         GuestOrderStorage.storeGuestOrder(
           orderId: orderId,
@@ -1835,28 +1882,33 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
       });
 
       // Show success dialog with tracking option
-      _showSuccessDialog(orderId);
+      _showSuccessDialog(orderId, paymentId);
     } catch (e) {
       setState(() {
         _isPlacingOrder = false;
       });
 
-      // Show error dialog
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text('Failed to place order: ${e.toString()}'),
-          backgroundColor: const Color(0xFFE74C3C),
-          behavior: SnackBarBehavior.floating,
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(12),
-          ),
-          duration: const Duration(seconds: 5),
-        ),
-      );
+      // If card payment was processed but order creation failed, attempt refund
+      if (paymentId != null && _cartManager.paymentMethod == 'card') {
+        try {
+          await SquareService.refundPayment(
+            paymentId: paymentId,
+            amount: _cartManager.total,
+            reason: 'Order creation failed',
+          );
+          _showErrorSnackBar('Payment refunded due to order creation error');
+        } catch (refundError) {
+          _showErrorSnackBar(
+            'Payment processed but order failed. Contact support with payment ID: $paymentId',
+          );
+        }
+      } else {
+        _showErrorSnackBar('Failed to place order: ${e.toString()}');
+      }
     }
   }
 
-  void _showSuccessDialog(String orderId) {
+  void _showSuccessDialog(String orderId, String? paymentId) {
     showDialog(
       context: context,
       barrierDismissible: false,
@@ -1908,6 +1960,16 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
                   color: Color(0xFF006A4E),
                 ),
               ),
+              if (paymentId != null) ...[
+                const SizedBox(height: 4),
+                Text(
+                  'Payment ID: ${paymentId.substring(0, 8)}...',
+                  style: const TextStyle(
+                    fontSize: 12,
+                    color: Color(0xFF7F8C8D),
+                  ),
+                ),
+              ],
               const SizedBox(height: 12),
               Text(
                 _cartManager.orderType == 'delivery'
@@ -1935,14 +1997,24 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
                           'Payment:',
                           style: TextStyle(fontWeight: FontWeight.w600),
                         ),
-                        Text(
-                          _cartManager.paymentMethod == 'cash'
-                              ? 'Cash'
-                              : 'Card',
-                          style: const TextStyle(
-                            color: Color(0xFF006A4E),
-                            fontWeight: FontWeight.w600,
-                          ),
+                        Row(
+                          children: [
+                            Text(
+                              _cartManager.paymentMethod == 'cash'
+                                  ? 'Cash'
+                                  : 'Card',
+                              style: const TextStyle(
+                                color: Color(0xFF006A4E),
+                                fontWeight: FontWeight.w600,
+                              ),
+                            ),
+                            if (_cartManager.paymentMethod == 'card')
+                              const Icon(
+                                Icons.check_circle,
+                                color: Color(0xFF006A4E),
+                                size: 16,
+                              ),
+                          ],
                         ),
                       ],
                     ),
@@ -1971,7 +2043,7 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
                 ),
               ),
               const SizedBox(height: 24),
-
+              // Continue with the rest of your dialog...
               // Action buttons with tracking option
               Column(
                 children: [
@@ -1981,7 +2053,9 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
                     child: ElevatedButton.icon(
                       onPressed: () {
                         Navigator.of(context).pop(); // Close dialog
-                        NotificationService.startListeningForOrderUpdates(orderId);
+                        NotificationService.startListeningForOrderUpdates(
+                          orderId,
+                        );
                         Navigator.push(
                           context,
                           MaterialPageRoute(

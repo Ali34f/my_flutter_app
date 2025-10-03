@@ -1422,18 +1422,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
     return _buildImageFallback();
   }
 
-  // Get the actual price for a tandoori item
-  double _getTandooriPrice(String curryType) {
-    final tandooriItems = MenuService.getItemsByCategory('Tandoori');
-
-    for (final item in tandooriItems) {
-      if (item.name.toLowerCase().contains(curryType.toLowerCase())) {
-        return item.price;
-      }
-    }
-
-    return 16.50; // Default fallback price
-  }
+  
 
   Widget _buildCurrySelectionSection(
     String title,

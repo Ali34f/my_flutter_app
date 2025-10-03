@@ -60,6 +60,8 @@ class Order {
   final String? userId; // null for guest orders
   final String? userEmail; // null for guest orders
   final bool isGuest; // to identify guest orders
+  final String? paymentId; // Square payment ID
+  final String? paymentStatus; // Payment status
 
   Order({
     required this.id,
@@ -75,6 +77,8 @@ class Order {
     this.userId,
     this.userEmail,
     this.isGuest = false,
+    this.paymentId,
+    this.paymentStatus,
   });
 
   double get totalItems => items.fold(0, (sum, item) => sum + item.quantity);
@@ -101,7 +105,7 @@ class OrderService {
     return digest.toString().substring(0, 16); // First 16 characters
   }
 
-  // 🔥 FIXED: Create order with guest support - No more FieldValue.serverTimestamp() issues
+  // Create order with guest support and payment information
   static Future<String> createOrder({
     required List<OrderItem> items,
     required double total,
@@ -112,6 +116,8 @@ class OrderService {
     String? phoneNumber,
     String? guestName, // For guest orders
     String? guestEmail, // For guest orders
+    String? paymentId, // Square payment ID
+    String? paymentStatus, // Payment status
   }) async {
     try {
       final user = _currentUser;
@@ -147,7 +153,6 @@ class OrderService {
         guestVerificationHash = _generateGuestOrderHash(orderId, phoneNumber);
       }
 
-      // 🔥 FIXED: Use regular Timestamp instead of FieldValue.serverTimestamp()
       final now = DateTime.now();
       final nowTimestamp = Timestamp.fromDate(now);
 
@@ -162,21 +167,22 @@ class OrderService {
         'total': total,
         'status': 'pending',
         'paymentMethod': paymentMethod,
+        'paymentId': paymentId, // Square payment ID
+        'paymentStatus': paymentStatus ?? 'pending', // Payment status
         'deliveryAddress': deliveryAddress,
         'orderType': orderType,
         'specialInstructions': specialInstructions,
         'phoneNumber': phoneNumber,
-        'createdAt': nowTimestamp, // ✅ Safe: Regular Timestamp
-        'updatedAt': nowTimestamp, // ✅ Safe: Regular Timestamp
+        'createdAt': nowTimestamp,
+        'updatedAt': nowTimestamp,
         'orderNumber': _generateOrderNumber(),
         'estimatedDeliveryTime': Timestamp.fromDate(
           _calculateEstimatedDeliveryTime(orderType),
         ),
-        // ✅ FIXED: Use regular Timestamp in trackingHistory
         'trackingHistory': [
           {
             'status': 'pending',
-            'timestamp': nowTimestamp, // ✅ Safe: Regular Timestamp
+            'timestamp': nowTimestamp,
             'message': 'Order received and awaiting confirmation',
           },
         ],
@@ -196,7 +202,7 @@ class OrderService {
     }
   }
 
-  // 🔥 NEW: Track order for guest users
+  // Track order for guest users
   static Future<Order?> trackGuestOrder(
     String orderId,
     String phoneNumber,
@@ -239,7 +245,7 @@ class OrderService {
     }
   }
 
-  // 🔥 NEW: Get order stream for tracking (works for both guest and authenticated)
+  // Get order stream for tracking (works for both guest and authenticated)
   static Stream<Order?> getOrderTrackingStream(
     String orderId, {
     String? phoneNumber,
@@ -372,7 +378,7 @@ class OrderService {
     }
   }
 
-  // 🔥 FIXED: Update order status with tracking history - Safe version
+  // Update order status with tracking history
   static Future<void> updateOrderStatus(
     String orderId,
     String status, {
@@ -407,26 +413,25 @@ class OrderService {
       final data = doc.data()!;
       final List<dynamic> currentHistory = data['trackingHistory'] ?? [];
 
-      // 🔥 FIXED: Use regular Timestamp instead of FieldValue.serverTimestamp()
       final now = Timestamp.fromDate(DateTime.now());
 
       // Add new tracking entry
       currentHistory.add({
         'status': status.toLowerCase(),
-        'timestamp': now, // ✅ Safe: Regular Timestamp
+        'timestamp': now,
         'message': message ?? _getDefaultStatusMessage(status),
       });
 
       // Update with additional metadata
       final updateData = {
         'status': status.toLowerCase(),
-        'updatedAt': now, // ✅ Safe: Regular Timestamp
+        'updatedAt': now,
         'trackingHistory': currentHistory,
       };
 
       // Add completion time for completed/delivered orders
       if (['delivered', 'collected'].contains(status.toLowerCase())) {
-        updateData['completedAt'] = now; // ✅ Safe: Regular Timestamp
+        updateData['completedAt'] = now;
       }
 
       await _firestore
@@ -565,13 +570,15 @@ class OrderService {
         userId: data['userId'],
         userEmail: data['userEmail'],
         isGuest: data['isGuest'] ?? false,
+        paymentId: data['paymentId'], // Square payment ID
+        paymentStatus: data['paymentStatus'], // Payment status
       );
     } catch (e) {
       return null; // Return null for invalid orders
     }
   }
 
-  // Other existing methods remain the same...
+  // Delete order (for authenticated users only)
   static Future<void> deleteOrder(String orderId) async {
     try {
       final user = _currentUser;

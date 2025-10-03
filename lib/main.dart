@@ -7,6 +7,7 @@ import 'home_screen.dart';
 import 'checkout.dart';
 import 'order_history.dart';
 import 'order_tracking_screen.dart';
+import 'square_service.dart';
 import 'notification_service.dart' as notif;
 
 void main() async {
@@ -19,6 +20,7 @@ void main() async {
 
   await Firebase.initializeApp();
   await notif.NotificationService.initialize();
+  await SquareService.initialize();
 
   runApp(const TandooriNightsApp());
 }
